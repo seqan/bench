@@ -1,0 +1,7 @@
+Name: iBench 
+Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
+Maintainer: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
+License: BSD
+Copyright: 2014, Enrico Siragusa
+Status: testing
+Description: Full-text indexing benchmarks.

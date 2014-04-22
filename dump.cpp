@@ -42,7 +42,7 @@
 
 #include <seqan/basic.h>
 #include <seqan/sequence.h>
-#include <seqan/index.h>
+#include <seqan/seq_io.h>
 #include <seqan/arg_parse.h>
 
 #include "options.h"
@@ -60,18 +60,15 @@ using namespace seqan;
 
 void setupArgumentParser(ArgumentParser & parser, Options const & options)
 {
-    setAppName(parser, "iBench Construct");
-    setShortDescription(parser, "Benchmark full-text index construction");
+    setAppName(parser, "iBench Dump");
+    setShortDescription(parser, "Dump any sequence file as a binary file");
     setCategory(parser, "Stringology");
 
-    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT FILE\\fP> <\\fIINDEX FILE\\fP>");
+    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT FILE\\fP> <\\fIOUTPUT FILE\\fP>");
 
-    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
 
     setAlphabetType(parser, options);
-    setIndexType(parser, options);
-//    setTmpFolder(parser);
 }
 
 // ----------------------------------------------------------------------------
@@ -87,76 +84,35 @@ parseCommandLine(Options & options, ArgumentParser & parser, int argc, char cons
         return res;
 
     getArgumentValue(options.textFile, parser, 0);
-    getArgumentValue(options.textIndexFile, parser, 1);
+    getArgumentValue(options.queryFile, parser, 1);
 
     getAlphabetType(options, parser);
-    getIndexType(options, parser);
-//    getTmpFolder(options, parser);
 
     return seqan::ArgumentParser::PARSE_OK;
-}
-
-// ----------------------------------------------------------------------------
-// Function construct()
-// ----------------------------------------------------------------------------
-
-template <typename TIndex>
-void construct(TIndex & index)
-{
-    typename Iterator<TIndex, TopDown<> >::Type it(index);
-    ignoreUnusedVariableWarning(it);
 }
 
 // ----------------------------------------------------------------------------
 // Function run()
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet, typename TIndexSpec>
-int run(Options & options)
-{
-    double start, finish;
-
-    typedef StringSet<String<TAlphabet>, Owner<ConcatDirect<> > >   TText;
-    typedef Index<TText, TIndexSpec>                                TIndex;
-
-    TText text;
-
-    if (!open(text, toCString(options.textFile)))
-        throw RuntimeError("Error while loading text");
-
-    TIndex index(text);
-
-    start = sysTime();
-    construct(index);
-    finish = sysTime();
-    std::cout << finish - start << " sec" << std::endl;
-
-    if (!save(index, toCString(options.textIndexFile)))
-        throw RuntimeError("Error while saving full-text index");
-
-    return 0;
-}
-
 template <typename TAlphabet>
 int run(Options & options)
 {
-    switch (options.textIndexType)
-    {
-    case Options::INDEX_ESA:
-        return run<TAlphabet, IndexEsa<> >(options);
+    typedef StringSet<CharString>                                   TCharStringSet;
+    typedef StringSet<String<TAlphabet>, Owner<ConcatDirect<> > >   TText;
 
-    case Options::INDEX_SA:
-        return run<TAlphabet, IndexSa<> >(options);
+    SequenceStream seqStream(toCString(options.textFile));
 
-//    case Options::INDEX_QGRAM:
-//        return run<TAlphabet, IndexQGram<> >(options);
+    TText text;
+    TCharStringSet ids;
+    TCharStringSet seqs;
 
-    case Options::INDEX_FM:
-        return run<TAlphabet, FMIndex<> >(options);
+    readAll(ids, text, seqStream);
 
-    default:
-        return 1;
-    }
+    if (!save(text, toCString(options.queryFile)))
+        throw RuntimeError("Error while saving text");
+
+    return 0;
 }
 
 int run(Options & options)

@@ -50,10 +50,12 @@ add_definitions (-DSEQAN_DATE="${SEQAN_DATE}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SEQAN_CXX_FLAGS}")
 
 # Update the list of file names below if you add source files to your application.
+add_executable(ibench_dump dump.cpp options.h types.h)
 add_executable(ibench_construct construct.cpp options.h types.h)
 add_executable(ibench_query query.cpp options.h types.h)
 
 # Add dependencies found by find_package (SeqAn).
+target_link_libraries (ibench_dump ${SEQAN_LIBRARIES})
 target_link_libraries (ibench_construct ${SEQAN_LIBRARIES})
 target_link_libraries (ibench_query ${SEQAN_LIBRARIES})
 
@@ -63,24 +65,17 @@ target_link_libraries (ibench_query ${SEQAN_LIBRARIES})
 
 # Set variables for installing, depending on the selected build type.
 if (NOT SEQAN_PREFIX_SHARE_DOC)
-  seqan_setup_install_vars (ibench_construct ibench_query)
+  seqan_setup_install_vars (ibench_dump ibench_construct ibench_query)
 endif (NOT SEQAN_PREFIX_SHARE_DOC)
 
 # Install ibench in ${PREFIX}/bin directory
-install (TARGETS ibench_construct ibench_query
+install (TARGETS ibench_dump ibench_construct ibench_query
          DESTINATION bin)
 
 # Install non-binary files for the package to "." for app builds and
 # ${PREFIX}/share/doc/ibench for SeqAn release builds.
 install (FILES LICENSE README
          DESTINATION ${SEQAN_PREFIX_SHARE_DOC})
-
-# ----------------------------------------------------------------------------
-# Setup Common Tool Description for Generic Workflow Nodes
-# ----------------------------------------------------------------------------
-
-# Include executable ibench_query in CTD structure.
-#set (SEQAN_CTD_EXECUTABLES ${SEQAN_CTD_EXECUTABLES} ibench_query CACHE INTERNAL "")
 
 # ----------------------------------------------------------------------------
 # CPack Install

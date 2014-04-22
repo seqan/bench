@@ -58,15 +58,20 @@ struct Options
         ALGO_SINGLE, ALGO_DFS, ALGO_BFS
     };
 
+    CharString      textFile;
+
     CharString      textIndexFile;
     IndexType       textIndexType;
     TList           textIndexTypeList;
+
     CharString      queryFile;
 
     AlphabetType    alphabetType;
     TList           alphabetTypeList;
+
     AlgorithmType   algorithmType;
     TList           algorithmTypeList;
+
     unsigned        errors;
 
     Options() :

@@ -32,51 +32,71 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-// ============================================================================
-// Prerequisites
-// ============================================================================
-
-// ----------------------------------------------------------------------------
-// SeqAn headers
-// ----------------------------------------------------------------------------
+#define SEQAN_EXTRAS_MASAI_DISABLE_MMAP
 
 #include <seqan/basic.h>
 #include <seqan/sequence.h>
-#include <seqan/index.h>
-#include <seqan/arg_parse.h>
 
 #include "options.h"
-#include "types.h"
+#include "index.h"
 
 using namespace seqan;
 
+
+// ============================================================================
+// Tags, Classes, Enums
+// ============================================================================
+
 // ----------------------------------------------------------------------------
-// Function setupArgumentParser()
+// Class Options
+// ----------------------------------------------------------------------------
+
+struct Options : public MasaiOptions
+{
+    CharString genomeFile;
+    CharString genomeIndexFile;
+    IndexType  genomeIndexType;
+
+    Options() :
+        MasaiOptions(),
+        genomeIndexType(INDEX_SA)
+    {}
+};
+
+// ============================================================================
+// Functions
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Function setupArgumentParser()                              [ArgumentParser]
 // ----------------------------------------------------------------------------
 
 void setupArgumentParser(ArgumentParser & parser, Options const & options)
 {
-    setAppName(parser, "iBench Query");
-    setShortDescription(parser, "Benchmark full-text index query time");
-    setCategory(parser, "Stringology");
+    setAppName(parser, "masai_indexer");
+    setShortDescription(parser, "Masai Indexer");
+    setCategory(parser, "Read Mapping");
 
-    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fIINDEX FILE\\fP> <\\fIQUERY FILE\\fP>");
+    setDateAndVersion(parser);
+    setDescription(parser);
+
+    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fIGENOME FILE\\fP>");
 
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
-    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
+    setValidValues(parser, 0, "fasta fa");
 
-    setAlphabetType(parser, options);
+    addSection(parser, "Genome Index Options");
+
     setIndexType(parser, options);
+    setIndexPrefix(parser);
+    
+    addSection(parser, "Output Options");
 
-//    setAlgorithmType(parser, options);
-    addOption(parser, ArgParseOption("e", "errors", "Number of errors.", ArgParseOption::INTEGER));
-    setMinValue(parser, "errors", "0");
-    setMaxValue(parser, "errors", "5");
-    setDefaultValue(parser, "errors", options.errors);
+    setTmpFolder(parser);
 }
 
 // ----------------------------------------------------------------------------
-// Function parseCommandLine()
+// Function parseCommandLine()                                        [Options]
 // ----------------------------------------------------------------------------
 
 ArgumentParser::ParseResult
@@ -87,86 +107,94 @@ parseCommandLine(Options & options, ArgumentParser & parser, int argc, char cons
     if (res != seqan::ArgumentParser::PARSE_OK)
         return res;
 
-    getArgumentValue(options.textIndexFile, parser, 0);
-    getArgumentValue(options.queryFile, parser, 1);
+    // Parse genome input file.
+    getArgumentValue(options.genomeFile, parser, 0);
 
-    getAlphabetType(options, parser);
+    // Parse genome index prefix.
+    getIndexPrefix(options, parser);
+
+    // Parse genome index type.
     getIndexType(options, parser);
-//    getAlgorithmType(options, parser);
-    getOptionValue(options.errors, parser, "errors");
+
+    // Parse tmp folder.
+    getTmpFolder(options, parser);
 
     return seqan::ArgumentParser::PARSE_OK;
 }
 
 // ----------------------------------------------------------------------------
-// Function run()
+// Function runIndexer()
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet, typename TIndexSpec>
-int run(Options & options)
+template <typename TIndex>
+int runIndexer(Options & options)
 {
+    typedef Genome<>                        TGenome;
+    typedef GenomeIndex<TGenome, TIndex>    TGenomeIndex;
+
+    TFragmentStore      store;
+    TGenome             genome(store);
+    TGenomeIndex        genomeIndex(genome);
+
     double start, finish;
 
-    typedef StringSet<String<TAlphabet>, Owner<ConcatDirect<> > >   TText;
-    typedef Index<TText, TIndexSpec>                                TIndex;
-
-    TIndex index;
-
-    if (!open(index, toCString(options.textIndexFile)))
-        throw RuntimeError("Error while loading full-text index");
-
-    TText queries;
-
-    if (!open(queries, toCString(options.queryFile)))
-        throw RuntimeError("Error while loading queries");
-
+    std::cout << "Loading genome:\t\t\t" << std::flush;
     start = sysTime();
-    std::cout << countOccurrences(index, queries) << std::endl;
+    if (!load(genome, options.genomeFile))
+    {
+        std::cerr << "Error while loading genome" << std::endl;
+        return 1;
+    }
+    finish = sysTime();
+    std::cout << finish - start << " sec" << std::endl;
+
+    std::cout << "Building genome index:\t\t" << std::flush;
+    start = sysTime();
+    build(genomeIndex);
+    finish = sysTime();
+    std::cout << finish - start << " sec" << std::endl;
+
+    std::cout << "Dumping genome index:\t\t" << std::flush;
+    start = sysTime();
+    if (!dump(genomeIndex, options.genomeIndexFile))
+    {
+        std::cerr << "Error while dumping genome index" << std::endl;
+        return 1;
+    }
     finish = sysTime();
     std::cout << finish - start << " sec" << std::endl;
 
     return 0;
 }
 
-template <typename TAlphabet>
-int run(Options & options)
+// ----------------------------------------------------------------------------
+// Functions configure*()
+// ----------------------------------------------------------------------------
+
+int configureIndex(Options & options)
 {
-    switch (options.textIndexType)
+    switch (options.genomeIndexType)
     {
     case Options::INDEX_ESA:
-        return run<TAlphabet, IndexEsa<> >(options);
+        return runIndexer<TGenomeEsa>(options);
 
     case Options::INDEX_SA:
-        return run<TAlphabet, IndexSa<> >(options);
+        return runIndexer<TGenomeSa>(options);
 
-//    case Options::INDEX_QGRAM:
-//        return run<TAlphabet, IndexQGram<> >(options);
+    case Options::INDEX_QGRAM:
+        return runIndexer<TGenomeQGram>(options);
 
     case Options::INDEX_FM:
-        return run<TAlphabet, FMIndex<> >(options);
+        return runIndexer<TGenomeFM>(options);
 
     default:
         return 1;
     }
 }
 
-int run(Options & options)
-{
-    switch (options.alphabetType)
-    {
-    case Options::ALPHABET_DNA:
-        return run<Dna>(options);
-
-    case Options::ALPHABET_PROTEIN:
-        return run<AminoAcid>(options);
-
-    case Options::ALPHABET_CHAR:
-        return run<char>(options);
-
-    default:
-        return 1;
-    }
-}
+// ----------------------------------------------------------------------------
+// Function main()
+// ----------------------------------------------------------------------------
 
 int main(int argc, char const ** argv)
 {
@@ -176,8 +204,8 @@ int main(int argc, char const ** argv)
 
     ArgumentParser::ParseResult res = parseCommandLine(options, parser, argc, argv);
 
-    if (res == seqan::ArgumentParser::PARSE_OK)
-        return run(options);
-    else
-        return res;
+    if (res != seqan::ArgumentParser::PARSE_OK)
+        return res == seqan::ArgumentParser::PARSE_ERROR;
+
+    return configureIndex(options);
 }

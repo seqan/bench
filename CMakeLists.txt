@@ -15,13 +15,8 @@ message (STATUS "Configuring core/apps/ibench")
 # ----------------------------------------------------------------------------
 
 # Search SeqAn and select dependencies.
-set (SEQAN_FIND_DEPENDENCIES OpenMP ZLIB)
+set (SEQAN_FIND_DEPENDENCIES NONE)
 find_package (SeqAn REQUIRED)
-
-# Warn if OpenMP was not found.
-if (NOT SEQAN_HAS_OPENMP)
-  message (STATUS "  OpenMP not found: building ibench without multi-threading.")
-endif (NOT SEQAN_HAS_OPENMP)
 
 # ----------------------------------------------------------------------------
 # Arch Setup
@@ -36,11 +31,6 @@ endif (CMAKE_COMPILER_IS_GNUCXX)
 if (CMAKE_COMPILER_IS_GNUCXX AND APPLE)
   set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -mno-avx")
 endif (CMAKE_COMPILER_IS_GNUCXX AND APPLE)
-
-if (COMPILER_IS_CLANG AND APPLE AND SEQAN_HAS_CUDA)
-  set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -stdlib=libstdc++")
-  set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libstdc++")
-endif (COMPILER_IS_CLANG AND APPLE AND SEQAN_HAS_CUDA)
 
 # ----------------------------------------------------------------------------
 # Build Setup
@@ -60,9 +50,8 @@ add_definitions (-DSEQAN_DATE="${SEQAN_DATE}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SEQAN_CXX_FLAGS}")
 
 # Update the list of file names below if you add source files to your application.
-add_executable(ibench_construct construct.cpp)
-
-add_executable(ibench_query query.cpp)
+add_executable(ibench_construct construct.cpp options.h types.h)
+add_executable(ibench_query query.cpp options.h types.h)
 
 # Add dependencies found by find_package (SeqAn).
 target_link_libraries (ibench_construct ${SEQAN_LIBRARIES})
@@ -85,12 +74,6 @@ install (TARGETS ibench_construct ibench_query
 # ${PREFIX}/share/doc/ibench for SeqAn release builds.
 install (FILES LICENSE README
          DESTINATION ${SEQAN_PREFIX_SHARE_DOC})
-
-# ----------------------------------------------------------------------------
-# App Test
-# ----------------------------------------------------------------------------
-
-seqan_add_app_test (ibench_query)
 
 # ----------------------------------------------------------------------------
 # Setup Common Tool Description for Generic Workflow Nodes

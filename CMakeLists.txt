@@ -15,8 +15,18 @@ message (STATUS "Configuring core/apps/ibench")
 # ----------------------------------------------------------------------------
 
 # Search SeqAn and select dependencies.
-set (SEQAN_FIND_DEPENDENCIES NONE)
+set (SEQAN_FIND_DEPENDENCIES ZLIB BZIP2)
 find_package (SeqAn REQUIRED)
+
+# Warn if Zlib was not found.
+if (NOT SEQAN_HAS_ZLIB)
+  message (STATUS "  Zlib not found: building ibench without gzip decompression.")
+endif (NOT SEQAN_HAS_ZLIB)
+
+# Warn if BZip2 was not found.
+if (NOT SEQAN_HAS_BZIP2)
+  message (STATUS "  BZip2 not found: building ibench without bzip2 decompression.")
+endif (NOT SEQAN_HAS_BZIP2)
 
 # ----------------------------------------------------------------------------
 # Arch Setup

@@ -42,6 +42,7 @@
 
 #include <seqan/basic.h>
 #include <seqan/sequence.h>
+#include <seqan/index.h>
 #include <seqan/seq_io.h>
 #include <seqan/arg_parse.h>
 
@@ -61,11 +62,12 @@ using namespace seqan;
 void setupArgumentParser(ArgumentParser & parser, Options const & options)
 {
     setAppName(parser, "iBench Dump");
-    setShortDescription(parser, "Dump any sequence file as a binary file");
+    setShortDescription(parser, "Dump any sequence file as a StringSet");
     setCategory(parser, "Stringology");
 
     addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT FILE\\fP> <\\fIOUTPUT FILE\\fP>");
 
+    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
 
     setAlphabetType(parser, options);
@@ -105,9 +107,9 @@ int run(Options & options)
 
     TText text;
     TCharStringSet ids;
-    TCharStringSet seqs;
 
-    readAll(ids, text, seqStream);
+    if (readAll(ids, text, seqStream) != 0)
+        throw RuntimeError("Error while reading text");
 
     if (!save(text, toCString(options.queryFile)))
         throw RuntimeError("Error while saving text");

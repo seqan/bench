@@ -38,76 +38,116 @@
 using namespace seqan;
 
 // ----------------------------------------------------------------------------
-// StringSetPosition (SAValue) Type
+// Tag Limits
 // ----------------------------------------------------------------------------
 
-namespace seqan {
-template <typename TText, typename TSpec>
-struct StringSetPosition<StringSet<TText, Owner<ConcatDirect<TSpec> > > >
+template <typename T1 = void, typename T2 = void>
+struct Limits {};
+
+// ----------------------------------------------------------------------------
+// Function appendValue(StringSet<Limits>)
+// ----------------------------------------------------------------------------
+
+template <typename TString, typename TSize, typename TSum, typename TSource, typename TExpand>
+inline void
+appendValue(StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > & me,
+            TSource const & obj,
+            Tag<TExpand> tag)
 {
-    typedef Pair<__uint8, __uint32, Pack> Type;
-};
+    appendValue(me.limits, lengthSum(me) + length(obj), tag);
+    append(me.concat, obj, tag);
 }
+
+namespace seqan
+{
+
+// ----------------------------------------------------------------------------
+// String Types
+// ----------------------------------------------------------------------------
+
+template <typename TValue, typename TSize>
+struct Size<String<TValue, Alloc<Limits<TSize> > > >
+{
+    typedef TSize Type;
+};
+
+// ----------------------------------------------------------------------------
+// StringSet Types
+// ----------------------------------------------------------------------------
+
+template <typename TString, typename TSize, typename TSum>
+struct Size<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > >
+{
+    typedef TSize Type;
+};
+
+template <typename TString, typename TSize, typename TSum>
+struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > >
+{
+    typedef TSum Type;
+};
+
+};
 
 // ----------------------------------------------------------------------------
 // EsaIndex Fibres
 // ----------------------------------------------------------------------------
 
-namespace seqan {
-template <typename TText>
-struct Fibre<Index<TText, IndexEsa<void> >, FibreLcp>
-{
-    typedef String<__uint32>   Type;
-};
-
-template <typename TText>
-struct Fibre<Index<TText, IndexEsa<void> >, FibreChildtab>
-{
-    typedef String<__uint32>   Type;
-};
-}
+//namespace seqan {
+//template <typename TText>
+//struct Fibre<Index<TText, IndexEsa<void> >, FibreLcp>
+//{
+//    typedef String<typename Size<TText>::Type>   Type;
+//};
+//
+//template <typename TText>
+//struct Fibre<Index<TText, IndexEsa<void> >, FibreChildtab>
+//{
+//    typedef String<typename LengthSum<TText>::Type>   Type;
+//};
+//}
 
 // ----------------------------------------------------------------------------
 // QGramIndex Fibres
 // ----------------------------------------------------------------------------
 
-template <typename TValue = char>
-struct ShapeWeight
-{
-    static const unsigned VALUE = 3;
-};
+//template <typename TValue = char>
+//struct ShapeWeight
+//{
+//    static const unsigned VALUE = 3;
+//};
+//
+//template <>
+//struct ShapeWeight<AminoAcid>
+//{
+//    static const unsigned VALUE = 5;
+//};
+//
+//template <>
+//struct ShapeWeight<Dna5>
+//{
+//    static const unsigned VALUE = 10;
+//};
+//
+//template <>
+//struct ShapeWeight<Dna>
+//{
+//    static const unsigned VALUE = 12;
+//};
+//
+//template <typename TValue = char>
+//struct QGramShape
+//{
+//    typedef UngappedShape<ShapeWeight<TValue>::VALUE>   Type;
+//};
 
-template <>
-struct ShapeWeight<AminoAcid>
-{
-    static const unsigned VALUE = 5;
-};
-
-template <>
-struct ShapeWeight<Dna5>
-{
-    static const unsigned VALUE = 10;
-};
-
-template <>
-struct ShapeWeight<Dna>
-{
-    static const unsigned VALUE = 12;
-};
-
-template <typename TValue = char>
-struct QGramShape
-{
-    typedef UngappedShape<ShapeWeight<TValue>::VALUE>   Type;
-};
-
-namespace seqan {
-template <typename TText, typename TSpec>
-struct Fibre<Index<TText, IndexQGram<TSpec> >, FibreDir>
-{
-    typedef String<__uint32>   Type;
-};
-}
+//namespace seqan {
+//template <typename TText, typename TSpec>
+//struct Fibre<Index<TText, IndexQGram<TSpec> >, FibreDir>
+//{
+//    typedef String<__uint32>   Type;
+//};
+//}
 
 // ----------------------------------------------------------------------------
 // FmIndex Fibres

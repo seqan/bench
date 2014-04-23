@@ -151,7 +151,7 @@ template <typename TAlphabet, typename TIndexSpec>
 inline void run(Options & options)
 {
     typedef StringSet<CharString, Owner<ConcatDirect<> > >          TCharStringSet;
-    typedef StringSet<String<TAlphabet>, Owner<ConcatDirect<> > >   TText;
+    typedef StringSet<String<TAlphabet, Alloc<Limits<__uint32> > >, Owner<ConcatDirect<Limits<__uint8, __uint32> > > >   TText;
 
     SequenceStream seqStream(toCString(options.textFile));
 

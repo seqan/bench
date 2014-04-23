@@ -63,14 +63,14 @@ inline void run(Options & options)
     case Options::INDEX_SA:
         return run<TAlphabet, IndexSa<void> >(options);
 
-    case Options::INDEX_QGRAM:
-        return run<TAlphabet, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
+//    case Options::INDEX_QGRAM:
+//        return run<TAlphabet, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
 
-    case Options::INDEX_FMTL:
-        return run<TAlphabet, FMIndex<void, TLFMIndex> >(options);
-
-    case Options::INDEX_FMWT:
-        return run<TAlphabet, FMIndex<void, WTFMIndex> >(options);
+//    case Options::INDEX_FMTL:
+//        return run<TAlphabet, FMIndex<void, TLFMIndex> >(options);
+//
+//    case Options::INDEX_FMWT:
+//        return run<TAlphabet, FMIndex<void, WTFMIndex> >(options);
 
     default:
         throw Exception();

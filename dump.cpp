@@ -44,6 +44,7 @@
 #include <seqan/sequence.h>
 #include <seqan/index.h>
 #include <seqan/seq_io.h>
+#include <seqan/random.h>
 #include <seqan/arg_parse.h>
 
 #include "options.h"
@@ -95,13 +96,61 @@ inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, ch
 }
 
 // ----------------------------------------------------------------------------
+// Function randomize()
+// ----------------------------------------------------------------------------
+
+template <typename TAlphabet, typename TString>
+inline void randomize(TString & me)
+{
+    typedef typename Iterator<TString, Standard>::Type      TIter;
+    typedef typename Value<TString>::Type                   TSourceAlphabet;
+
+    Rng<MersenneTwister> rng(0xBADC0FFE);
+
+    TIter it = begin(me, Standard());
+    TIter itEnd = end(me, Standard());
+
+    while (it != itEnd)
+    {
+        for (; it != itEnd && value(it) != TSourceAlphabet('N'); ++it) ;
+
+        if (it == itEnd) break;
+
+        for (; it != itEnd && value(it) == TSourceAlphabet('N'); ++it)
+            value(it) = pickRandomNumber(rng) % ValueSize<TAlphabet>::VALUE;
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Function readAll(Dna StringSet)
+// ----------------------------------------------------------------------------
+
+template <typename TId, typename TIdSpec, typename TSeqSpec>
+inline int readAll(StringSet<TId, TIdSpec> & ids, StringSet<String<Dna>, TSeqSpec> & seqs, SequenceStream & seqStream)
+{
+    typedef StringSet<String<Dna5>, Owner<ConcatDirect<> > >   TText;
+
+    TText text;
+
+    int ret = readAll(ids, text, seqStream);
+
+    if (ret)
+        return ret;
+
+    randomize<Dna>(concat(text));
+    assign(seqs, text);
+
+    return ret;
+}
+
+// ----------------------------------------------------------------------------
 // Function run()
 // ----------------------------------------------------------------------------
 
 template <typename TAlphabet, typename TIndexSpec>
 inline void run(Options & options)
 {
-    typedef StringSet<CharString>                                   TCharStringSet;
+    typedef StringSet<CharString, Owner<ConcatDirect<> > >          TCharStringSet;
     typedef StringSet<String<TAlphabet>, Owner<ConcatDirect<> > >   TText;
 
     SequenceStream seqStream(toCString(options.textFile));

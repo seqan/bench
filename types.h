@@ -37,5 +37,133 @@
 
 using namespace seqan;
 
+// ----------------------------------------------------------------------------
+// StringSetPosition (SAValue) Type
+// ----------------------------------------------------------------------------
+
+namespace seqan {
+template <typename TText, typename TSpec>
+struct StringSetPosition<StringSet<TText, Owner<ConcatDirect<TSpec> > > >
+{
+    typedef Pair<__uint8, __uint32, Pack> Type;
+};
+}
+
+// ----------------------------------------------------------------------------
+// EsaIndex Fibres
+// ----------------------------------------------------------------------------
+
+namespace seqan {
+template <typename TText>
+struct Fibre<Index<TText, IndexEsa<void> >, FibreLcp>
+{
+    typedef String<__uint32>   Type;
+};
+
+template <typename TText>
+struct Fibre<Index<TText, IndexEsa<void> >, FibreChildtab>
+{
+    typedef String<__uint32>   Type;
+};
+}
+
+// ----------------------------------------------------------------------------
+// QGramIndex Fibres
+// ----------------------------------------------------------------------------
+
+template <typename TValue = char>
+struct ShapeWeight
+{
+    static const unsigned VALUE = 3;
+};
+
+template <>
+struct ShapeWeight<AminoAcid>
+{
+    static const unsigned VALUE = 5;
+};
+
+template <>
+struct ShapeWeight<Dna5>
+{
+    static const unsigned VALUE = 10;
+};
+
+template <>
+struct ShapeWeight<Dna>
+{
+    static const unsigned VALUE = 12;
+};
+
+template <typename TValue = char>
+struct QGramShape
+{
+    typedef UngappedShape<ShapeWeight<TValue>::VALUE>   Type;
+};
+
+namespace seqan {
+template <typename TText, typename TSpec>
+struct Fibre<Index<TText, IndexQGram<TSpec> >, FibreDir>
+{
+    typedef String<__uint32>   Type;
+};
+}
+
+// ----------------------------------------------------------------------------
+// FmIndex Fibres
+// ----------------------------------------------------------------------------
+
+struct WTFMIndex
+{
+    typedef WaveletTree<void>  TValuesSpec;
+    typedef Naive<void>        TSentinelsSpec;
+
+    static const unsigned SAMPLING = 10;
+};
+
+struct TLFMIndex
+{
+    typedef TwoLevels<void>    TValuesSpec;
+    typedef Naive<void>        TSentinelsSpec;
+
+    static const unsigned SAMPLING = 10;
+};
+
+// ----------------------------------------------------------------------------
+// RankDictionary Size
+// ----------------------------------------------------------------------------
+
+namespace seqan {
+template <typename TSpec>
+struct Size<RankDictionary<Dna, TwoLevels<TSpec> > >
+{
+    typedef __uint32 Type;
+};
+
+template <typename TSpec>
+struct Size<RankDictionary<bool, TwoLevels<TSpec> > >
+{
+    typedef __uint32 Type;
+};
+
+template <typename TSpec>
+struct Size<RankDictionary<bool, Naive<TSpec> > >
+{
+    typedef __uint32 Type;
+};
+}
+
+// ----------------------------------------------------------------------------
+// SparseString Size
+// ----------------------------------------------------------------------------
+
+namespace seqan {
+// TODO(esiragusa): Overload Size<CSA> instead of Size<SparseString>
+template <typename TValueString>
+struct Size<SparseString<TValueString, void> >
+{
+    typedef __uint32    Type;
+};
+}
 
 #endif  // #ifndef APP_IBENCH_TYPES_H_

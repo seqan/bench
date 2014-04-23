@@ -47,6 +47,7 @@
 
 #include "options.h"
 #include "types.h"
+#include "run.h"
 
 using namespace seqan;
 
@@ -54,7 +55,7 @@ using namespace seqan;
 // Function setupArgumentParser()
 // ----------------------------------------------------------------------------
 
-void setupArgumentParser(ArgumentParser & parser, Options const & options)
+inline void setupArgumentParser(ArgumentParser & parser, Options const & options)
 {
     setAppName(parser, "iBench Query");
     setShortDescription(parser, "Benchmark full-text index query time");
@@ -80,7 +81,7 @@ void setupArgumentParser(ArgumentParser & parser, Options const & options)
 // ----------------------------------------------------------------------------
 
 ArgumentParser::ParseResult
-parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv)
+inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv)
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
@@ -103,7 +104,7 @@ parseCommandLine(Options & options, ArgumentParser & parser, int argc, char cons
 // ----------------------------------------------------------------------------
 
 template <typename TAlphabet, typename TIndexSpec>
-int run(Options & options)
+inline void run(Options & options)
 {
     double start, finish;
 
@@ -124,60 +125,9 @@ int run(Options & options)
     std::cout << countOccurrences(index, queries) << std::endl;
     finish = sysTime();
     std::cout << finish - start << " sec" << std::endl;
-
-    return 0;
-}
-
-template <typename TAlphabet>
-int run(Options & options)
-{
-    switch (options.textIndexType)
-    {
-    case Options::INDEX_ESA:
-        return run<TAlphabet, IndexEsa<> >(options);
-
-    case Options::INDEX_SA:
-        return run<TAlphabet, IndexSa<> >(options);
-
-//    case Options::INDEX_QGRAM:
-//        return run<TAlphabet, IndexQGram<> >(options);
-
-    case Options::INDEX_FM:
-        return run<TAlphabet, FMIndex<> >(options);
-
-    default:
-        return 1;
-    }
-}
-
-int run(Options & options)
-{
-    switch (options.alphabetType)
-    {
-    case Options::ALPHABET_DNA:
-        return run<Dna>(options);
-
-    case Options::ALPHABET_PROTEIN:
-        return run<AminoAcid>(options);
-
-    case Options::ALPHABET_CHAR:
-        return run<char>(options);
-
-    default:
-        return 1;
-    }
 }
 
 int main(int argc, char const ** argv)
 {
-    ArgumentParser parser;
-    Options options;
-    setupArgumentParser(parser, options);
-
-    ArgumentParser::ParseResult res = parseCommandLine(options, parser, argc, argv);
-
-    if (res == seqan::ArgumentParser::PARSE_OK)
-        return run(options);
-    else
-        return res;
+    return run(argc, argv);
 }

@@ -50,9 +50,9 @@ add_definitions (-DSEQAN_DATE="${SEQAN_DATE}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SEQAN_CXX_FLAGS}")
 
 # Update the list of file names below if you add source files to your application.
-add_executable(ibench_dump dump.cpp options.h types.h)
-add_executable(ibench_construct construct.cpp options.h types.h)
-add_executable(ibench_query query.cpp options.h types.h)
+add_executable(ibench_dump dump.cpp options.h types.h run.h)
+add_executable(ibench_construct construct.cpp options.h types.h run.h)
+add_executable(ibench_query query.cpp options.h types.h run.h)
 
 # Add dependencies found by find_package (SeqAn).
 target_link_libraries (ibench_dump ${SEQAN_LIBRARIES})

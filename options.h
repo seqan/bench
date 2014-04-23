@@ -50,7 +50,7 @@ struct Options
 
     enum IndexType
     {
-        INDEX_ESA, INDEX_SA, INDEX_QGRAM, INDEX_FM, INDEX_FM_WT
+        INDEX_SA, INDEX_ESA, INDEX_QGRAM, INDEX_FMTL, INDEX_FMWT
     };
 
     enum AlgorithmType
@@ -84,10 +84,11 @@ struct Options
         alphabetTypeList.push_back("protein");
         alphabetTypeList.push_back("char");
 
-        textIndexTypeList.push_back("esa");
         textIndexTypeList.push_back("sa");
+        textIndexTypeList.push_back("esa");
         textIndexTypeList.push_back("qgram");
-        textIndexTypeList.push_back("fm");
+        textIndexTypeList.push_back("fm-tl");
+        textIndexTypeList.push_back("fm-wt");
 
         algorithmTypeList.push_back("single");
         algorithmTypeList.push_back("dfs");

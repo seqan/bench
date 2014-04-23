@@ -48,6 +48,7 @@
 
 #include "options.h"
 #include "types.h"
+#include "run.h"
 
 using namespace seqan;
 
@@ -59,7 +60,7 @@ using namespace seqan;
 // Function setupArgumentParser()
 // ----------------------------------------------------------------------------
 
-void setupArgumentParser(ArgumentParser & parser, Options const & options)
+inline void setupArgumentParser(ArgumentParser & parser, Options const & options)
 {
     setAppName(parser, "iBench Dump");
     setShortDescription(parser, "Dump any sequence file as a StringSet");
@@ -78,7 +79,7 @@ void setupArgumentParser(ArgumentParser & parser, Options const & options)
 // ----------------------------------------------------------------------------
 
 ArgumentParser::ParseResult
-parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv)
+inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv)
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
@@ -97,8 +98,8 @@ parseCommandLine(Options & options, ArgumentParser & parser, int argc, char cons
 // Function run()
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet>
-int run(Options & options)
+template <typename TAlphabet, typename TIndexSpec>
+inline void run(Options & options)
 {
     typedef StringSet<CharString>                                   TCharStringSet;
     typedef StringSet<String<TAlphabet>, Owner<ConcatDirect<> > >   TText;
@@ -113,39 +114,9 @@ int run(Options & options)
 
     if (!save(text, toCString(options.queryFile)))
         throw RuntimeError("Error while saving text");
-
-    return 0;
-}
-
-int run(Options & options)
-{
-    switch (options.alphabetType)
-    {
-    case Options::ALPHABET_DNA:
-        return run<Dna>(options);
-
-    case Options::ALPHABET_PROTEIN:
-        return run<AminoAcid>(options);
-
-    case Options::ALPHABET_CHAR:
-        return run<char>(options);
-
-    default:
-        return 1;
-    }
 }
 
 int main(int argc, char const ** argv)
 {
-    ArgumentParser parser;
-    Options options;
-    setupArgumentParser(parser, options);
-
-    ArgumentParser::ParseResult res = parseCommandLine(options, parser, argc, argv);
-
-    if (res == seqan::ArgumentParser::PARSE_OK)
-        return run(options);
-    else
-        return res;
+    return run(argc, argv);
 }
-

@@ -72,6 +72,7 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
 
+    addSection(parser, "Main Options");
     setAlphabetType(parser, options);
     setTextLimits(parser, options);
 }

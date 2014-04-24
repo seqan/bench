@@ -66,9 +66,10 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
 
+    addSection(parser, "Main Options");
     setAlphabetType(parser, options);
-    setTextLimits(parser, options);
     setIndexType(parser, options);
+    setTextLimits(parser, options);
 
 //    setAlgorithmType(parser, options);
     addOption(parser, ArgParseOption("e", "errors", "Number of errors.", ArgParseOption::INTEGER));
@@ -93,8 +94,8 @@ inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, ch
     getArgumentValue(options.queryFile, parser, 1);
 
     getAlphabetType(options, parser);
-    getTextLimits(options, parser);
     getIndexType(options, parser);
+    getTextLimits(options, parser);
 //    getAlgorithmType(options, parser);
     getOptionValue(options.errors, parser, "errors");
 

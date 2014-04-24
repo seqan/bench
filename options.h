@@ -134,6 +134,7 @@ void getOptionValue(TOption & option,
 template <typename TOptions>
 void setTextLimits(ArgumentParser & parser, TOptions const & options)
 {
+    addSection(parser, "Limit Options");
     addOption(parser, ArgParseOption("tc", "text-count", "Limit the number of texts in the collection.", ArgParseOption::INTEGER));
     addOption(parser, ArgParseOption("ts", "text-sum", "Limit the total length of the text collection.", ArgParseOption::INTEGER));
     addOption(parser, ArgParseOption("tl", "text-length", "Limit the length of any text in the collection.", ArgParseOption::INTEGER));

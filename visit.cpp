@@ -69,9 +69,10 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
 
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
 
+    addSection(parser, "Main Options");
     setAlphabetType(parser, options);
-    setTextLimits(parser, options);
     setIndexType(parser, options);
+    setTextLimits(parser, options);
 }
 
 // ----------------------------------------------------------------------------
@@ -89,8 +90,8 @@ parseCommandLine(Options & options, ArgumentParser & parser, int argc, char cons
     getArgumentValue(options.textIndexFile, parser, 0);
 
     getAlphabetType(options, parser);
-    getTextLimits(options, parser);
     getIndexType(options, parser);
+    getTextLimits(options, parser);
 
     return seqan::ArgumentParser::PARSE_OK;
 }

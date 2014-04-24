@@ -59,6 +59,9 @@ struct Options
     };
 
     CharString      textFile;
+    unsigned        textCount;
+    unsigned        textSum;
+    unsigned        textLen;
 
     CharString      textIndexFile;
     IndexType       textIndexType;
@@ -75,6 +78,9 @@ struct Options
     unsigned        errors;
 
     Options() :
+        textCount(32),
+        textSum(32),
+        textLen(32),
         textIndexType(INDEX_SA),
         alphabetType(ALPHABET_DNA),
         algorithmType(ALGO_SINGLE),
@@ -123,6 +129,25 @@ void getOptionValue(TOption & option,
     getOptionValue(optionStr, parser, optionName);
 
     return getOptionEnum(option, optionStr, optionsList);
+}
+
+template <typename TOptions>
+void setTextLimits(ArgumentParser & parser, TOptions const & options)
+{
+    addOption(parser, ArgParseOption("tc", "text-count", "Limit the number of texts in the collection.", ArgParseOption::INTEGER));
+    addOption(parser, ArgParseOption("ts", "text-sum", "Limit the total length of the text collection.", ArgParseOption::INTEGER));
+    addOption(parser, ArgParseOption("tl", "text-length", "Limit the length of any text in the collection.", ArgParseOption::INTEGER));
+    setDefaultValue(parser, "text-count", options.textCount);
+    setDefaultValue(parser, "text-sum", options.textSum);
+    setDefaultValue(parser, "text-length", options.textLen);
+}
+
+template <typename TOptions>
+void getTextLimits(TOptions & options, ArgumentParser const & parser)
+{
+    getOptionValue(options.textCount, parser, "text-count");
+    getOptionValue(options.textSum, parser, "text-sum");
+    getOptionValue(options.textLen, parser, "text-length");
 }
 
 template <typename TOptions>

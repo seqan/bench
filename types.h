@@ -42,7 +42,22 @@ using namespace seqan;
 // ----------------------------------------------------------------------------
 
 template <typename T1 = void, typename T2 = void>
-struct Limits {};
+struct Limits;
+
+namespace seqan
+{
+template <typename T1, typename T2>
+struct Value<Limits<T1, T2>, 1>
+{
+    typedef T1 Type;
+};
+
+template <typename T1, typename T2>
+struct Value<Limits<T1, T2>, 2>
+{
+        typedef T2 Type;
+};
+}
 
 // ----------------------------------------------------------------------------
 // Function appendValue(StringSet<Limits>)
@@ -58,23 +73,41 @@ appendValue(StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > & me
     append(me.concat, obj, tag);
 }
 
-namespace seqan
+// ============================================================================
+// Basic Types
+// ============================================================================
+
+typedef StringSet<CharString, Owner<ConcatDirect<> > >          CharStringSet;
+
+// ----------------------------------------------------------------------------
+// Metafunction TextCollection
+// ----------------------------------------------------------------------------
+
+template <typename TAlphabet, typename TLimits, typename TSetLimits>
+struct TextCollection
 {
+    typedef StringSet<String<TAlphabet, Alloc<TLimits> >, Owner<ConcatDirect<TSetLimits> > >    Type;
+};
 
 // ----------------------------------------------------------------------------
 // String Types
 // ----------------------------------------------------------------------------
 
+namespace seqan
+{
 template <typename TValue, typename TSize>
 struct Size<String<TValue, Alloc<Limits<TSize> > > >
 {
     typedef TSize Type;
 };
+}
 
 // ----------------------------------------------------------------------------
 // StringSet Types
 // ----------------------------------------------------------------------------
 
+namespace seqan
+{
 template <typename TString, typename TSize, typename TSum>
 struct Size<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > >
 {
@@ -86,7 +119,6 @@ struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > >
 {
     typedef TSum Type;
 };
-
 };
 
 // ----------------------------------------------------------------------------

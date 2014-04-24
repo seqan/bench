@@ -73,6 +73,7 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
 
     setAlphabetType(parser, options);
+    setTextLimits(parser, options);
 }
 
 // ----------------------------------------------------------------------------
@@ -91,6 +92,7 @@ inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, ch
     getArgumentValue(options.queryFile, parser, 1);
 
     getAlphabetType(options, parser);
+    getTextLimits(options, parser);
 
     return seqan::ArgumentParser::PARSE_OK;
 }
@@ -103,7 +105,7 @@ template <typename TAlphabet, typename TString>
 inline void randomize(TString & me)
 {
     typedef typename Iterator<TString, Standard>::Type      TIter;
-    typedef typename Value<TString>::Type                   TSourceAlphabet;
+    typedef typename Value<TString>::Type                   TValue;
 
     Rng<MersenneTwister> rng(0xBADC0FFE);
 
@@ -112,54 +114,47 @@ inline void randomize(TString & me)
 
     while (it != itEnd)
     {
-        for (; it != itEnd && value(it) != TSourceAlphabet('N'); ++it) ;
+        for (; it != itEnd && value(it) == TValue(TAlphabet(value(it))); ++it) ;
 
         if (it == itEnd) break;
 
-        for (; it != itEnd && value(it) == TSourceAlphabet('N'); ++it)
-            value(it) = pickRandomNumber(rng) % ValueSize<TAlphabet>::VALUE;
+        for (; it != itEnd && value(it) != TValue(TAlphabet(value(it))); ++it)
+            value(it) = TAlphabet(pickRandomNumber(rng) % ValueSize<TAlphabet>::VALUE);
     }
-}
-
-// ----------------------------------------------------------------------------
-// Function readAll(Dna StringSet)
-// ----------------------------------------------------------------------------
-
-template <typename TId, typename TIdSpec, typename TSeqSpec>
-inline int readAll(StringSet<TId, TIdSpec> & ids, StringSet<String<Dna>, TSeqSpec> & seqs, SequenceStream & seqStream)
-{
-    typedef StringSet<String<Dna5>, Owner<ConcatDirect<> > >   TText;
-
-    TText text;
-
-    int ret = readAll(ids, text, seqStream);
-
-    if (ret)
-        return ret;
-
-    randomize<Dna>(concat(text));
-    assign(seqs, text);
-
-    return ret;
 }
 
 // ----------------------------------------------------------------------------
 // Function run()
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet, typename TIndexSpec>
+template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TIndexSpec>
 inline void run(Options & options)
 {
-    typedef StringSet<CharString, Owner<ConcatDirect<> > >          TCharStringSet;
-    typedef StringSet<String<TAlphabet, Alloc<Limits<__uint32> > >, Owner<ConcatDirect<Limits<__uint8, __uint32> > > >   TText;
+    typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
 
     SequenceStream seqStream(toCString(options.textFile));
 
-    TText text;
-    TCharStringSet ids;
+    CharStringSet ids;
+    CharStringSet seqs;
 
-    if (readAll(ids, text, seqStream) != 0)
+    if (readAll(ids, seqs, seqStream) != 0)
         throw RuntimeError("Error while reading text");
+
+    if (maxLength(seqs) > MaxValue<typename Value<TLimits, 1>::Type>::VALUE)
+        throw RuntimeError("Too long sequences");
+
+    if (length(seqs) > MaxValue<typename Value<TSetLimits, 1>::Type>::VALUE)
+        throw RuntimeError("Too many sequences");
+
+    if (lengthSum(seqs) > MaxValue<typename Value<TSetLimits, 2>::Type>::VALUE)
+        throw RuntimeError("Too many symbols");
+
+    if (IsSameType<TAlphabet, Dna>::VALUE)
+        randomize<Dna>(concat(seqs));
+
+    TText text;
+
+    assign(text, seqs);
 
     if (!save(text, toCString(options.queryFile)))
         throw RuntimeError("Error while saving text");

@@ -71,6 +71,7 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
 
     setAlphabetType(parser, options);
+    setTextLimits(parser, options);
     setIndexType(parser, options);
 //    setTmpFolder(parser);
 }
@@ -91,6 +92,7 @@ parseCommandLine(Options & options, ArgumentParser & parser, int argc, char cons
     getArgumentValue(options.textIndexFile, parser, 1);
 
     getAlphabetType(options, parser);
+    getTextLimits(options, parser);
     getIndexType(options, parser);
 //    getTmpFolder(options, parser);
 
@@ -126,27 +128,18 @@ inline void construct(Index<TText, FMIndex<TIndexSpec> > & index)
 // Function run()
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet, typename TIndexSpec>
+template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TIndexSpec>
 inline void run(Options & options)
 {
     double start, finish;
 
-    typedef StringSet<String<TAlphabet, Alloc<Limits<__uint32> > >, Owner<ConcatDirect<Limits<__uint8, __uint32> > > >   TText;
-    typedef Index<TText, TIndexSpec>                                TIndex;
+    typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
+    typedef Index<TText, TIndexSpec>                                        TIndex;
 
     TText text;
 
     if (!open(text, toCString(options.textFile)))
         throw RuntimeError("Error while loading text");
-
-    if (length(text) > MaxValue<__uint16>::VALUE)
-        throw RuntimeError("Too many sequences");
-
-    if (lengthSum(text) > MaxValue<__uint32>::VALUE)
-        throw RuntimeError("Too many symbols");
-
-    if (maxLength(text) > MaxValue<__uint32>::VALUE)
-        throw RuntimeError("Too long sequences");
 
     TIndex index(text);
 

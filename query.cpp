@@ -67,6 +67,7 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
 
     setAlphabetType(parser, options);
+    setTextLimits(parser, options);
     setIndexType(parser, options);
 
 //    setAlgorithmType(parser, options);
@@ -92,6 +93,7 @@ inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, ch
     getArgumentValue(options.queryFile, parser, 1);
 
     getAlphabetType(options, parser);
+    getTextLimits(options, parser);
     getIndexType(options, parser);
 //    getAlgorithmType(options, parser);
     getOptionValue(options.errors, parser, "errors");

@@ -52,16 +52,16 @@ inline ArgumentParser::ParseResult parseCommandLine(Options & options, ArgumentP
 // Function run()
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet>
+template <typename TAlphabet, typename TStringLimits, typename TStringSetLimits>
 inline void run(Options & options)
 {
     switch (options.textIndexType)
     {
-    case Options::INDEX_ESA:
-        return run<TAlphabet, IndexEsa<void> >(options);
+//    case Options::INDEX_ESA:
+//        return run<TAlphabet, TStringLimits, TStringSetLimits, IndexEsa<void> >(options);
 
     case Options::INDEX_SA:
-        return run<TAlphabet, IndexSa<void> >(options);
+        return run<TAlphabet, TStringLimits, TStringSetLimits, IndexSa<void> >(options);
 
 //    case Options::INDEX_QGRAM:
 //        return run<TAlphabet, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
@@ -71,6 +71,53 @@ inline void run(Options & options)
 //
 //    case Options::INDEX_FMWT:
 //        return run<TAlphabet, FMIndex<void, WTFMIndex> >(options);
+
+    default:
+        throw Exception();
+    }
+}
+
+template <typename TAlphabet, typename TStringLimits>
+inline void run(Options & options)
+{
+    switch (options.textCount)
+    {
+    case 8:
+        if (options.textSum <= 32)
+            return run<TAlphabet, TStringLimits, Limits<__uint8, __uint32> >(options);
+        else
+            return run<TAlphabet, TStringLimits, Limits<__uint8, __uint64> >(options);
+
+    case 16:
+        if (options.textSum <= 32)
+            return run<TAlphabet, TStringLimits, Limits<__uint16, __uint32> >(options);
+        else
+            return run<TAlphabet, TStringLimits, Limits<__uint16, __uint64> >(options);
+
+    case 32:
+        if (options.textSum <= 32)
+            return run<TAlphabet, TStringLimits, Limits<__uint32, __uint32> >(options);
+        else
+            return run<TAlphabet, TStringLimits, Limits<__uint32, __uint64> >(options);
+
+    default:
+        throw Exception();
+    }
+}
+
+template <typename TAlphabet>
+inline void run(Options & options)
+{
+    switch (options.textLen)
+    {
+    case 16:
+        return run<TAlphabet, Limits<__uint16> >(options);
+
+    case 32:
+        return run<TAlphabet, Limits<__uint32> >(options);
+
+//    case 64:
+//        return run<TAlphabet, Limits<__uint64> >(options);
 
     default:
         throw Exception();

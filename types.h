@@ -210,6 +210,24 @@ struct Size<RankDictionary<TValue, Naive<TSize> > >
 {
     typedef TSize Type;
 };
+
+template <typename TValue, typename TSize>
+struct Size<RankDictionary<TValue, WaveletTree<View<TSize> > > >
+{
+    typedef TSize Type;
+};
+
+template <typename TValue, typename TSize>
+struct Size<RankDictionary<TValue, TwoLevels<View<TSize> > > >
+{
+    typedef TSize Type;
+};
+
+template <typename TValue, typename TSize>
+struct Size<RankDictionary<TValue, Naive<View<TSize> > > >
+{
+    typedef TSize Type;
+};
 }
 
 // ----------------------------------------------------------------------------

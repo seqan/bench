@@ -57,8 +57,8 @@ inline void run(Options & options)
 {
     switch (options.textIndexType)
     {
-    case Options::INDEX_ESA:
-        return run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
+//    case Options::INDEX_ESA:
+//        return run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
 
     case Options::INDEX_SA:
         return run<TAlphabet, TLimits, TSetLimits, IndexSa<void> >(options);
@@ -66,11 +66,11 @@ inline void run(Options & options)
 //    case Options::INDEX_QGRAM:
 //        return run<TAlphabet, TLimits, TSetLimits, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
 
-    case Options::INDEX_FMTL:
-        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, FMIndexConfig<TSetLimits> > >(options);
+//    case Options::INDEX_FMTL:
+//        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, FMIndexConfig<TSetLimits> > >(options);
 
-    case Options::INDEX_FMWT:
-        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, FMIndexConfig<TSetLimits> > >(options);
+//    case Options::INDEX_FMWT:
+//        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, FMIndexConfig<TSetLimits> > >(options);
 
     default:
         throw RuntimeError("Unsupported index type");

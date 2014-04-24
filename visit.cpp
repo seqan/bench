@@ -51,38 +51,35 @@
 
 using namespace seqan;
 
+// ============================================================================
+// Functions
+// ============================================================================
+
 // ----------------------------------------------------------------------------
 // Function setupArgumentParser()
 // ----------------------------------------------------------------------------
 
 inline void setupArgumentParser(ArgumentParser & parser, Options const & options)
 {
-    setAppName(parser, "iBench Query");
-    setShortDescription(parser, "Benchmark full-text index query time");
+    setAppName(parser, "iBench Visit");
+    setShortDescription(parser, "Benchmark full-text index top-down visit");
     setCategory(parser, "Stringology");
 
-    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fIINDEX FILE\\fP> <\\fIQUERY FILE\\fP>");
+    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fIINDEX FILE\\fP>");
 
-    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
 
     setAlphabetType(parser, options);
     setTextLimits(parser, options);
     setIndexType(parser, options);
-
-//    setAlgorithmType(parser, options);
-    addOption(parser, ArgParseOption("e", "errors", "Number of errors.", ArgParseOption::INTEGER));
-    setMinValue(parser, "errors", "0");
-    setMaxValue(parser, "errors", "5");
-    setDefaultValue(parser, "errors", options.errors);
 }
 
 // ----------------------------------------------------------------------------
 // Function parseCommandLine()
 // ----------------------------------------------------------------------------
 
-ArgumentParser::ParseResult
-inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv)
+inline ArgumentParser::ParseResult
+parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv)
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
@@ -90,15 +87,38 @@ inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, ch
         return res;
 
     getArgumentValue(options.textIndexFile, parser, 0);
-    getArgumentValue(options.queryFile, parser, 1);
 
     getAlphabetType(options, parser);
     getTextLimits(options, parser);
     getIndexType(options, parser);
-//    getAlgorithmType(options, parser);
-    getOptionValue(options.errors, parser, "errors");
 
     return seqan::ArgumentParser::PARSE_OK;
+}
+
+// ----------------------------------------------------------------------------
+// Function construct()
+// ----------------------------------------------------------------------------
+
+template <typename TIndex, typename TSize>
+inline void visit(TIndex & index, TSize depth)
+{
+    typedef typename Iterator<TIndex, TopDown<ParentLinks<> > >::Type TIter;
+
+    TIter it(index);
+
+    do
+    {
+        if (!goDown(it) || repLength(it) > depth)
+        {
+            do
+            {
+                if (!goRight(it))
+                    while (goUp(it) && !goRight(it)) ;
+            }
+            while (repLength(it) > depth);
+        }
+    }
+    while (!isRoot(it));
 }
 
 // ----------------------------------------------------------------------------
@@ -110,7 +130,6 @@ inline void run(Options & options)
 {
     double start, finish;
 
-    typedef typename TextCollection<TAlphabet>::Type                        TQuery;
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
     typedef Index<TText, TIndexSpec>                                        TIndex;
 
@@ -119,13 +138,8 @@ inline void run(Options & options)
     if (!open(index, toCString(options.textIndexFile)))
         throw RuntimeError("Error while loading full-text index");
 
-    TQuery queries;
-
-    if (!open(queries, toCString(options.queryFile)))
-        throw RuntimeError("Error while loading queries");
-
     start = sysTime();
-    std::cout << countOccurrences(index, queries) << std::endl;
+    visit(index, 10u);
     finish = sysTime();
     std::cout << finish - start << " sec" << std::endl;
 }

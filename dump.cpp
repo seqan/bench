@@ -61,7 +61,14 @@ using namespace seqan;
 // Class Options
 // ----------------------------------------------------------------------------
 
-struct Options : BaseOptions {};
+struct Options : BaseOptions
+{
+    CharString      outputFile;
+
+    Options() :
+        BaseOptions()
+    {}
+};
 
 // ============================================================================
 // Functions
@@ -102,7 +109,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
         return res;
 
     getArgumentValue(options.textFile, parser, 0);
-    getArgumentValue(options.queryFile, parser, 1);
+    getArgumentValue(options.outputFile, parser, 1);
 
     getAlphabetType(options, parser);
     getTextLimits(options, parser);
@@ -169,7 +176,7 @@ inline void run(Options & options)
 
     assign(text, seqs);
 
-    if (!save(text, toCString(options.queryFile)))
+    if (!save(text, toCString(options.outputFile)))
         throw RuntimeError("Error while saving text");
 }
 

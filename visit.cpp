@@ -73,6 +73,9 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
     setAlphabetType(parser, options);
     setIndexType(parser, options);
     setTextLimits(parser, options);
+
+    addSection(parser, "Visit Options");
+    
 }
 
 // ----------------------------------------------------------------------------

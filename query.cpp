@@ -71,6 +71,7 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
     setIndexType(parser, options);
     setTextLimits(parser, options);
 
+    addSection(parser, "Query Options");
 //    setAlgorithmType(parser, options);
     addOption(parser, ArgParseOption("e", "errors", "Number of errors.", ArgParseOption::INTEGER));
     setMinValue(parser, "errors", "0");

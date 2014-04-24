@@ -88,7 +88,7 @@ appendValue(StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > & me
 typedef StringSet<CharString, Owner<ConcatDirect<> > >          CharStringSet;
 
 // ----------------------------------------------------------------------------
-// Metafunction TextCollection<>
+// Metafunction TextCollection
 // ----------------------------------------------------------------------------
 
 template <typename TAlphabet, typename TLimits = void, typename TSetLimits = void>
@@ -98,7 +98,7 @@ struct TextCollection
 };
 
 // ----------------------------------------------------------------------------
-// String Types
+// String Size
 // ----------------------------------------------------------------------------
 
 namespace seqan
@@ -111,7 +111,7 @@ struct Size<String<TValue, Alloc<Limits<TSize> > > >
 }
 
 // ----------------------------------------------------------------------------
-// StringSet Types
+// StringSet Size
 // ----------------------------------------------------------------------------
 
 namespace seqan
@@ -190,46 +190,50 @@ struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > >
 //}
 
 // ----------------------------------------------------------------------------
-// FmIndex Fibres
+// FmIndex Config
 // ----------------------------------------------------------------------------
 
-struct WTFMIndex
+namespace seqan {
+template <typename TSize, typename TSum>
+struct FMIndexConfig<Limits<TSize, TSum> >
 {
-    typedef WaveletTree<void>  TValuesSpec;
-    typedef Naive<void>        TSentinelsSpec;
+    typedef WaveletTree<TSum>   TValuesSpec;
+    typedef TwoLevels<TSum>     TSentinelsSpec;
 
     static const unsigned SAMPLING = 10;
 };
 
-struct TLFMIndex
+template <typename TSum>
+struct FMIndexConfig<Limits<__uint8, TSum> >
 {
-    typedef TwoLevels<void>    TValuesSpec;
-    typedef Naive<void>        TSentinelsSpec;
+    typedef TwoLevels<TSum>     TValuesSpec;
+    typedef Naive<TSum>         TSentinelsSpec;
 
     static const unsigned SAMPLING = 10;
 };
+}
 
 // ----------------------------------------------------------------------------
 // RankDictionary Size
 // ----------------------------------------------------------------------------
 
 namespace seqan {
-template <typename TSpec>
-struct Size<RankDictionary<Dna, TwoLevels<TSpec> > >
+template <typename TValue, typename TSize>
+struct Size<RankDictionary<TValue, WaveletTree<TSize> > >
 {
-    typedef __uint32 Type;
+    typedef TSize Type;
 };
 
-template <typename TSpec>
-struct Size<RankDictionary<bool, TwoLevels<TSpec> > >
+template <typename TValue, typename TSize>
+struct Size<RankDictionary<TValue, TwoLevels<TSize> > >
 {
-    typedef __uint32 Type;
+    typedef TSize Type;
 };
 
-template <typename TSpec>
-struct Size<RankDictionary<bool, Naive<TSpec> > >
+template <typename TValue, typename TSize>
+struct Size<RankDictionary<TValue, Naive<TSize> > >
 {
-    typedef __uint32 Type;
+    typedef TSize Type;
 };
 }
 
@@ -238,11 +242,10 @@ struct Size<RankDictionary<bool, Naive<TSpec> > >
 // ----------------------------------------------------------------------------
 
 namespace seqan {
-// TODO(esiragusa): Overload Size<CSA> instead of Size<SparseString>
 template <typename TValueString>
-struct Size<SparseString<TValueString, void> >
+struct Fibre<SparseString<TValueString, void>, FibreIndicators>
 {
-    typedef __uint32    Type;
+    typedef RankDictionary<bool, TwoLevels<typename Size<TValueString>::Type> > Type;
 };
 }
 

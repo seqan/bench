@@ -67,10 +67,10 @@ inline void run(Options & options)
 //        return run<TAlphabet, TLimits, TSetLimits, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
 
     case Options::INDEX_FMTL:
-        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, TLFMIndex> >(options);
+        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, FMIndexConfig<TSetLimits> > >(options);
 
     case Options::INDEX_FMWT:
-        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, WTFMIndex> >(options);
+        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, FMIndexConfig<TSetLimits> > >(options);
 
     default:
         throw RuntimeError("Unsupported index type");

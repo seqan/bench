@@ -37,12 +37,20 @@
 
 using namespace seqan;
 
+// ============================================================================
+// Limits
+// ============================================================================
+
 // ----------------------------------------------------------------------------
 // Tag Limits
 // ----------------------------------------------------------------------------
 
 template <typename T1 = void, typename T2 = void>
 struct Limits;
+
+// ----------------------------------------------------------------------------
+// Metafunction Value<>
+// ----------------------------------------------------------------------------
 
 namespace seqan
 {
@@ -80,7 +88,7 @@ appendValue(StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > & me
 typedef StringSet<CharString, Owner<ConcatDirect<> > >          CharStringSet;
 
 // ----------------------------------------------------------------------------
-// Metafunction TextCollection
+// Metafunction TextCollection<>
 // ----------------------------------------------------------------------------
 
 template <typename TAlphabet, typename TLimits, typename TSetLimits>

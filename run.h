@@ -110,14 +110,14 @@ inline void run(Options & options)
 {
     switch (options.textLen)
     {
-    case 16:
-        return run<TAlphabet, Limits<__uint16> >(options);
+//    case 16:
+//        return run<TAlphabet, Limits<__uint16> >(options);
 
     case 32:
         return run<TAlphabet, Limits<__uint32> >(options);
 
-//    case 64:
-//        return run<TAlphabet, Limits<__uint64> >(options);
+    case 64:
+        return run<TAlphabet, Limits<__uint64> >(options);
 
     default:
         throw RuntimeError("Unsupported text limit");

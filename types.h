@@ -91,7 +91,7 @@ typedef StringSet<CharString, Owner<ConcatDirect<> > >          CharStringSet;
 // Metafunction TextCollection
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet, typename TLimits = void, typename TSetLimits = void>
+template <typename TAlphabet, typename TLimits = Limits<__uint32>, typename TSetLimits = Limits<__uint32, __uint32> >
 struct TextCollection
 {
     typedef StringSet<String<TAlphabet, Alloc<TLimits> >, Owner<ConcatDirect<TSetLimits> > >    Type;
@@ -242,10 +242,10 @@ struct Size<RankDictionary<TValue, Naive<TSize> > >
 // ----------------------------------------------------------------------------
 
 namespace seqan {
-template <typename TValueString>
-struct Fibre<SparseString<TValueString, void>, FibreIndicators>
+template <typename TValue, typename TSpec>
+struct Fibre<SparseString<String<TValue, TSpec>, void>, FibreIndicators>
 {
-    typedef RankDictionary<bool, TwoLevels<typename Size<TValueString>::Type> > Type;
+    typedef RankDictionary<bool, TwoLevels<__uint32> > Type;
 };
 }
 

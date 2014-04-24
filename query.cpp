@@ -105,26 +105,27 @@ inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, ch
 // Function run()
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet, typename TIndexSpec>
+template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TIndexSpec>
 inline void run(Options & options)
 {
     double start, finish;
 
-    typedef StringSet<String<TAlphabet>, Owner<ConcatDirect<> > >   TText;
-    typedef Index<TText, TIndexSpec>                                TIndex;
+    typedef typename TextCollection<TAlphabet>::Type                        TQuery;
+    typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
+    typedef Index<TText, TIndexSpec>                                        TIndex;
 
     TIndex index;
 
     if (!open(index, toCString(options.textIndexFile)))
         throw RuntimeError("Error while loading full-text index");
 
-    TText queries;
+    TQuery queries;
 
     if (!open(queries, toCString(options.queryFile)))
         throw RuntimeError("Error while loading queries");
 
     start = sysTime();
-    std::cout << countOccurrences(index, queries) << std::endl;
+//    std::cout << countOccurrences(index, queries) << std::endl;
     finish = sysTime();
     std::cout << finish - start << " sec" << std::endl;
 }

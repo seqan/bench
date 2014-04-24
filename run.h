@@ -83,25 +83,25 @@ inline void run(Options & options)
     switch (options.textCount)
     {
     case 8:
-        if (options.textSum <= 32)
+        if (options.textSum == 32)
             return run<TAlphabet, TStringLimits, Limits<__uint8, __uint32> >(options);
-        else
+        if (options.textSum == 64)
             return run<TAlphabet, TStringLimits, Limits<__uint8, __uint64> >(options);
 
     case 16:
-        if (options.textSum <= 32)
+        if (options.textSum == 32)
             return run<TAlphabet, TStringLimits, Limits<__uint16, __uint32> >(options);
-        else
+        if (options.textSum == 64)
             return run<TAlphabet, TStringLimits, Limits<__uint16, __uint64> >(options);
 
     case 32:
-        if (options.textSum <= 32)
+        if (options.textSum == 32)
             return run<TAlphabet, TStringLimits, Limits<__uint32, __uint32> >(options);
-        else
+        if (options.textSum == 64)
             return run<TAlphabet, TStringLimits, Limits<__uint32, __uint64> >(options);
 
     default:
-        throw Exception();
+        throw RuntimeError("Unsupported text collection limit");
     }
 }
 
@@ -120,7 +120,7 @@ inline void run(Options & options)
 //        return run<TAlphabet, Limits<__uint64> >(options);
 
     default:
-        throw Exception();
+        throw RuntimeError("Unsupported text limit");
     }
 }
 

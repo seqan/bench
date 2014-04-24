@@ -130,24 +130,6 @@ struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > >
 };
 
 // ----------------------------------------------------------------------------
-// EsaIndex Fibres
-// ----------------------------------------------------------------------------
-
-//namespace seqan {
-//template <typename TText>
-//struct Fibre<Index<TText, IndexEsa<void> >, FibreLcp>
-//{
-//    typedef String<typename Size<TText>::Type>   Type;
-//};
-//
-//template <typename TText>
-//struct Fibre<Index<TText, IndexEsa<void> >, FibreChildtab>
-//{
-//    typedef String<typename LengthSum<TText>::Type>   Type;
-//};
-//}
-
-// ----------------------------------------------------------------------------
 // QGramIndex Fibres
 // ----------------------------------------------------------------------------
 

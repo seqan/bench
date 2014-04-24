@@ -73,7 +73,7 @@ inline void run(Options & options)
 //        return run<TAlphabet, FMIndex<void, WTFMIndex> >(options);
 
     default:
-        throw Exception();
+        throw RuntimeError("Unsupported index type");
     }
 }
 

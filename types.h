@@ -130,7 +130,7 @@ struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > >
 };
 
 // ----------------------------------------------------------------------------
-// QGramIndex Fibres
+// QGramIndex Config
 // ----------------------------------------------------------------------------
 
 //template <typename TValue = char>
@@ -163,14 +163,6 @@ struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > >
 //    typedef UngappedShape<ShapeWeight<TValue>::VALUE>   Type;
 //};
 
-//namespace seqan {
-//template <typename TText, typename TSpec>
-//struct Fibre<Index<TText, IndexQGram<TSpec> >, FibreDir>
-//{
-//    typedef String<__uint32>   Type;
-//};
-//}
-
 // ----------------------------------------------------------------------------
 // FmIndex Config
 // ----------------------------------------------------------------------------
@@ -179,7 +171,8 @@ namespace seqan {
 template <typename TSize, typename TSum>
 struct FMIndexConfig<Limits<TSize, TSum> >
 {
-    typedef WaveletTree<TSum>   TValuesSpec;
+    typedef TwoLevels<TSum>     TValuesSpec;
+//    typedef WaveletTree<TSum>   TValuesSpec;
     typedef TwoLevels<TSum>     TSentinelsSpec;
 
     static const unsigned SAMPLING = 10;

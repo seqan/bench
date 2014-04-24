@@ -37,8 +37,15 @@
 
 using namespace seqan;
 
+// ============================================================================
+// Classes
+// ============================================================================
 
-struct Options
+// ----------------------------------------------------------------------------
+// Class BaseOptions
+// ----------------------------------------------------------------------------
+
+struct BaseOptions
 {
     typedef std::string             TString;
     typedef std::vector<TString>    TList;
@@ -53,11 +60,6 @@ struct Options
         INDEX_SA, INDEX_ESA, INDEX_QGRAM, INDEX_FMTL, INDEX_FMWT
     };
 
-    enum AlgorithmType
-    {
-        ALGO_SINGLE, ALGO_DFS, ALGO_BFS
-    };
-
     CharString      textFile;
     unsigned        textCount;
     unsigned        textSum;
@@ -67,24 +69,15 @@ struct Options
     IndexType       textIndexType;
     TList           textIndexTypeList;
 
-    CharString      queryFile;
-
     AlphabetType    alphabetType;
     TList           alphabetTypeList;
 
-    AlgorithmType   algorithmType;
-    TList           algorithmTypeList;
-
-    unsigned        errors;
-
-    Options() :
+    BaseOptions() :
         textCount(32),
         textSum(32),
         textLen(32),
         textIndexType(INDEX_SA),
-        alphabetType(ALPHABET_DNA),
-        algorithmType(ALGO_SINGLE),
-        errors(0)
+        alphabetType(ALPHABET_DNA)
     {
         alphabetTypeList.push_back("dna");
         alphabetTypeList.push_back("protein");
@@ -95,12 +88,12 @@ struct Options
         textIndexTypeList.push_back("qgram");
         textIndexTypeList.push_back("fm-tl");
         textIndexTypeList.push_back("fm-wt");
-
-        algorithmTypeList.push_back("single");
-        algorithmTypeList.push_back("dfs");
-        algorithmTypeList.push_back("bfs");
     }
 };
+
+// ============================================================================
+// Getters & Setters
+// ============================================================================
 
 template <typename TOption, typename TString, typename TOptionsList>
 void getOptionEnum(TOption & option,

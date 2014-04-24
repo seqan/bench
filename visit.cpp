@@ -52,6 +52,24 @@
 using namespace seqan;
 
 // ============================================================================
+// Classes
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Class Options
+// ----------------------------------------------------------------------------
+
+struct Options : BaseOptions
+{
+    unsigned        depth;
+
+    Options() :
+        BaseOptions(),
+        depth(0)
+    {}
+};
+
+// ============================================================================
 // Functions
 // ============================================================================
 
@@ -59,7 +77,8 @@ using namespace seqan;
 // Function setupArgumentParser()
 // ----------------------------------------------------------------------------
 
-inline void setupArgumentParser(ArgumentParser & parser, Options const & options)
+template <typename TOptions>
+inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options)
 {
     setAppName(parser, "iBench Visit");
     setShortDescription(parser, "Benchmark full-text index top-down visit");
@@ -75,15 +94,17 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
     setTextLimits(parser, options);
 
     addSection(parser, "Visit Options");
-    
+    addOption(parser, ArgParseOption("d", "depth", "Limit the visit to this depth.", ArgParseOption::INTEGER));
+    setDefaultValue(parser, "depth", options.depth);
 }
 
 // ----------------------------------------------------------------------------
 // Function parseCommandLine()
 // ----------------------------------------------------------------------------
 
+template <typename TOptions>
 inline ArgumentParser::ParseResult
-parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv)
+parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char const ** argv)
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
@@ -95,6 +116,7 @@ parseCommandLine(Options & options, ArgumentParser & parser, int argc, char cons
     getAlphabetType(options, parser);
     getIndexType(options, parser);
     getTextLimits(options, parser);
+    getOptionValue(options.depth, parser, "depth");
 
     return seqan::ArgumentParser::PARSE_OK;
 }
@@ -143,12 +165,12 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading full-text index");
 
     start = sysTime();
-    visit(index, 10u);
+    visit(index, options.depth);
     finish = sysTime();
     std::cout << finish - start << " sec" << std::endl;
 }
 
 int main(int argc, char const ** argv)
 {
-    return run(argc, argv);
+    return run<Options>(argc, argv);
 }

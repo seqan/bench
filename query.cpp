@@ -51,11 +51,48 @@
 
 using namespace seqan;
 
+// ============================================================================
+// Classes
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Class Options
+// ----------------------------------------------------------------------------
+
+struct Options : BaseOptions
+{
+    typedef std::string             TString;
+    typedef std::vector<TString>    TList;
+
+    enum AlgorithmType
+    {
+        ALGO_SINGLE, ALGO_DFS, ALGO_BFS
+    };
+
+    CharString      queryFile;
+
+    AlgorithmType   algorithmType;
+    TList           algorithmTypeList;
+
+    unsigned        errors;
+
+    Options() :
+        BaseOptions(),
+        algorithmType(ALGO_SINGLE),
+        errors(0)
+    {
+        algorithmTypeList.push_back("single");
+        algorithmTypeList.push_back("dfs");
+        algorithmTypeList.push_back("bfs");
+    }
+};
+
 // ----------------------------------------------------------------------------
 // Function setupArgumentParser()
 // ----------------------------------------------------------------------------
 
-inline void setupArgumentParser(ArgumentParser & parser, Options const & options)
+template <typename TOptions>
+inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options)
 {
     setAppName(parser, "iBench Query");
     setShortDescription(parser, "Benchmark full-text index query time");
@@ -83,8 +120,9 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
 // Function parseCommandLine()
 // ----------------------------------------------------------------------------
 
+template <typename TOptions>
 ArgumentParser::ParseResult
-inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv)
+inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char const ** argv)
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
@@ -134,5 +172,5 @@ inline void run(Options & options)
 
 int main(int argc, char const ** argv)
 {
-    return run(argc, argv);
+    return run<Options>(argc, argv);
 }

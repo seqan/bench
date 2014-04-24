@@ -41,8 +41,12 @@ using namespace seqan;
 // Forwards
 // ============================================================================
 
-inline void setupArgumentParser(ArgumentParser & parser, Options const & options);
-inline ArgumentParser::ParseResult parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv);
+template <typename TOptions>
+inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options);
+
+template <typename TOptions>
+inline ArgumentParser::ParseResult
+parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char const ** argv);
 
 // ============================================================================
 // Functions
@@ -52,24 +56,24 @@ inline ArgumentParser::ParseResult parseCommandLine(Options & options, ArgumentP
 // Function run()
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet, typename TLimits, typename TSetLimits>
-inline void run(Options & options)
+template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TOptions>
+inline void run(TOptions & options)
 {
     switch (options.textIndexType)
     {
-//    case Options::INDEX_ESA:
-//        return run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
+    case TOptions::INDEX_ESA:
+        return run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
 
-    case Options::INDEX_SA:
+    case TOptions::INDEX_SA:
         return run<TAlphabet, TLimits, TSetLimits, IndexSa<void> >(options);
 
-//    case Options::INDEX_QGRAM:
+//    case TOptions::INDEX_QGRAM:
 //        return run<TAlphabet, TLimits, TSetLimits, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
 
-//    case Options::INDEX_FMTL:
-//        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, FMIndexConfig<TSetLimits> > >(options);
+    case TOptions::INDEX_FMTL:
+        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, FMIndexConfig<TSetLimits> > >(options);
 
-//    case Options::INDEX_FMWT:
+//    case TOptions::INDEX_FMWT:
 //        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, FMIndexConfig<TSetLimits> > >(options);
 
     default:
@@ -77,8 +81,8 @@ inline void run(Options & options)
     }
 }
 
-template <typename TAlphabet, typename TLimits>
-inline void run(Options & options)
+template <typename TAlphabet, typename TLimits, typename TOptions>
+inline void run(TOptions & options)
 {
     switch (options.textCount)
     {
@@ -105,8 +109,8 @@ inline void run(Options & options)
     }
 }
 
-template <typename TAlphabet>
-inline void run(Options & options)
+template <typename TAlphabet, typename TOptions>
+inline void run(TOptions & options)
 {
     switch (options.textLen)
     {
@@ -124,17 +128,18 @@ inline void run(Options & options)
     }
 }
 
-inline void run(Options & options)
+template <typename TOptions>
+inline void run(TOptions & options)
 {
     switch (options.alphabetType)
     {
-    case Options::ALPHABET_DNA:
+    case TOptions::ALPHABET_DNA:
         return run<Dna>(options);
 
-    case Options::ALPHABET_PROTEIN:
+    case TOptions::ALPHABET_PROTEIN:
         return run<AminoAcid>(options);
 
-    case Options::ALPHABET_CHAR:
+    case TOptions::ALPHABET_CHAR:
         return run<char>(options);
 
     default:
@@ -142,10 +147,11 @@ inline void run(Options & options)
     }
 }
 
+template <typename TOptions>
 inline int run(int argc, char const ** argv)
 {
     ArgumentParser parser;
-    Options options;
+    TOptions options;
     setupArgumentParser(parser, options);
 
     ArgumentParser::ParseResult res = parseCommandLine(options, parser, argc, argv);

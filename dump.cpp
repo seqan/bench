@@ -54,6 +54,16 @@
 using namespace seqan;
 
 // ============================================================================
+// Classes
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Class Options
+// ----------------------------------------------------------------------------
+
+struct Options : BaseOptions {};
+
+// ============================================================================
 // Functions
 // ============================================================================
 
@@ -61,7 +71,8 @@ using namespace seqan;
 // Function setupArgumentParser()
 // ----------------------------------------------------------------------------
 
-inline void setupArgumentParser(ArgumentParser & parser, Options const & options)
+template <typename TOptions>
+inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options)
 {
     setAppName(parser, "iBench Dump");
     setShortDescription(parser, "Dump any sequence file as a StringSet");
@@ -81,8 +92,9 @@ inline void setupArgumentParser(ArgumentParser & parser, Options const & options
 // Function parseCommandLine()
 // ----------------------------------------------------------------------------
 
+template <typename TOptions>
 ArgumentParser::ParseResult
-inline parseCommandLine(Options & options, ArgumentParser & parser, int argc, char const ** argv)
+inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char const ** argv)
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
@@ -163,5 +175,5 @@ inline void run(Options & options)
 
 int main(int argc, char const ** argv)
 {
-    return run(argc, argv);
+    return run<Options>(argc, argv);
 }

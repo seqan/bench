@@ -91,7 +91,7 @@ typedef StringSet<CharString, Owner<ConcatDirect<> > >          CharStringSet;
 // Metafunction TextCollection<>
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet, typename TLimits, typename TSetLimits>
+template <typename TAlphabet, typename TLimits = void, typename TSetLimits = void>
 struct TextCollection
 {
     typedef StringSet<String<TAlphabet, Alloc<TLimits> >, Owner<ConcatDirect<TSetLimits> > >    Type;

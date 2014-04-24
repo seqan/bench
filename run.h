@@ -52,53 +52,53 @@ inline ArgumentParser::ParseResult parseCommandLine(Options & options, ArgumentP
 // Function run()
 // ----------------------------------------------------------------------------
 
-template <typename TAlphabet, typename TStringLimits, typename TStringSetLimits>
+template <typename TAlphabet, typename TLimits, typename TSetLimits>
 inline void run(Options & options)
 {
     switch (options.textIndexType)
     {
-//    case Options::INDEX_ESA:
-//        return run<TAlphabet, TStringLimits, TStringSetLimits, IndexEsa<void> >(options);
+    case Options::INDEX_ESA:
+        return run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
 
     case Options::INDEX_SA:
-        return run<TAlphabet, TStringLimits, TStringSetLimits, IndexSa<void> >(options);
+        return run<TAlphabet, TLimits, TSetLimits, IndexSa<void> >(options);
 
 //    case Options::INDEX_QGRAM:
-//        return run<TAlphabet, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
+//        return run<TAlphabet, TLimits, TSetLimits, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
 
-//    case Options::INDEX_FMTL:
-//        return run<TAlphabet, FMIndex<void, TLFMIndex> >(options);
-//
-//    case Options::INDEX_FMWT:
-//        return run<TAlphabet, FMIndex<void, WTFMIndex> >(options);
+    case Options::INDEX_FMTL:
+        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, TLFMIndex> >(options);
+
+    case Options::INDEX_FMWT:
+        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, WTFMIndex> >(options);
 
     default:
         throw RuntimeError("Unsupported index type");
     }
 }
 
-template <typename TAlphabet, typename TStringLimits>
+template <typename TAlphabet, typename TLimits>
 inline void run(Options & options)
 {
     switch (options.textCount)
     {
     case 8:
         if (options.textSum == 32)
-            return run<TAlphabet, TStringLimits, Limits<__uint8, __uint32> >(options);
+            return run<TAlphabet, TLimits, Limits<__uint8, __uint32> >(options);
         if (options.textSum == 64)
-            return run<TAlphabet, TStringLimits, Limits<__uint8, __uint64> >(options);
+            return run<TAlphabet, TLimits, Limits<__uint8, __uint64> >(options);
 
     case 16:
         if (options.textSum == 32)
-            return run<TAlphabet, TStringLimits, Limits<__uint16, __uint32> >(options);
+            return run<TAlphabet, TLimits, Limits<__uint16, __uint32> >(options);
         if (options.textSum == 64)
-            return run<TAlphabet, TStringLimits, Limits<__uint16, __uint64> >(options);
+            return run<TAlphabet, TLimits, Limits<__uint16, __uint64> >(options);
 
     case 32:
         if (options.textSum == 32)
-            return run<TAlphabet, TStringLimits, Limits<__uint32, __uint32> >(options);
+            return run<TAlphabet, TLimits, Limits<__uint32, __uint32> >(options);
         if (options.textSum == 64)
-            return run<TAlphabet, TStringLimits, Limits<__uint32, __uint64> >(options);
+            return run<TAlphabet, TLimits, Limits<__uint32, __uint64> >(options);
 
     default:
         throw RuntimeError("Unsupported text collection limit");

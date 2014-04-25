@@ -105,7 +105,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
-    if (res != seqan::ArgumentParser::PARSE_OK)
+    if (res != ArgumentParser::PARSE_OK)
         return res;
 
     getArgumentValue(options.textFile, parser, 0);

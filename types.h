@@ -85,8 +85,6 @@ appendValue(StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > & me
 // Basic Types
 // ============================================================================
 
-typedef StringSet<CharString, Owner<ConcatDirect<> > >          CharStringSet;
-
 // ----------------------------------------------------------------------------
 // Metafunction TextCollection
 // ----------------------------------------------------------------------------

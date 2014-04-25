@@ -98,7 +98,7 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
-    if (res != seqan::ArgumentParser::PARSE_OK)
+    if (res != ArgumentParser::PARSE_OK)
         return res;
 
     getArgumentValue(options.textFile, parser, 0);
@@ -109,7 +109,7 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
     getTextLimits(options, parser);
 //    getTmpFolder(options, parser);
 
-    return seqan::ArgumentParser::PARSE_OK;
+    return ArgumentParser::PARSE_OK;
 }
 
 // ----------------------------------------------------------------------------

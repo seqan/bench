@@ -108,7 +108,7 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
-    if (res != seqan::ArgumentParser::PARSE_OK)
+    if (res != ArgumentParser::PARSE_OK)
         return res;
 
     getArgumentValue(options.textIndexFile, parser, 0);
@@ -118,7 +118,7 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
     getTextLimits(options, parser);
     getOptionValue(options.depth, parser, "depth");
 
-    return seqan::ArgumentParser::PARSE_OK;
+    return ArgumentParser::PARSE_OK;
 }
 
 // ----------------------------------------------------------------------------

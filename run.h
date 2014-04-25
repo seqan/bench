@@ -157,7 +157,7 @@ inline int run(int argc, char const ** argv)
 
     ArgumentParser::ParseResult res = parseCommandLine(options, parser, argc, argv);
 
-    if (res != seqan::ArgumentParser::PARSE_OK)
+    if (res != ArgumentParser::PARSE_OK)
         return res;
 
     run(options);

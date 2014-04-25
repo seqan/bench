@@ -126,7 +126,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
-    if (res != seqan::ArgumentParser::PARSE_OK)
+    if (res != ArgumentParser::PARSE_OK)
         return res;
 
     getArgumentValue(options.textIndexFile, parser, 0);
@@ -138,7 +138,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 //    getAlgorithmType(options, parser);
     getOptionValue(options.errors, parser, "errors");
 
-    return seqan::ArgumentParser::PARSE_OK;
+    return ArgumentParser::PARSE_OK;
 }
 
 // ----------------------------------------------------------------------------

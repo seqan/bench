@@ -122,29 +122,37 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
 }
 
 // ----------------------------------------------------------------------------
-// Function construct()
+// Function countSubstrings()
 // ----------------------------------------------------------------------------
 
-template <typename TIndex, typename TSize>
-inline void visit(TIndex & index, TSize depth)
+template <typename TIndex, typename TLength>
+inline typename Size<TIndex>::Type
+countSubstrings(TIndex & index, TLength length)
 {
-    typedef typename Iterator<TIndex, TopDown<ParentLinks<> > >::Type TIter;
+    typedef TopDown<ParentLinks<> >                     TIterSpec;
+    typedef typename Iterator<TIndex, TIterSpec>::Type  TIter;
+    typedef typename Size<TIndex>::Type                 TSize;
 
+    TSize count = 0;
     TIter it(index);
 
     do
     {
-        if (!goDown(it) || repLength(it) > depth)
+        if (!goDown(it) || repLength(it) >= length)
         {
             do
             {
+                if (repLength(it) >= length) ++count;
+
                 if (!goRight(it))
                     while (goUp(it) && !goRight(it)) ;
             }
-            while (repLength(it) > depth);
+            while (repLength(it) >= length);
         }
     }
     while (!isRoot(it));
+
+    return count;
 }
 
 // ----------------------------------------------------------------------------
@@ -165,7 +173,8 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading full-text index");
 
     start = sysTime();
-    visit(index, options.depth);
+    std::cout << countSubstrings(index, options.depth) << " / " <<
+                 (unsigned long)std::pow(ValueSize<TAlphabet>::VALUE, options.depth) << std::endl;
     finish = sysTime();
     std::cout << finish - start << " sec" << std::endl;
 }

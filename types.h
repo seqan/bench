@@ -133,35 +133,29 @@ struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > >
 // QGramIndex Config
 // ----------------------------------------------------------------------------
 
-//template <typename TValue = char>
-//struct ShapeWeight
-//{
-//    static const unsigned VALUE = 3;
-//};
-//
-//template <>
-//struct ShapeWeight<AminoAcid>
-//{
-//    static const unsigned VALUE = 5;
-//};
-//
-//template <>
-//struct ShapeWeight<Dna5>
-//{
-//    static const unsigned VALUE = 10;
-//};
-//
-//template <>
-//struct ShapeWeight<Dna>
-//{
-//    static const unsigned VALUE = 12;
-//};
-//
-//template <typename TValue = char>
-//struct QGramShape
-//{
-//    typedef UngappedShape<ShapeWeight<TValue>::VALUE>   Type;
-//};
+template <typename TValue = char>
+struct ShapeWeight
+{
+    static const unsigned VALUE = 3;
+};
+
+template <>
+struct ShapeWeight<AminoAcid>
+{
+    static const unsigned VALUE = 5;
+};
+
+template <>
+struct ShapeWeight<Dna>
+{
+    static const unsigned VALUE = 12;
+};
+
+template <typename TValue = char>
+struct QGramShape
+{
+    typedef UngappedShape<ShapeWeight<TValue>::VALUE>   Type;
+};
 
 // ----------------------------------------------------------------------------
 // FmIndex Config

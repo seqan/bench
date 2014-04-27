@@ -159,7 +159,8 @@ inline void run(Options & options)
     start = sysTime();
     construct(index);
     finish = sysTime();
-    std::cout << finish - start << " sec" << std::endl;
+//    std::cout << finish - start << " sec" << std::endl;
+    std::cout << (unsigned)(lengthSum(text) / (finish - start)) << " symbols/sec" << std::endl;
 
     if (!save(index, toCString(options.textIndexFile)))
         throw RuntimeError("Error while saving full-text index");

@@ -64,9 +64,11 @@ using namespace seqan;
 struct Options : BaseOptions
 {
     CharString      outputFile;
+    unsigned        prefixLen;
 
     Options() :
-        BaseOptions()
+        BaseOptions(),
+        prefixLen(0)
     {}
 };
 
@@ -93,6 +95,10 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     addSection(parser, "Main Options");
     setAlphabetType(parser, options);
     setTextLimits(parser, options);
+
+    addSection(parser, "Dump Options");
+    addOption(parser, ArgParseOption("pl", "prefix-length", "Cut the texts.", ArgParseOption::INTEGER));
+    setDefaultValue(parser, "prefix-length", options.prefixLen);
 }
 
 // ----------------------------------------------------------------------------
@@ -113,8 +119,9 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 
     getAlphabetType(options, parser);
     getTextLimits(options, parser);
+    getOptionValue(options.prefixLen, parser, "prefix-length");
 
-    return seqan::ArgumentParser::PARSE_OK;
+    return ArgumentParser::PARSE_OK;
 }
 
 // ----------------------------------------------------------------------------
@@ -151,14 +158,24 @@ template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TI
 inline void run(Options & options)
 {
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
+    typedef StringSet<CharString, Owner<ConcatDirect<> > >                  TCharStringSet;
 
     SequenceStream seqStream(toCString(options.textFile));
 
-    CharStringSet ids;
-    CharStringSet seqs;
+    TCharStringSet seqs;
+    CharString  seq;
+    CharString  id;
 
-    if (readAll(ids, seqs, seqStream) != 0)
-        throw RuntimeError("Error while reading text");
+    while (!atEnd(seqStream))
+    {
+        if (readRecord(id, seq, seqStream) != 0)
+            throw RuntimeError("Error while reading text");
+
+        if (options.prefixLen > 0 && options.prefixLen < length(seq))
+            resize(seq, options.prefixLen);
+
+        appendValue(seqs, seq, Generous());
+    }
 
     if (maxLength(seqs) > MaxValue<typename Value<TLimits, 1>::Type>::VALUE)
         throw RuntimeError("Too long sequences");
@@ -173,7 +190,6 @@ inline void run(Options & options)
         randomize<Dna>(concat(seqs));
 
     TText text;
-
     assign(text, seqs);
 
     if (!save(text, toCString(options.outputFile)))

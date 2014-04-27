@@ -141,6 +141,43 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     return ArgumentParser::PARSE_OK;
 }
 
+struct OccCounter
+{
+    unsigned long count;
+
+    OccCounter() : count() {}
+
+    template <typename TFinder>
+    inline void operator() (TFinder const & finder)
+    {
+        count += countOccurrences(textIterator(finder));
+    }
+};
+
+template <typename TIndex, typename TPatterns>
+inline typename Size<TIndex>::Type
+countOcc(TIndex & index, TPatterns & patterns)
+{
+    typedef typename Value<TPatterns>::Type           TPattern;
+    typedef Finder2<TIndex, TPattern, FinderSTree>    TFinder;
+
+    OccCounter counter;
+    TFinder finder(index);
+
+    typename Size<TIndex>::Type count = 0;
+    for (unsigned i = 0; i < length(patterns); ++i)
+    {
+        find(finder, patterns[i], counter);
+        count += counter.count;
+        clear(finder);
+        counter.count = 0;
+
+//        find(finder, pattern, [count](TFinder const & finder) { count += countOccurrences(textIterator(finder)); });
+    }
+
+    return count;
+}
+
 // ----------------------------------------------------------------------------
 // Function run()
 // ----------------------------------------------------------------------------
@@ -165,9 +202,11 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading queries");
 
     start = sysTime();
-    std::cout << countOccurrences(index, queries) << std::endl;
+//    std::cout << countOccurrences(index, queries) << std::endl;
+//    std::cout << finish - start << " sec" << std::endl;
+    std::cout << (double)length(queries) / countOcc(index, queries) << " occurrences/query" << std::endl;
     finish = sysTime();
-    std::cout << finish - start << " sec" << std::endl;
+    std::cout << (unsigned)(length(queries) / (finish - start)) << " query/sec" << std::endl;
 }
 
 int main(int argc, char const ** argv)

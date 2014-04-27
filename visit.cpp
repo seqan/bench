@@ -173,8 +173,8 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading full-text index");
 
     start = sysTime();
-    std::cout << countSubstrings(index, options.depth) << " / " <<
-                 (unsigned long)std::pow(ValueSize<TAlphabet>::VALUE, options.depth) << std::endl;
+    std::cout << countSubstrings(index, options.depth) << " nodes" << std::endl;
+//                 (unsigned long)std::pow(ValueSize<TAlphabet>::VALUE, options.depth) << std::endl;
     finish = sysTime();
     std::cout << finish - start << " sec" << std::endl;
 }

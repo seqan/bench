@@ -85,6 +85,25 @@ appendValue(StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > & me
 // Container Types
 // ============================================================================
 
+// --------------------------------------------------------------------------
+// StringSet Types
+// --------------------------------------------------------------------------
+
+namespace seqan
+{
+template <typename TAlphabet, typename TSpec, typename TSize, typename TSum>
+struct Concatenator<StringSet<String<TAlphabet, TSpec>, Owner<ConcatDirect<Limits<TSize, TSum> > > > >
+{
+    typedef String<TAlphabet, Alloc<Limits<TSum> > > Type;
+};
+
+template <typename TString, typename TSize, typename TSum>
+struct StringSetLimits<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > >
+{
+    typedef String<TSum, Alloc<Limits<TSize> > > Type;
+};
+}
+
 // ----------------------------------------------------------------------------
 // String Size
 // ----------------------------------------------------------------------------
@@ -116,19 +135,6 @@ struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > >
     typedef TSum Type;
 };
 };
-
-// --------------------------------------------------------------------------
-// StringSet Concatenator
-// --------------------------------------------------------------------------
-
-namespace seqan
-{
-template <typename TAlphabet, typename TSpec, typename TSize, typename TSum>
-struct Concatenator<StringSet<String<TAlphabet, TSpec>, Owner<ConcatDirect<Limits<TSize, TSum> > > > >
-{
-    typedef String<TAlphabet, Alloc<Limits<TSum> > > Type;
-};
-}
 
 // ----------------------------------------------------------------------------
 // Metafunction TextCollection

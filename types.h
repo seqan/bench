@@ -127,6 +127,19 @@ struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > >
 };
 };
 
+// --------------------------------------------------------------------------
+// StringSet Concatenator
+// --------------------------------------------------------------------------
+
+namespace seqan
+{
+template <typename TAlphabet, typename TSpec, typename TSize, typename TSum>
+struct Concatenator<StringSet<String<TAlphabet, TSpec>, Owner<ConcatDirect<Limits<TSize, TSum> > > > >
+{
+    typedef String<TAlphabet, Alloc<Limits<TSum> > > Type;
+};
+}
+
 // ----------------------------------------------------------------------------
 // QGramIndex Config
 // ----------------------------------------------------------------------------

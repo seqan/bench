@@ -115,6 +115,9 @@ inline void run(TOptions & options)
 {
     switch (options.textLen)
     {
+    case 8:
+        return run<TAlphabet, Limits<__uint8> >(options);
+
     case 16:
         return run<TAlphabet, Limits<__uint16> >(options);
 

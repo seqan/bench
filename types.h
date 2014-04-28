@@ -82,18 +82,8 @@ appendValue(StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > & me
 }
 
 // ============================================================================
-// Basic Types
+// Container Types
 // ============================================================================
-
-// ----------------------------------------------------------------------------
-// Metafunction TextCollection
-// ----------------------------------------------------------------------------
-
-template <typename TAlphabet, typename TLimits = Limits<__uint32>, typename TSetLimits = Limits<__uint32, __uint32> >
-struct TextCollection
-{
-    typedef StringSet<String<TAlphabet, Alloc<TLimits> >, Owner<ConcatDirect<TSetLimits> > >    Type;
-};
 
 // ----------------------------------------------------------------------------
 // String Size
@@ -139,6 +129,20 @@ struct Concatenator<StringSet<String<TAlphabet, TSpec>, Owner<ConcatDirect<Limit
     typedef String<TAlphabet, Alloc<Limits<TSum> > > Type;
 };
 }
+
+// ----------------------------------------------------------------------------
+// Metafunction TextCollection
+// ----------------------------------------------------------------------------
+
+template <typename TAlphabet, typename TLimits = Limits<__uint32>, typename TSetLimits = Limits<__uint32, __uint32> >
+struct TextCollection
+{
+    typedef StringSet<String<TAlphabet, Alloc<TLimits> >, Owner<ConcatDirect<TSetLimits> > >    Type;
+};
+
+// ============================================================================
+// Index Types
+// ============================================================================
 
 // ----------------------------------------------------------------------------
 // QGramIndex Config

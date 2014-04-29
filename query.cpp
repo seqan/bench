@@ -144,6 +144,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 // ----------------------------------------------------------------------------
 // Function find()
 // ----------------------------------------------------------------------------
+// Overloaded to accept Delegate &&
 
 template <typename TText, typename TIndexSpec, typename TPattern, typename TDelegate>
 SEQAN_HOST_DEVICE inline void
@@ -238,9 +239,10 @@ countOcc(TIndex & index, TPatterns & patterns)
     typedef typename Value<TPatterns>::Type           TPattern;
     typedef Finder2<TIndex, TPattern, FinderSTree>    TFinder;
 
+    typename Size<TIndex>::Type count = 0;
+
     TFinder finder(index);
 
-    typename Size<TIndex>::Type count = 0;
     for (unsigned i = 0; i < length(patterns); ++i)
     {
         find(finder, patterns[i],
@@ -248,6 +250,7 @@ countOcc(TIndex & index, TPatterns & patterns)
              {
                 count += countOccurrences(textIterator(finder));
              });
+        clear(finder);
     }
 
     return count;
@@ -277,9 +280,8 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading queries");
 
     start = sysTime();
-//    std::cout << finish - start << " sec" << std::endl;
-//    std::cout << (double)length(queries) / countOcc(index, queries) << " occurrences/query" << std::endl;
-    std::cout << countOcc(index, queries) << " occurrences" << std::endl;
+//    std::cout << countOcc(index, queries) << " occurrences" << std::endl;
+    std::cout << (double)length(queries) / countOcc(index, queries) << " occurrences/query" << std::endl;
     finish = sysTime();
     std::cout << (unsigned)(length(queries) / (finish - start)) << " query/sec" << std::endl;
 }

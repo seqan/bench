@@ -182,26 +182,47 @@ struct QGramShape
 // FmIndex Config
 // ----------------------------------------------------------------------------
 
-namespace seqan {
+template <typename TSpec>
+struct TLFMIndexConfig;
+
 template <typename TSize, typename TSum>
-struct FMIndexConfig<Limits<TSize, TSum> >
+struct TLFMIndexConfig<Limits<TSize, TSum> >
 {
     typedef TwoLevels<TSum>     TValuesSpec;
-//    typedef WaveletTree<TSum>   TValuesSpec;
     typedef TwoLevels<TSum>     TSentinelsSpec;
 
     static const unsigned SAMPLING = 10;
 };
 
 template <typename TSum>
-struct FMIndexConfig<Limits<__uint8, TSum> >
+struct TLFMIndexConfig<Limits<__uint8, TSum> >
 {
     typedef TwoLevels<TSum>     TValuesSpec;
     typedef Naive<TSum>         TSentinelsSpec;
 
     static const unsigned SAMPLING = 10;
 };
-}
+
+template <typename TSpec>
+struct WTFMIndexConfig;
+
+template <typename TSize, typename TSum>
+struct WTFMIndexConfig<Limits<TSize, TSum> >
+{
+    typedef WaveletTree<TSum>   TValuesSpec;
+    typedef TwoLevels<TSum>     TSentinelsSpec;
+
+    static const unsigned SAMPLING = 10;
+};
+
+template <typename TSum>
+struct WTFMIndexConfig<Limits<__uint8, TSum> >
+{
+    typedef WaveletTree<TSum>   TValuesSpec;
+    typedef Naive<TSum>         TSentinelsSpec;
+
+    static const unsigned SAMPLING = 10;
+};
 
 // ----------------------------------------------------------------------------
 // RankDictionary Size

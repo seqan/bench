@@ -243,7 +243,6 @@ countOcc(TIndex & index, TPatterns & patterns)
     typename Size<TIndex>::Type count = 0;
     for (unsigned i = 0; i < length(patterns); ++i)
     {
-        std::cout << patterns[i] << std::endl;
         find(finder, patterns[i],
              [&count](TFinder const & finder)
              {

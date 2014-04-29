@@ -100,7 +100,7 @@ struct Concatenator<StringSet<String<TAlphabet, TSpec>, Owner<ConcatDirect<Limit
 template <typename TString, typename TSize, typename TSum>
 struct StringSetLimits<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > >
 {
-    typedef String<TSum, Alloc<Limits<TSize> > > Type;
+    typedef String<TSum, Alloc<Limits<TSum> > > Type;
 };
 }
 

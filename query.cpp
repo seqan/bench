@@ -281,7 +281,7 @@ inline void run(Options & options)
 
     start = sysTime();
 //    std::cout << countOcc(index, queries) << " occurrences" << std::endl;
-    std::cout << (double)length(queries) / countOcc(index, queries) << " occurrences/query" << std::endl;
+    std::cout << countOcc(index, queries) / (double)length(queries) << " occurrences/query" << std::endl;
     finish = sysTime();
     std::cout << (unsigned)(length(queries) / (finish - start)) << " query/sec" << std::endl;
 }

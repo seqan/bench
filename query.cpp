@@ -141,18 +141,95 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     return ArgumentParser::PARSE_OK;
 }
 
-struct OccCounter
+// ----------------------------------------------------------------------------
+// Function find()
+// ----------------------------------------------------------------------------
+
+template <typename TText, typename TIndexSpec, typename TPattern, typename TDelegate>
+SEQAN_HOST_DEVICE inline void
+find(Finder2<Index<TText, TIndexSpec>, TPattern, FinderSTree> & finder,
+     TPattern const & pattern,
+     TDelegate && delegate)
 {
-    unsigned long count;
-
-    OccCounter() : count() {}
-
-    template <typename TFinder>
-    inline void operator() (TFinder const & finder)
+    if (goDown(textIterator(finder), pattern))
     {
-        count += countOccurrences(textIterator(finder));
+        delegate(finder);
     }
-};
+}
+
+template <typename TText, typename TIndexSpec, typename TPattern, typename TSpec, typename TDelegate>
+inline void
+find(Finder2<Index<TText, TIndexSpec>, TPattern, Backtracking<HammingDistance, TSpec> > & finder,
+     TPattern const & pattern,
+     TDelegate && delegate)
+{
+    typedef Index<TText, TIndexSpec>                                        TIndex;
+    typedef Backtracking<HammingDistance, TSpec>                            TFinderSpec;
+    typedef typename TextIterator_<TIndex, TPattern, TFinderSpec>::Type     TTextIterator;
+    typedef typename PatternIterator_<TIndex, TPattern, TFinderSpec>::Type  TPatternIterator;
+
+    setPatternIterator(finder, begin(pattern));
+
+    TTextIterator & textIt = textIterator(finder);
+    TPatternIterator & patternIt = patternIterator(finder);
+
+    do
+    {
+        // Exact case.
+        if (finder._score == finder._scoreThreshold)
+        {
+            if (goDown(textIt, suffix(pattern, position(patternIt))))
+            {
+                delegate(finder);
+            }
+
+            goUp(textIt);
+
+            // Termination.
+            if (isRoot(textIt)) break;
+        }
+
+        // Approximate case.
+        else if (finder._score < finder._scoreThreshold)
+        {
+            // Base case.
+            if (atEnd(patternIt))
+            {
+                delegate(finder);
+            }
+
+            // Recursive case.
+            else if (goDown(textIt))
+            {
+                finder._score += _getVertexScore(finder);
+                goNext(patternIt);
+                continue;
+            }
+        }
+
+        // Backtrack.
+        do
+        {
+            // Termination.
+            if (isRoot(textIt)) break;
+
+            goPrevious(patternIt);
+            finder._score -= _getVertexScore(finder);
+        }
+        while (!goRight(textIt) && goUp(textIt));
+
+        // Termination.
+        if (isRoot(textIt)) break;
+
+        finder._score += _getVertexScore(finder);
+        goNext(patternIt);
+    }
+    while (true);
+}
+
+// ----------------------------------------------------------------------------
+// Function countOcc()
+// ----------------------------------------------------------------------------
 
 template <typename TIndex, typename TPatterns>
 inline typename Size<TIndex>::Type
@@ -161,18 +238,17 @@ countOcc(TIndex & index, TPatterns & patterns)
     typedef typename Value<TPatterns>::Type           TPattern;
     typedef Finder2<TIndex, TPattern, FinderSTree>    TFinder;
 
-    OccCounter counter;
     TFinder finder(index);
 
     typename Size<TIndex>::Type count = 0;
     for (unsigned i = 0; i < length(patterns); ++i)
     {
-        find(finder, patterns[i], counter);
-        count += counter.count;
-        clear(finder);
-        counter.count = 0;
-
-//        find(finder, pattern, [count](TFinder const & finder) { count += countOccurrences(textIterator(finder)); });
+        std::cout << patterns[i] << std::endl;
+        find(finder, patterns[i],
+             [&count](TFinder const & finder)
+             {
+                count += countOccurrences(textIterator(finder));
+             });
     }
 
     return count;
@@ -202,9 +278,9 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading queries");
 
     start = sysTime();
-//    std::cout << countOccurrences(index, queries) << std::endl;
 //    std::cout << finish - start << " sec" << std::endl;
-    std::cout << (double)length(queries) / countOcc(index, queries) << " occurrences/query" << std::endl;
+//    std::cout << (double)length(queries) / countOcc(index, queries) << " occurrences/query" << std::endl;
+    std::cout << countOcc(index, queries) << " occurrences" << std::endl;
     finish = sysTime();
     std::cout << (unsigned)(length(queries) / (finish - start)) << " query/sec" << std::endl;
 }

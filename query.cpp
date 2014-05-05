@@ -243,7 +243,7 @@ countOcc(TIndex & index, TPatterns & patterns)
 
     TFinder finder(index);
 
-    for (unsigned i = 0; i < length(patterns); ++i)
+    for (typename Size<TPatterns>::Type i = 0; i < length(patterns); ++i)
     {
         find(finder, patterns[i],
              [&count](TFinder const & finder)

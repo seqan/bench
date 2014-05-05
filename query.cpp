@@ -75,11 +75,13 @@ struct Options : BaseOptions
     TList           algorithmTypeList;
 
     unsigned        errors;
+    bool            locate;
 
     Options() :
         BaseOptions(),
         algorithmType(ALGO_SINGLE),
-        errors(0)
+        errors(0),
+        locate(false)
     {
         algorithmTypeList.push_back("single");
         algorithmTypeList.push_back("dfs");
@@ -114,6 +116,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setMinValue(parser, "errors", "0");
     setMaxValue(parser, "errors", "5");
     setDefaultValue(parser, "errors", options.errors);
+    addOption(parser, ArgParseOption("l", "locate", "Locate occurrences. Default: count only."));
 }
 
 // ----------------------------------------------------------------------------
@@ -137,6 +140,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     getTextLimits(options, parser);
 //    getAlgorithmType(options, parser);
     getOptionValue(options.errors, parser, "errors");
+    getOptionValue(options.locate, parser, "locate");
 
     return ArgumentParser::PARSE_OK;
 }
@@ -228,31 +232,58 @@ find(Finder2<Index<TText, TIndexSpec>, TPattern, Backtracking<HammingDistance, T
     while (true);
 }
 
+
 // ----------------------------------------------------------------------------
-// Function countOcc()
+// Function locate()
 // ----------------------------------------------------------------------------
 
-template <typename TIndex, typename TPatterns>
+template <typename TSA, typename TSARange>
+inline typename Size<TSA>::Type
+locate(TSA const & sa, TSARange const & saRange, True)
+{
+    typedef typename Value<TSARange, 1>::Type   TSAPos;
+    typedef typename Size<TSA>::Type            TSASize;
+
+    TSASize checkSum = 0;
+    for (TSAPos saPos = getValueI1(saRange); saPos < getValueI2(saRange); ++saPos)
+        checkSum += getSeqOffset(sa[saPos]);
+    return checkSum;
+}
+
+template <typename TSA, typename TSARange>
+inline typename Size<TSA>::Type
+locate(TSA const & /* sa */, TSARange const & /* saRange */, False)
+{
+    return 0;
+}
+
+// ----------------------------------------------------------------------------
+// Function count()
+// ----------------------------------------------------------------------------
+
+template <typename TIndex, typename TPatterns, typename TLocate>
 inline typename Size<TIndex>::Type
-countOcc(TIndex & index, TPatterns & patterns)
+count(TIndex & index, TPatterns & patterns, TLocate const & /* tag */)
 {
     typedef typename Value<TPatterns>::Type           TPattern;
     typedef Finder2<TIndex, TPattern, FinderSTree>    TFinder;
 
     typename Size<TIndex>::Type count = 0;
+    volatile  typename Size<TIndex>::Type locateSum = 0;
 
     TFinder finder(index);
 
     for (typename Size<TPatterns>::Type i = 0; i < length(patterns); ++i)
     {
         find(finder, patterns[i],
-             [&count](TFinder const & finder)
+             [&index, &count, &locateSum](TFinder const & finder)
              {
                 count += countOccurrences(textIterator(finder));
+                locateSum += locate(indexSA(index), range(textIterator(finder)), TLocate());
              });
         clear(finder);
     }
-
+    
     return count;
 }
 
@@ -280,7 +311,7 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading queries");
 
     start = sysTime();
-    unsigned long occurrences = countOcc(index, queries);
+    unsigned long occurrences = options.locate ? count(index, queries, True()) : count(index, queries, False());
     finish = sysTime();
 
     std::cout << length(queries) << " queries" << std::endl;

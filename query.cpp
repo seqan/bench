@@ -152,7 +152,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 
 template <typename TText, typename TIndexSpec, typename TPattern, typename TDelegate>
 SEQAN_HOST_DEVICE inline void
-find(Finder2<Index<TText, TIndexSpec>, TPattern, FinderSTree> & finder,
+find(Finder2<Index<TText, TIndexSpec>, TPattern, Backtracking<Exact> > & finder,
      TPattern const & pattern,
      TDelegate && delegate)
 {
@@ -258,33 +258,68 @@ locate(TSA const & /* sa */, TSARange const & /* saRange */, False)
 }
 
 // ----------------------------------------------------------------------------
-// Function count()
+// Function countOccurrences()
+// ----------------------------------------------------------------------------
+
+template <typename TIndex, typename TPatterns, typename TErrors, typename TLocate, typename TFinderSpec>
+inline typename Size<TIndex>::Type
+countOccurrences(TIndex & index, TPatterns const & patterns, TErrors errors, TLocate, TFinderSpec)
+{
+    typedef typename Value<TPatterns const>::Type           TPattern;
+    typedef Finder2<TIndex, TPattern, TFinderSpec>          TFinder;
+    typedef typename Size<TIndex>::Type                     TSize;
+    typedef typename Size<TPatterns>::Type                  TPatternsSize;
+
+    TFinder finder(index);
+    setScoreThreshold(finder, errors);
+
+    TSize count = 0;
+    TSize volatile checkSum = 0;
+
+    for (TPatternsSize i = 0; i < length(patterns); ++i)
+    {
+        find(finder, patterns[i],
+             [&index, &count, &checkSum](TFinder const & finder)
+             {
+                count += countOccurrences(textIterator(finder));
+                checkSum += locate(indexSA(index), range(textIterator(finder)), TLocate());
+             });
+        clear(finder);
+    }
+
+    return count;
+}
+
+template <typename TText, typename TSpec, typename TPatterns, typename TErrors, typename TLocate>
+inline typename Size<Index<TText, IndexEsa<TSpec> > >::Type
+countOccurrences(Index<TText, IndexEsa<TSpec> > &, TPatterns const &, TErrors, TLocate, Backtracking<HammingDistance>)
+{
+    throw RuntimeError("Unsupported index type");
+    return 0;
+}
+
+// ----------------------------------------------------------------------------
+// Function countOccurrences()
 // ----------------------------------------------------------------------------
 
 template <typename TIndex, typename TPatterns, typename TLocate>
 inline typename Size<TIndex>::Type
-count(TIndex & index, TPatterns & patterns, TLocate const & /* tag */)
+countOccurrences(Options const & options, TIndex & index, TPatterns const & patterns, TLocate const & tag)
 {
-    typedef typename Value<TPatterns>::Type           TPattern;
-    typedef Finder2<TIndex, TPattern, FinderSTree>    TFinder;
+    if (options.errors)
+        return countOccurrences(index, patterns, options.errors, tag, Backtracking<HammingDistance>());
+    else
+        return countOccurrences(index, patterns, options.errors, tag, Backtracking<Exact>());
+}
 
-    typename Size<TIndex>::Type count = 0;
-    volatile  typename Size<TIndex>::Type locateSum = 0;
-
-    TFinder finder(index);
-
-    for (typename Size<TPatterns>::Type i = 0; i < length(patterns); ++i)
-    {
-        find(finder, patterns[i],
-             [&index, &count, &locateSum](TFinder const & finder)
-             {
-                count += countOccurrences(textIterator(finder));
-                locateSum += locate(indexSA(index), range(textIterator(finder)), TLocate());
-             });
-        clear(finder);
-    }
-    
-    return count;
+template <typename TIndex, typename TPatterns>
+inline typename Size<TIndex>::Type
+countOccurrences(Options const & options, TIndex & index, TPatterns const & patterns)
+{
+    if (options.locate)
+        return countOccurrences(options, index, patterns, True());
+    else
+        return countOccurrences(options, index, patterns, False());
 }
 
 // ----------------------------------------------------------------------------
@@ -292,7 +327,7 @@ count(TIndex & index, TPatterns & patterns, TLocate const & /* tag */)
 // ----------------------------------------------------------------------------
 
 template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TIndexSpec>
-inline void run(Options & options)
+inline void run(Options const & options)
 {
     double start, finish;
 
@@ -311,7 +346,7 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading queries");
 
     start = sysTime();
-    unsigned long occurrences = options.locate ? count(index, queries, True()) : count(index, queries, False());
+    unsigned long occurrences = countOccurrences(options, index, queries);
     finish = sysTime();
 
     std::cout << length(queries) << " queries" << std::endl;

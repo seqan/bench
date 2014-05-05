@@ -284,6 +284,7 @@ inline void run(Options & options)
     finish = sysTime();
 
     std::cout << length(queries) << " queries" << std::endl;
+    std::cout << lengthSum(queries) << " symbols" << std::endl;
     std::cout << occurrences << " occurrences" << std::endl;
     std::cout << finish - start << " sec" << std::endl;
 

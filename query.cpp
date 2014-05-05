@@ -298,6 +298,14 @@ countOccurrences(Index<TText, IndexEsa<TSpec> > &, TPatterns const &, TErrors, T
     return 0;
 }
 
+template <typename TText, typename TShape, typename TSpec, typename TPatterns, typename TErrors, typename TLocate>
+inline typename Size<Index<TText, IndexQGram<TShape, TSpec> > >::Type
+countOccurrences(Index<TText, IndexQGram<TShape, TSpec> > &, TPatterns const &, TErrors, TLocate, Backtracking<HammingDistance>)
+{
+    throw RuntimeError("Unsupported index type");
+    return 0;
+}
+
 // ----------------------------------------------------------------------------
 // Function countOccurrences()
 // ----------------------------------------------------------------------------

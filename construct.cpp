@@ -125,16 +125,15 @@ inline void construct(TIndex & index)
     ignoreUnusedVariableWarning(it);
 }
 
-template <typename TText, typename TIndexSpec>
-inline void construct(Index<TText, FMIndex<TIndexSpec> > & index)
+template <typename TText, typename TSpec, typename TConfig>
+inline void construct(Index<TText, FMIndex<TSpec, TConfig> > & index)
 {
-    typedef Index<TText, FMIndex<TIndexSpec> >          TIndex;
+    typedef Index<TText, FMIndex<TSpec, TConfig> >      TIndex;
     typedef typename Iterator<TIndex, TopDown<> >::Type TIter;
 
     reverse(indexText(index));
     TIter it(index);
     ignoreUnusedVariableWarning(it);
-    reverse(indexText(index));
 }
 
 // ----------------------------------------------------------------------------

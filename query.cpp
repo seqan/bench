@@ -280,10 +280,15 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading queries");
 
     start = sysTime();
-//    std::cout << countOcc(index, queries) << " occurrences" << std::endl;
-    std::cout << countOcc(index, queries) / (double)length(queries) << " occurrences/query" << std::endl;
+    unsigned long occurrences = countOcc(index, queries);
     finish = sysTime();
-    std::cout << (unsigned)(length(queries) / (finish - start)) << " query/sec" << std::endl;
+
+    std::cout << length(queries) << " queries" << std::endl;
+    std::cout << occurrences << " occurrences" << std::endl;
+    std::cout << finish - start << " sec" << std::endl;
+
+//    std::cout << countOcc(index, queries) / (double)length(queries) << " occurrences/query" << std::endl;
+//    std::cout << (unsigned)(length(queries) / (finish - start)) << " query/sec" << std::endl;
 }
 
 int main(int argc, char const ** argv)

@@ -259,12 +259,28 @@ find(Finder2<Index<TText, TTextIndexSpec>, Index<TPattern, TPatternIndexSpec>, B
 // Function buildTrie()
 // ----------------------------------------------------------------------------
 
-template <typename TIndex, typename TText>
-inline void buildTrie(TIndex & index, TText const & text)
+template <typename TText, typename TSpec>
+inline void buildTrie(Index<TText, IndexSa<TSpec> > & index)
 {
-//    // Construct index using quicksort.
-//    QGramLess_<TIndexSAPos, TText const> less(db.text, seedLength);
-//    std::sort(begin(sa, Standard()), end(sa, Standard()), less);
+    typedef Index<TText, IndexSa<TSpec> >           TIndex;
+    typedef typename Fibre<TIndex, FibreSA>::Type   TSA;
+    typedef typename Value<TSA>::Type               TSAValue;
+    typedef QGramLess_<TSAValue, TText const>       TLess;
+
+    TText const & text = indexText(index);
+    TSA & sa = indexSA(index);
+
+    // Fill the suffix array with (i, 0).
+    TSAValue saValue(0, 0);
+    resize(sa, length(text), Exact());
+    generate(sa, [&saValue]()
+                 {
+                    saValue.i1++;
+                    return saValue;
+                 });
+
+    // Construct index using quicksort.
+    sort(sa, TLess(text, maxLength(text)));
 }
 
 // ----------------------------------------------------------------------------
@@ -294,6 +310,7 @@ locateOccurrences(TSA const & /* sa */, TSARange const & /* saRange */, False)
 // ----------------------------------------------------------------------------
 // Function countOccurrences()
 // ----------------------------------------------------------------------------
+// Single search.
 
 template <typename TIndex, typename TQueries, typename TLocate, typename TFinderSpec>
 inline typename Size<TIndex>::Type
@@ -324,6 +341,11 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
     return count;
 }
 
+// ----------------------------------------------------------------------------
+// Function countOccurrences()
+// ----------------------------------------------------------------------------
+// Multiple search (DFS).
+
 template <typename TIndex, typename TNeedles, typename TLocate, typename TFinderSpec>
 inline typename Size<TIndex>::Type
 countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TLocate, TFinderSpec, DfsPreorder)
@@ -333,8 +355,8 @@ countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TL
     typedef typename Size<TIndex>::Type                     TSize;
 
     TFinder finder;
-    TPattern pattern;
-    buildTrie(pattern, needles);
+    TPattern pattern(needles);
+    buildTrie(pattern);
 
 //    setMaxScore(finder, options.errors);
 
@@ -351,6 +373,18 @@ countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TL
 
     return count;
 }
+
+template <typename TIndex, typename TNeedles, typename TLocate>
+inline typename Size<TIndex>::Type
+countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TLocate, Backtracking<Exact>, DfsPreorder)
+{
+    return countOccurrences(options, index, needles, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
+}
+
+// ----------------------------------------------------------------------------
+// Function countOccurrences()
+// ----------------------------------------------------------------------------
+// Disable HammingDistance search on Esa and QGram - they lack trie-like iterator.
 
 template <typename TText, typename TSpec, typename TQueries, typename TLocate>
 inline typename Size<Index<TText, IndexEsa<TSpec> > >::Type
@@ -371,6 +405,7 @@ countOccurrences(Options const &, Index<TText, IndexQGram<TShape, TSpec> > &, TQ
 // ----------------------------------------------------------------------------
 // Function countOccurrences()
 // ----------------------------------------------------------------------------
+// Dispatch locate, distance, and search algorithm.
 
 template <typename TIndex, typename TQueries, typename TLocate, typename TFinderSpec>
 inline typename Size<TIndex>::Type
@@ -396,10 +431,10 @@ template <typename TIndex, typename TQueries, typename TLocate>
 inline typename Size<TIndex>::Type
 countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate const & tag)
 {
-//    if (options.errors)
+    if (options.errors)
         return countOccurrences(options, index, queries, tag, Backtracking<HammingDistance>());
-//    else
-//        return countOccurrences(options, index, queries, tag, Backtracking<Exact>());
+    else
+        return countOccurrences(options, index, queries, tag, Backtracking<Exact>());
 }
 
 template <typename TIndex, typename TQueries>
@@ -443,9 +478,6 @@ inline void run(Options const & options)
     std::cout << lengthSum(queries) << " symbols" << std::endl;
     std::cout << occurrences << " occurrences" << std::endl;
     std::cout << finish - start << " sec" << std::endl;
-
-//    std::cout << countOcc(index, queries) / (double)length(queries) << " occurrences/query" << std::endl;
-//    std::cout << (unsigned)(length(queries) / (finish - start)) << " query/sec" << std::endl;
 }
 
 int main(int argc, char const ** argv)

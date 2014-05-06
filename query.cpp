@@ -148,7 +148,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 // ----------------------------------------------------------------------------
 // Function find()
 // ----------------------------------------------------------------------------
-// Overloaded to accept Delegate &&
+// Overloaded to accept C++11 && delegate
 
 template <typename TText, typename TIndexSpec, typename TPattern, typename TDelegate>
 SEQAN_HOST_DEVICE inline void
@@ -232,14 +232,48 @@ find(Finder2<Index<TText, TIndexSpec>, TPattern, Backtracking<HammingDistance, T
     while (true);
 }
 
+template <typename TText, typename TTextIndexSpec, typename TPattern, typename TPatternIndexSpec, typename TDistance, typename TSpec, typename TValue, typename TDelegate>
+inline void
+find(Finder2<Index<TText, TTextIndexSpec>, Index<TPattern, TPatternIndexSpec>, Backtracking<TDistance, TSpec> > & finder,
+     Index<TText, TTextIndexSpec> & text,
+     Index<TPattern, TPatternIndexSpec> & pattern,
+     TValue maxScore,
+     TDelegate && delegate)
+{
+    typedef Index<TText, TTextIndexSpec>                                                TTextIndex;
+    typedef Index<TPattern, TPatternIndexSpec>                                          TPatternIndex;
+    typedef Backtracking<TDistance, TSpec>                                              TBacktracking;
+    typedef typename TextIterator_<TTextIndex, TPatternIndex, TBacktracking>::Type      TTextIterator;
+    typedef typename PatternIterator_<TTextIndex, TPatternIndex, TBacktracking>::Type   TPatternIterator;
+
+    TTextIterator textIt(text);
+    TPatternIterator patternIt(pattern);
+
+    setMaxScore(finder, maxScore);
+    _initState(finder, textIt, patternIt);
+    _find(finder, delegate, StageInitial_());
+    _popState(finder, StageInitial_());
+}
 
 // ----------------------------------------------------------------------------
-// Function locate()
+// Function buildTrie()
+// ----------------------------------------------------------------------------
+
+template <typename TIndex, typename TText>
+inline void buildTrie(TIndex & index, TText const & text)
+{
+//    // Construct index using quicksort.
+//    QGramLess_<TIndexSAPos, TText const> less(db.text, seedLength);
+//    std::sort(begin(sa, Standard()), end(sa, Standard()), less);
+}
+
+// ----------------------------------------------------------------------------
+// Function locateOccurrences()
 // ----------------------------------------------------------------------------
 
 template <typename TSA, typename TSARange>
 inline typename Size<TSA>::Type
-locate(TSA const & sa, TSARange const & saRange, True)
+locateOccurrences(TSA const & sa, TSARange const & saRange, True)
 {
     typedef typename Value<TSARange, 1>::Type   TSAPos;
     typedef typename Size<TSA>::Type            TSASize;
@@ -252,7 +286,7 @@ locate(TSA const & sa, TSARange const & saRange, True)
 
 template <typename TSA, typename TSARange>
 inline typename Size<TSA>::Type
-locate(TSA const & /* sa */, TSARange const & /* saRange */, False)
+locateOccurrences(TSA const & /* sa */, TSARange const & /* saRange */, False)
 {
     return 0;
 }
@@ -261,28 +295,28 @@ locate(TSA const & /* sa */, TSARange const & /* saRange */, False)
 // Function countOccurrences()
 // ----------------------------------------------------------------------------
 
-template <typename TIndex, typename TPatterns, typename TErrors, typename TLocate, typename TFinderSpec>
+template <typename TIndex, typename TQueries, typename TLocate, typename TFinderSpec>
 inline typename Size<TIndex>::Type
-countOccurrences(TIndex & index, TPatterns const & patterns, TErrors errors, TLocate, TFinderSpec)
+countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, TFinderSpec, Serial)
 {
-    typedef typename Value<TPatterns const>::Type           TPattern;
+    typedef typename Value<TQueries>::Type                  TPattern;
     typedef Finder2<TIndex, TPattern, TFinderSpec>          TFinder;
     typedef typename Size<TIndex>::Type                     TSize;
-    typedef typename Size<TPatterns>::Type                  TPatternsSize;
+    typedef typename Size<TQueries>::Type                   TQueriesSize;
 
     TFinder finder(index);
-    setScoreThreshold(finder, errors);
+    setScoreThreshold(finder, options.errors);
 
     TSize count = 0;
     TSize volatile checkSum = 0;
 
-    for (TPatternsSize i = 0; i < length(patterns); ++i)
+    for (TQueriesSize i = 0; i < length(queries); ++i)
     {
-        find(finder, patterns[i],
+        find(finder, queries[i],
              [&index, &count, &checkSum](TFinder const & finder)
              {
                 count += countOccurrences(textIterator(finder));
-                checkSum += locate(indexSA(index), range(textIterator(finder)), TLocate());
+                checkSum += locateOccurrences(indexSA(index), range(textIterator(finder)), TLocate());
              });
         clear(finder);
     }
@@ -290,17 +324,45 @@ countOccurrences(TIndex & index, TPatterns const & patterns, TErrors errors, TLo
     return count;
 }
 
-template <typename TText, typename TSpec, typename TPatterns, typename TErrors, typename TLocate>
+template <typename TIndex, typename TNeedles, typename TLocate, typename TFinderSpec>
+inline typename Size<TIndex>::Type
+countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TLocate, TFinderSpec, DfsPreorder)
+{
+    typedef Index<TNeedles, IndexSa<> >                     TPattern;
+    typedef Finder2<TIndex, TPattern, TFinderSpec>          TFinder;
+    typedef typename Size<TIndex>::Type                     TSize;
+
+    TFinder finder;
+    TPattern pattern;
+    buildTrie(pattern, needles);
+
+//    setMaxScore(finder, options.errors);
+
+    TSize count = 0;
+    TSize volatile checkSum = 0;
+
+    find(finder, index, pattern, options.errors,
+         [&index, &count, &checkSum](TFinder const & finder)
+         {
+            count += countOccurrences(back(finder.textStack)) * countOccurrences(back(finder.patternStack));
+            checkSum += locateOccurrences(indexSA(index), range(back(finder.textStack)), TLocate());
+         });
+    clear(finder);
+
+    return count;
+}
+
+template <typename TText, typename TSpec, typename TQueries, typename TLocate>
 inline typename Size<Index<TText, IndexEsa<TSpec> > >::Type
-countOccurrences(Index<TText, IndexEsa<TSpec> > &, TPatterns const &, TErrors, TLocate, Backtracking<HammingDistance>)
+countOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries const &, TLocate, Backtracking<HammingDistance>, Serial)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
 }
 
-template <typename TText, typename TShape, typename TSpec, typename TPatterns, typename TErrors, typename TLocate>
+template <typename TText, typename TShape, typename TSpec, typename TQueries, typename TLocate>
 inline typename Size<Index<TText, IndexQGram<TShape, TSpec> > >::Type
-countOccurrences(Index<TText, IndexQGram<TShape, TSpec> > &, TPatterns const &, TErrors, TLocate, Backtracking<HammingDistance>)
+countOccurrences(Options const &, Index<TText, IndexQGram<TShape, TSpec> > &, TQueries const &, TLocate, Backtracking<HammingDistance>, Serial)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
@@ -310,24 +372,44 @@ countOccurrences(Index<TText, IndexQGram<TShape, TSpec> > &, TPatterns const &, 
 // Function countOccurrences()
 // ----------------------------------------------------------------------------
 
-template <typename TIndex, typename TPatterns, typename TLocate>
+template <typename TIndex, typename TQueries, typename TLocate, typename TFinderSpec>
 inline typename Size<TIndex>::Type
-countOccurrences(Options const & options, TIndex & index, TPatterns const & patterns, TLocate const & tag)
+countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate const & locateTag, TFinderSpec const & finderSpec)
 {
-    if (options.errors)
-        return countOccurrences(index, patterns, options.errors, tag, Backtracking<HammingDistance>());
-    else
-        return countOccurrences(index, patterns, options.errors, tag, Backtracking<Exact>());
+    switch (options.algorithmType)
+    {
+    case Options::ALGO_SINGLE:
+        return countOccurrences(options, index, queries, locateTag, finderSpec, Serial());
+
+    case Options::ALGO_DFS:
+        return countOccurrences(options, index, queries, locateTag, finderSpec, DfsPreorder());
+
+//    case Options::ALGO_BFS:
+//        return countOccurrences(options, index, queries, locateTag, finderSpec, BfsIterator());
+
+    default:
+        throw RuntimeError("Unsupported search algorithm");
+    }
 }
 
-template <typename TIndex, typename TPatterns>
+template <typename TIndex, typename TQueries, typename TLocate>
 inline typename Size<TIndex>::Type
-countOccurrences(Options const & options, TIndex & index, TPatterns const & patterns)
+countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate const & tag)
+{
+//    if (options.errors)
+        return countOccurrences(options, index, queries, tag, Backtracking<HammingDistance>());
+//    else
+//        return countOccurrences(options, index, queries, tag, Backtracking<Exact>());
+}
+
+template <typename TIndex, typename TQueries>
+inline typename Size<TIndex>::Type
+countOccurrences(Options const & options, TIndex & index, TQueries & queries)
 {
     if (options.locate)
-        return countOccurrences(options, index, patterns, True());
+        return countOccurrences(options, index, queries, True());
     else
-        return countOccurrences(options, index, patterns, False());
+        return countOccurrences(options, index, queries, False());
 }
 
 // ----------------------------------------------------------------------------
@@ -339,7 +421,7 @@ inline void run(Options const & options)
 {
     double start, finish;
 
-    typedef typename TextCollection<TAlphabet>::Type                        TQuery;
+    typedef typename TextCollection<TAlphabet, Limits<__uint8> >::Type      TQueries;
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
     typedef Index<TText, TIndexSpec>                                        TIndex;
 
@@ -348,7 +430,7 @@ inline void run(Options const & options)
     if (!open(index, toCString(options.textIndexFile)))
         throw RuntimeError("Error while loading full-text index");
 
-    TQuery queries;
+    TQueries queries;
 
     if (!open(queries, toCString(options.queryFile)))
         throw RuntimeError("Error while loading queries");

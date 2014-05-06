@@ -1,7 +1,7 @@
 // ==========================================================================
 //                 SeqAn - The Library for Sequence Analysis
 // ==========================================================================
-// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+// Copyright (c) 2006-2014, Knut Reinert, FU Berlin
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -34,16 +34,12 @@
 // Approximate string matching via backtracking on VSTrees
 // ==========================================================================
 
-#ifndef SANDBOX_ESIRAGUSA_INCLUDE_SEQAN_FIND_BACKTRACKING_BFS_H_
-#define SANDBOX_ESIRAGUSA_INCLUDE_SEQAN_FIND_BACKTRACKING_BFS_H_
+#ifndef APP_IBENCH_FIND_BACKTRACKING_BFS_H_
+#define APP_IBENCH_FIND_BACKTRACKING_BFS_H_
 
 //#define SEQAN_DEBUG
 
 namespace seqan {
-
-// ============================================================================
-// Forwards
-// ============================================================================
 
 // ============================================================================
 // Metafunctions
@@ -379,4 +375,4 @@ void find(TTextIndex & text,
 
 }
 
-#endif  // #ifndef SANDBOX_ESIRAGUSA_INCLUDE_SEQAN_FIND_BACKTRACKING_BFS_H_
+#endif  // #ifndef APP_IBENCH_FIND_BACKTRACKING_BFS_H_

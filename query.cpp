@@ -249,40 +249,10 @@ find(Finder2<Index<TText, TTextIndexSpec>, Index<TPattern, TPatternIndexSpec>, B
     TTextIterator textIt(text);
     TPatternIterator patternIt(pattern);
 
-    setMaxScore(finder, maxScore);
+    setScoreThreshold(finder, maxScore);
     _initState(finder, textIt, patternIt);
     _find(finder, delegate, StageInitial_());
     _popState(finder, StageInitial_());
-}
-
-// ----------------------------------------------------------------------------
-// Function buildTrie()
-// ----------------------------------------------------------------------------
-
-template <typename TText, typename TSpec>
-inline void buildTrie(Index<TText, IndexSa<TSpec> > & index)
-{
-    typedef Index<TText, IndexSa<TSpec> >           TIndex;
-    typedef typename Fibre<TIndex, FibreSA>::Type   TSA;
-    typedef typename Value<TSA>::Type               TSAValue;
-    typedef QGramLess_<TSAValue, TText const>       TLess;
-
-    TText const & text = indexText(index);
-    TSA & sa = indexSA(index);
-
-    resize(sa, length(text), Exact());
-
-    // Fill the suffix array with (i, 0).
-    TSAValue saValue(0, 0);
-    generate(sa, [&saValue]()
-    {
-        TSAValue val = saValue;
-        setValueI1(saValue, getValueI1(saValue) + 1);
-        return val;
-    });
-
-    // Sort the suffix array using quicksort.
-    sort(sa, TLess(text, maxLength(text)));
 }
 
 // ----------------------------------------------------------------------------
@@ -357,15 +327,15 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
 
     TFinder finder;
     TPattern pattern(queries);
-    buildTrie(pattern);
+    indexCreate(pattern, FibreSA(), Trie());
 
     TSize count = 0;
     TSize volatile checkSum = 0;
 
     find(finder, index, pattern, options.errors, [&](TFinder const & finder)
     {
-        count += countOccurrences(back(finder.textStack)) * countOccurrences(back(finder.patternStack));
-        checkSum += locateOccurrences(indexSA(index), range(back(finder.textStack)), TLocate());
+        count += countOccurrences(textIterator(finder)) * countOccurrences(patternIterator(finder));
+        checkSum += locateOccurrences(indexSA(index), range(textIterator(finder)), TLocate());
     });
     clear(finder);
 

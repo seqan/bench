@@ -270,16 +270,18 @@ inline void buildTrie(Index<TText, IndexSa<TSpec> > & index)
     TText const & text = indexText(index);
     TSA & sa = indexSA(index);
 
+    resize(sa, length(text), Exact());
+
     // Fill the suffix array with (i, 0).
     TSAValue saValue(0, 0);
-    resize(sa, length(text), Exact());
     generate(sa, [&saValue]()
                  {
-                    saValue.i1++;
-                    return saValue;
+                    TSAValue val = saValue;
+                    setValueI1(saValue, getValueI1(saValue) + 1);
+                    return val;
                  });
 
-    // Construct index using quicksort.
+    // Sort the suffix array using quicksort.
     sort(sa, TLess(text, maxLength(text)));
 }
 
@@ -357,8 +359,6 @@ countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TL
     TFinder finder;
     TPattern pattern(needles);
     buildTrie(pattern);
-
-//    setMaxScore(finder, options.errors);
 
     TSize count = 0;
     TSize volatile checkSum = 0;

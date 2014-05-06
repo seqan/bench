@@ -71,7 +71,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SEQAN_CXX_FLAGS} ${CXX11_CXX_FLAGS}")
 add_executable(ibench_dump dump.cpp options.h types.h run.h)
 add_executable(ibench_construct construct.cpp options.h types.h run.h)
 add_executable(ibench_visit visit.cpp options.h types.h run.h)
-add_executable(ibench_query query.cpp options.h types.h run.h find.h)
+add_executable(ibench_query query.cpp options.h types.h run.h find.h find_backtracking_dfs.h find_backtracking_bfs.h)
 
 # Add dependencies found by find_package (SeqAn).
 target_link_libraries (ibench_dump ${SEQAN_LIBRARIES})

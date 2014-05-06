@@ -143,8 +143,6 @@ inline void construct(Index<TText, FMIndex<TSpec, TConfig> > & index)
 template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TIndexSpec>
 inline void run(Options & options)
 {
-    double start, finish;
-
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
     typedef Index<TText, TIndexSpec>                                        TIndex;
 
@@ -155,9 +153,9 @@ inline void run(Options & options)
 
     TIndex index(text);
 
-    start = sysTime();
+    double start = sysTime();
     construct(index);
-    finish = sysTime();
+    double finish = sysTime();
     std::cout << length(text) << " texts" << std::endl;
     std::cout << lengthSum(text) << " symbols" << std::endl;
     std::cout << finish - start << " sec" << std::endl;

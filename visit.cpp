@@ -162,8 +162,6 @@ countSubstrings(TIndex & index, TLength length)
 template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TIndexSpec>
 inline void run(Options & options)
 {
-    double start, finish;
-
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
     typedef Index<TText, TIndexSpec>                                        TIndex;
 
@@ -172,10 +170,10 @@ inline void run(Options & options)
     if (!open(index, toCString(options.textIndexFile)))
         throw RuntimeError("Error while loading full-text index");
 
-    start = sysTime();
+    double start = sysTime();
     std::cout << countSubstrings(index, options.depth) << " nodes" << std::endl;
 //                 (unsigned long)std::pow(ValueSize<TAlphabet>::VALUE, options.depth) << std::endl;
-    finish = sysTime();
+    double finish = sysTime();
     std::cout << finish - start << " sec" << std::endl;
 }
 

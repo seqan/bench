@@ -147,7 +147,7 @@ inline void run(TOptions & options)
         return run<char>(options);
 
     default:
-        throw Exception();
+        throw RuntimeError("Unsupported alphabet type");
     }
 }
 
@@ -163,7 +163,15 @@ inline int run(int argc, char const ** argv)
     if (res != ArgumentParser::PARSE_OK)
         return res;
 
-    run(options);
+    try
+    {
+        run(options);
+    }
+    catch (Exception const & e)
+    {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
 
     return 0;
 }

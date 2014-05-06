@@ -316,7 +316,7 @@ locateOccurrences(TSA const & /* sa */, TSARange const & /* saRange */, False)
 
 template <typename TIndex, typename TQueries, typename TLocate, typename TFinderSpec>
 inline typename Size<TIndex>::Type
-countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, TFinderSpec, Serial)
+countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, TFinderSpec, Nothing)
 {
     typedef typename Value<TQueries>::Type                  TPattern;
     typedef Finder2<TIndex, TPattern, TFinderSpec>          TFinder;
@@ -387,7 +387,7 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
 template <typename TText, typename TSpec, typename TQueries, typename TLocate>
 inline typename Size<Index<TText, IndexEsa<TSpec> > >::Type
 countOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, TLocate,
-                 Backtracking<HammingDistance>, Serial)
+                 Backtracking<HammingDistance>, Nothing)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
@@ -396,7 +396,7 @@ countOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, 
 template <typename TText, typename TShape, typename TSpec, typename TQueries, typename TLocate>
 inline typename Size<Index<TText, IndexQGram<TShape, TSpec> > >::Type
 countOccurrences(Options const &, Index<TText, IndexQGram<TShape, TSpec> > &, TQueries &, TLocate,
-                 Backtracking<HammingDistance>, Serial)
+                 Backtracking<HammingDistance>, Nothing)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
@@ -432,7 +432,7 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
     switch (options.algorithmType)
     {
     case Options::ALGO_SINGLE:
-        return countOccurrences(options, index, queries, locateTag, finderSpec, Serial());
+        return countOccurrences(options, index, queries, locateTag, finderSpec, Nothing());
 
     case Options::ALGO_DFS:
         return countOccurrences(options, index, queries, locateTag, finderSpec, DfsPreorder());

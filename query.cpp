@@ -275,11 +275,11 @@ inline void buildTrie(Index<TText, IndexSa<TSpec> > & index)
     // Fill the suffix array with (i, 0).
     TSAValue saValue(0, 0);
     generate(sa, [&saValue]()
-                 {
-                    TSAValue val = saValue;
-                    setValueI1(saValue, getValueI1(saValue) + 1);
-                    return val;
-                 });
+    {
+        TSAValue val = saValue;
+        setValueI1(saValue, getValueI1(saValue) + 1);
+        return val;
+    });
 
     // Sort the suffix array using quicksort.
     sort(sa, TLess(text, maxLength(text)));
@@ -329,16 +329,15 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
     TSize count = 0;
     TSize volatile checkSum = 0;
 
-    for (TQueriesSize i = 0; i < length(queries); ++i)
+    forEach(queries, [&](TPattern const & query)
     {
-        find(finder, queries[i],
-             [&index, &count, &checkSum](TFinder const & finder)
-             {
-                count += countOccurrences(textIterator(finder));
-                checkSum += locateOccurrences(indexSA(index), range(textIterator(finder)), TLocate());
-             });
+        find(finder, query, [&](TFinder const & finder)
+        {
+            count += countOccurrences(textIterator(finder));
+            checkSum += locateOccurrences(indexSA(index), range(textIterator(finder)), TLocate());
+        });
         clear(finder);
-    }
+    });
 
     return count;
 }
@@ -363,12 +362,11 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
     TSize count = 0;
     TSize volatile checkSum = 0;
 
-    find(finder, index, pattern, options.errors,
-         [&index, &count, &checkSum](TFinder const & finder)
-         {
-            count += countOccurrences(back(finder.textStack)) * countOccurrences(back(finder.patternStack));
-            checkSum += locateOccurrences(indexSA(index), range(back(finder.textStack)), TLocate());
-         });
+    find(finder, index, pattern, options.errors, [&](TFinder const & finder)
+    {
+        count += countOccurrences(back(finder.textStack)) * countOccurrences(back(finder.patternStack));
+        checkSum += locateOccurrences(indexSA(index), range(back(finder.textStack)), TLocate());
+    });
     clear(finder);
 
     return count;

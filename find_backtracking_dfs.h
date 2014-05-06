@@ -42,137 +42,41 @@
 namespace seqan {
 
 // ============================================================================
+// Classes
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Class Finder2
+// ----------------------------------------------------------------------------
+
+template <typename THaystack, typename TTextSpec, typename TNeedle, typename TPatternSpec>
+struct Finder2<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtracking<HammingDistance, DfsPreorder> > :
+    Finder2<Index<THaystack, TIndexSpec>, Index<TNeedle, TPatternSpec>, void>
+{
+    typedef Finder2<Index<THaystack, TIndexSpec>, Index<TNeedle, TPatternSpec>, void>       TBase;
+
+    Finder2() :
+        TBase()
+    {}
+};
+
+// ============================================================================
 // Functions
 // ============================================================================
 
-template <typename TTextIterator, typename TPatternIterator, typename TSize, typename TErrors, typename TDelegate>
-inline void _search(TTextIterator textIt,
-                    TPatternIterator patternIt,
-                    TSize const patternsLength,
-                    TErrors const maxErrors,
-                    TSize currentDepth,
-                    TErrors errors,
-                    TDelegate & delegate)
+// ----------------------------------------------------------------------------
+// Function _getVertexScore()
+// ----------------------------------------------------------------------------
+
+template <typename THaystack, typename TTextSpec, typename TNeedle, typename TPatternSpec, typename TDistance, typename TSpec>
+SEQAN_HOST_DEVICE inline typename Score_<Backtracking<TDistance, TSpec> >::Type
+_getVertexScore(Finder2<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtracking<TDistance, TSpec> > const & finder)
 {
-    typedef typename EdgeLabel<TTextIterator>::Type         TTextLabel;
-    typedef typename EdgeLabel<TPatternIterator>::Type      TPatternLabel;
-
-#ifdef SEQAN_DEBUG
-    std::cout << "representative: " << representative(textIt) << std::endl;
-    std::cout << "repLength:      " << repLength(textIt) << std::endl;
-    std::cout << "current depth:  " << currentDepth << std::endl;
-#endif
-
-    // NOTE(esiragusa): Using repLength() is fine only for tries.
-    SEQAN_ASSERT_EQ(repLength(textIt), currentDepth);
-    SEQAN_ASSERT_EQ(repLength(patternIt), currentDepth);
-    
-    // An acceptance state was reached.
-    if (currentDepth == patternsLength || isLeaf(patternIt))
-    {
-        onMatch(delegate, textIt, patternIt, errors);
-    }
-    else
-    {
-        // Visit all children of pattern.
-        if (currentDepth < patternsLength && goDown(patternIt))
-        {
-            do
-            {
-                TTextLabel patternLabel = parentEdgeLabel(patternIt);
-                TTextIterator textChildIt = textIt;
-
-                // Search the corresponding children in the text.
-                if (goDown(textChildIt, patternLabel))
-                {
-#ifdef SEQAN_DEBUG
-                    std::cout << "pattern:        " << patternLabel << std::endl;
-                    std::cout << "errors:         " << static_cast<unsigned>(errors) << std::endl;
-#endif
-                    _search(textChildIt, patternIt, patternsLength, maxErrors, currentDepth + 1, errors, delegate);
-
-#ifdef SEQAN_DEBUG
-                    std::cout << "back to depth:  " << currentDepth << std::endl;
-#endif
-                }
-
-            } while (goRight(patternIt));
-        }
-    }
-}
-
-template <typename TTextIterator, typename TPatternIterator, typename TSize, typename TErrors, typename TDelegate>
-inline void _dfs(TTextIterator textIt,
-                 TPatternIterator patternIt,
-                 TSize const patternsLength,
-                 TErrors const maxErrors,
-                 TSize currentDepth,
-                 TErrors errors,
-                 TDelegate & delegate)
-{
-    typedef typename EdgeLabel<TTextIterator>::Type         TTextLabel;
-    typedef typename EdgeLabel<TPatternIterator>::Type      TPatternLabel;
-
-#ifdef SEQAN_DEBUG
-    std::cout << "representative: " << representative(textIt) << std::endl;
-    std::cout << "repLength:      " << repLength(textIt) << std::endl;
-    std::cout << "current depth:  " << currentDepth << std::endl;
-#endif
-
-    // NOTE(esiragusa): Using repLength() is fine only for tries.
-    SEQAN_ASSERT_EQ(repLength(textIt), currentDepth);
-    SEQAN_ASSERT_EQ(repLength(patternIt), currentDepth);
-
-    // An acceptance state was reached.
-    if (currentDepth == patternsLength || isLeaf(patternIt))
-    {
-        onMatch(delegate, textIt, patternIt, errors);
-    }
-    else
-    {
-        // Visit all children of text and pattern.
-        if (goDown(textIt) && (currentDepth < patternsLength && goDown(patternIt)))
-        {
-            // Visit all children of text.
-            do
-            {
-                TTextLabel textLabel = parentEdgeLabel(textIt);
-                TPatternIterator patternChildIt = patternIt;
-
-                // Visit all children of pattern.
-                // NOTE(esiragusa): Each children could be visited more than once.
-                do
-                {
-                    TTextLabel patternLabel = parentEdgeLabel(patternChildIt);
-
-                    // Align edge labels.
-                    TErrors distance = (textLabel == patternLabel) ? 0 : 1;
-                    TErrors newErrors = errors + distance;
-
-#ifdef SEQAN_DEBUG
-                    std::cout << "text:           " << textLabel << std::endl;
-                    std::cout << "pattern:        " << patternLabel << std::endl;
-                    std::cout << "distance:       " << static_cast<unsigned>(distance) << std::endl;
-                    std::cout << "errors:         " << static_cast<unsigned>(newErrors) << std::endl;
-#endif
-
-                    if (newErrors < maxErrors)
-                        _dfs(textIt, patternChildIt, patternsLength, maxErrors, currentDepth + 1, newErrors, delegate);
-                    else
-                        _search(textIt, patternChildIt, patternsLength, maxErrors, currentDepth + 1, newErrors, delegate);
-
-#ifdef SEQAN_DEBUG
-                    std::cout << "back to depth:  " << currentDepth << std::endl;
-#endif
-                } while (goRight(patternChildIt));
-
-            } while (goRight(textIt));
-        }
-    }
+    return !ordEqual(parentEdgeLabel(textIterator(finder)), parentEdgeLabel(patternIterator(finder)));
 }
 
 //template <typename TTextIterator, typename TPatternIterator, typename TSize, typename TErrors, typename TDelegate>
-//inline void _dfs(TTextIterator textIt,
+//inline void _iterateDfs(TTextIterator textIt,
 //                 TPatternIterator patternIt,
 //                 TSize const patternsLength,
 //                 TErrors const maxErrors,
@@ -183,8 +87,8 @@ inline void _dfs(TTextIterator textIt,
 //    typedef typename EdgeLabel<TTextIterator>::Type         TTextLabel;
 //    typedef typename EdgeLabel<TPatternIterator>::Type      TPatternLabel;
 //
-//    typedef typename Container<TPatternIterator>::Type      TPatternIndex;
-//    typedef typename Value<TPatternIndex>::Type             TPatternAlphabet;
+//    typedef typename Container<TPatternIterator>::Type      TPattern;
+//    typedef typename Value<TPattern>::Type             TPatternAlphabet;
 //    typedef typename ValueSize<TPatternAlphabet>::Type      TPatternAlphabetSize;
 //
 //    TPatternIterator patternChildren[ValueSize<TPatternAlphabet>::VALUE + 1];
@@ -254,28 +158,139 @@ inline void _dfs(TTextIterator textIt,
 //    }
 //}
 
-// NOTE(esiragusa): TTextIndex and TPatternIndex must be tries
-template <typename TTextIndex, typename TPatternIndex, typename TSize, typename TErrors, typename TDelegate>
-void find(TTextIndex & text,
-          TPatternIndex & pattern,
-          TSize patternsLength,
-          TErrors errors,
-          TDelegate & delegate,
-          DfsPreorder const & /* tag */)
+
+//template <typename TTextIterator, typename TPatternIterator, typename TSize, typename TErrors, typename TDelegate>
+//inline void _search(TTextIterator textIt,
+//                    TPatternIterator patternIt,
+//                    TSize const patternsLength,
+//                    TErrors const maxErrors,
+//                    TSize currentDepth,
+//                    TErrors errors,
+//                    TDelegate & delegate)
+//{
+//    typedef typename EdgeLabel<TTextIterator>::Type         TTextLabel;
+//    typedef typename EdgeLabel<TPatternIterator>::Type      TPatternLabel;
+//
+//#ifdef SEQAN_DEBUG
+//    std::cout << "representative: " << representative(textIt) << std::endl;
+//    std::cout << "repLength:      " << repLength(textIt) << std::endl;
+//    std::cout << "current depth:  " << currentDepth << std::endl;
+//#endif
+//
+//    // NOTE(esiragusa): Using repLength() is fine only for tries.
+//    SEQAN_ASSERT_EQ(repLength(textIt), currentDepth);
+//    SEQAN_ASSERT_EQ(repLength(patternIt), currentDepth);
+//    
+//    // An acceptance state was reached.
+//    if (currentDepth == patternsLength || isLeaf(patternIt))
+//    {
+//        onMatch(delegate, textIt, patternIt, errors);
+//    }
+//    else
+//    {
+//        // Visit all children of pattern.
+//        if (currentDepth < patternsLength && goDown(patternIt))
+//        {
+//            do
+//            {
+//                TTextLabel patternLabel = parentEdgeLabel(patternIt);
+//                TTextIterator textChildIt = textIt;
+//
+//                // Search the corresponding children in the text.
+//                if (goDown(textChildIt, patternLabel))
+//                {
+//#ifdef SEQAN_DEBUG
+//                    std::cout << "pattern:        " << patternLabel << std::endl;
+//                    std::cout << "errors:         " << static_cast<unsigned>(errors) << std::endl;
+//#endif
+//                    _search(textChildIt, patternIt, patternsLength, maxErrors, currentDepth + 1, errors, delegate);
+//
+//#ifdef SEQAN_DEBUG
+//                    std::cout << "back to depth:  " << currentDepth << std::endl;
+//#endif
+//                }
+//
+//            } while (goRight(patternIt));
+//        }
+//    }
+//}
+
+// ----------------------------------------------------------------------------
+// Function _recurseDfs()
+// ----------------------------------------------------------------------------
+
+template <typename TFinder, typename TTextIterator, typename TPatternIterator, typename TErrors, typename TDelegate>
+inline void _recurseDfs(TFinder & me;
+                        TTextIterator textIt,
+                        TPatternIterator patternIt,
+                        TErrors errors,
+                        TDelegate & delegate)
 {
-    typedef TopDown<>                                               TIteratorSpec;
-    typedef typename Iterator<TTextIndex, TIteratorSpec>::Type      TTextIterator;
-    typedef typename Iterator<TPatternIndex, TIteratorSpec>::Type   TPatternIterator;
-    typedef String<TPatternIterator>                                TPatternIteratorString;
+#ifdef SEQAN_DEBUG
+    std::cout << "repLength: " << repLength(textIt) << std::endl;
+#endif
+
+    // An acceptance state was reached.
+    if (isLeaf(patternIt))
+    {
+        delegate(finder);
+    }
+    else
+    {
+        // Visit all children of text and pattern.
+        if (goDown(textIt) && goDown(patternIt))
+        {
+            // Visit all children of text.
+            do
+            {
+                TPatternIterator patternChildIt = patternIt;
+
+                // Visit all children of pattern.
+                // NOTE(esiragusa): Each children could be visited more than once.
+                do
+                {
+                    // Align edge labels.
+                    TErrors newErrors = errors + _getVertexScore(finder);
+
+#ifdef SEQAN_DEBUG
+                    std::cout << "text:    " << parentEdgeLabel(textIterator(finder)) << std::endl;
+                    std::cout << "pattern: " << parentEdgeLabel(patternIterator(finder)) << std::endl;
+                    std::cout << "errors:  " << static_cast<unsigned>(newErrors) << std::endl;
+#endif
+
+                    if (newErrors < finder._scoreThreshold)
+                        _recurseDfs(finder, textIt, patternChildIt, newErrors, delegate);
+                    else
+                        _search(finder, textIt, patternChildIt, newErrors, delegate);
+
+                }
+                while (goRight(patternChildIt));
+
+            }
+            while (goRight(textIt));
+        }
+    }
+}
+
+template <typename THaystack, typename TTextSpec, typename TNeedle, typename TPatternSpec, typename TDelegate>
+inline void
+find(Finder2<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtracking<HammingDistance, DfsPreorder> > & me
+     Index<THaystack, TTextSpec> & text,
+     Index<TNeedle, TPatternSpec> & pattern,
+     TDelegate && delegate)
+{
+    setPatternIterator(me, begin(pattern));
 
     TTextIterator textIt(text);
     TPatternIterator patternIt(pattern);
 
+    _recurseDfs(me, textIt, patternIt, static_cast<TErrors>(0), delegate);
+
     // NOTE(esiragusa): This is necessary since tail recursion was optimised in _dfs().
-    if (errors > 0)
-        _dfs(textIt, patternIt, patternsLength, errors, static_cast<TSize>(0), static_cast<TErrors>(0), delegate);
-    else
-        _search(textIt, patternIt, patternsLength, errors, static_cast<TSize>(0), static_cast<TErrors>(0), delegate);
+//    if (finder._scoreThreshold)
+//        _findDfs(textIt, patternIt, static_cast<TErrors>(0), delegate);
+//    else
+//        _search(textIt, patternIt, static_cast<TErrors>(0), delegate);
 }
 
 }

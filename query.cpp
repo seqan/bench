@@ -48,6 +48,7 @@
 #include "options.h"
 #include "types.h"
 #include "run.h"
+#include "find.h"
 
 using namespace seqan;
 
@@ -88,6 +89,10 @@ struct Options : BaseOptions
         algorithmTypeList.push_back("bfs");
     }
 };
+
+// ============================================================================
+// Functions
+// ============================================================================
 
 // ----------------------------------------------------------------------------
 // Function setupArgumentParser()
@@ -146,138 +151,28 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 }
 
 // ----------------------------------------------------------------------------
-// Function find()
-// ----------------------------------------------------------------------------
-// Overloaded to accept C++11 && delegate
-
-template <typename TText, typename TIndexSpec, typename TPattern, typename TDelegate>
-SEQAN_HOST_DEVICE inline void
-find(Finder2<Index<TText, TIndexSpec>, TPattern, Backtracking<Exact> > & finder,
-     TPattern const & pattern,
-     TDelegate && delegate)
-{
-    if (goDown(textIterator(finder), pattern))
-    {
-        delegate(finder);
-    }
-}
-
-template <typename TText, typename TIndexSpec, typename TPattern, typename TSpec, typename TDelegate>
-inline void
-find(Finder2<Index<TText, TIndexSpec>, TPattern, Backtracking<HammingDistance, TSpec> > & finder,
-     TPattern const & pattern,
-     TDelegate && delegate)
-{
-    typedef Index<TText, TIndexSpec>                                        TIndex;
-    typedef Backtracking<HammingDistance, TSpec>                            TFinderSpec;
-    typedef typename TextIterator_<TIndex, TPattern, TFinderSpec>::Type     TTextIterator;
-    typedef typename PatternIterator_<TIndex, TPattern, TFinderSpec>::Type  TPatternIterator;
-
-    setPatternIterator(finder, begin(pattern));
-
-    TTextIterator & textIt = textIterator(finder);
-    TPatternIterator & patternIt = patternIterator(finder);
-
-    do
-    {
-        // Exact case.
-        if (finder._score == finder._scoreThreshold)
-        {
-            if (goDown(textIt, suffix(pattern, position(patternIt))))
-            {
-                delegate(finder);
-            }
-
-            goUp(textIt);
-
-            // Termination.
-            if (isRoot(textIt)) break;
-        }
-
-        // Approximate case.
-        else if (finder._score < finder._scoreThreshold)
-        {
-            // Base case.
-            if (atEnd(patternIt))
-            {
-                delegate(finder);
-            }
-
-            // Recursive case.
-            else if (goDown(textIt))
-            {
-                finder._score += _getVertexScore(finder);
-                goNext(patternIt);
-                continue;
-            }
-        }
-
-        // Backtrack.
-        do
-        {
-            // Termination.
-            if (isRoot(textIt)) break;
-
-            goPrevious(patternIt);
-            finder._score -= _getVertexScore(finder);
-        }
-        while (!goRight(textIt) && goUp(textIt));
-
-        // Termination.
-        if (isRoot(textIt)) break;
-
-        finder._score += _getVertexScore(finder);
-        goNext(patternIt);
-    }
-    while (true);
-}
-
-template <typename TText, typename TTextIndexSpec, typename TPattern, typename TPatternIndexSpec, typename TDistance, typename TSpec, typename TValue, typename TDelegate>
-inline void
-find(Finder2<Index<TText, TTextIndexSpec>, Index<TPattern, TPatternIndexSpec>, Backtracking<TDistance, TSpec> > & finder,
-     Index<TText, TTextIndexSpec> & text,
-     Index<TPattern, TPatternIndexSpec> & pattern,
-     TValue maxScore,
-     TDelegate && delegate)
-{
-    typedef Index<TText, TTextIndexSpec>                                                TTextIndex;
-    typedef Index<TPattern, TPatternIndexSpec>                                          TPatternIndex;
-    typedef Backtracking<TDistance, TSpec>                                              TBacktracking;
-    typedef typename TextIterator_<TTextIndex, TPatternIndex, TBacktracking>::Type      TTextIterator;
-    typedef typename PatternIterator_<TTextIndex, TPatternIndex, TBacktracking>::Type   TPatternIterator;
-
-    TTextIterator textIt(text);
-    TPatternIterator patternIt(pattern);
-
-    setScoreThreshold(finder, maxScore);
-    _initState(finder, textIt, patternIt);
-    _find(finder, delegate, StageInitial_());
-    _popState(finder, StageInitial_());
-}
-
-// ----------------------------------------------------------------------------
 // Function locateOccurrences()
 // ----------------------------------------------------------------------------
 
-template <typename TSA, typename TSARange>
-inline typename Size<TSA>::Type
-locateOccurrences(TSA const & sa, TSARange const & saRange, True)
+template <typename TIndex, typename TSpec>
+inline void locateOccurrences(Iter<TIndex, TSpec> const & it, True)
 {
-    typedef typename Value<TSARange, 1>::Type   TSAPos;
-    typedef typename Size<TSA>::Type            TSASize;
+    typedef typename Fibre<TIndex, FibreSA>::Type   TSA;
+    typedef typename Infix<TSA const>::Type         TOccurrences;
+    typedef typename Value<TOccurrences>::Type      TOccurrence;
+    typedef typename Size<TIndex>::Type             TSize;
 
-    TSASize checkSum = 0;
-    for (TSAPos saPos = getValueI1(saRange); saPos < getValueI2(saRange); ++saPos)
-        checkSum += getSeqOffset(sa[saPos]);
-    return checkSum;
+    TOccurrences const & occs = getOccurrences(it);
+
+    forEach(occs, [&](TOccurrence const & occ)
+    {
+        TSize volatile offset = getSeqOffset(occ);
+        ignoreUnusedVariableWarning(offset);
+    });
 }
 
-template <typename TSA, typename TSARange>
-inline typename Size<TSA>::Type
-locateOccurrences(TSA const & /* sa */, TSARange const & /* saRange */, False)
-{
-    return 0;
-}
+template <typename TIndex, typename TSpec>
+inline void locateOccurrences(Iter<TIndex, TSpec> const & /* it */, False) {}
 
 // ----------------------------------------------------------------------------
 // Function countOccurrences()
@@ -291,20 +186,18 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
     typedef typename Value<TQueries>::Type                  TPattern;
     typedef Finder2<TIndex, TPattern, TFinderSpec>          TFinder;
     typedef typename Size<TIndex>::Type                     TSize;
-    typedef typename Size<TQueries>::Type                   TQueriesSize;
 
     TFinder finder(index);
     setScoreThreshold(finder, options.errors);
 
     TSize count = 0;
-    TSize volatile checkSum = 0;
 
     forEach(queries, [&](TPattern const & query)
     {
         find(finder, query, [&](TFinder const & finder)
         {
             count += countOccurrences(textIterator(finder));
-            checkSum += locateOccurrences(indexSA(index), range(textIterator(finder)), TLocate());
+            locateOccurrences(textIterator(finder), TLocate());
         });
         clear(finder);
     });
@@ -330,12 +223,11 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
     indexCreate(pattern, FibreSA(), Trie());
 
     TSize count = 0;
-    TSize volatile checkSum = 0;
 
     find(finder, index, pattern, options.errors, [&](TFinder const & finder)
     {
         count += countOccurrences(textIterator(finder)) * countOccurrences(patternIterator(finder));
-        checkSum += locateOccurrences(indexSA(index), range(textIterator(finder)), TLocate());
+        locateOccurrences(textIterator(finder), TLocate());
     });
     clear(finder);
 

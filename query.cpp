@@ -111,7 +111,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setTextLimits(parser, options);
 
     addSection(parser, "Query Options");
-//    setAlgorithmType(parser, options);
+    setAlgorithmType(parser, options);
     addOption(parser, ArgParseOption("e", "errors", "Number of errors.", ArgParseOption::INTEGER));
     setMinValue(parser, "errors", "0");
     setMaxValue(parser, "errors", "5");
@@ -138,7 +138,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     getAlphabetType(options, parser);
     getIndexType(options, parser);
     getTextLimits(options, parser);
-//    getAlgorithmType(options, parser);
+    getAlgorithmType(options, parser);
     getOptionValue(options.errors, parser, "errors");
     getOptionValue(options.locate, parser, "locate");
 

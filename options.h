@@ -175,7 +175,7 @@ void getAlphabetType(TOptions & options, ArgumentParser const & parser)
 template <typename TOptions>
 void setAlgorithmType(ArgumentParser & parser, TOptions const & options)
 {
-    addOption(parser, ArgParseOption("a", "algorithm", "Select the algorithm.", ArgParseOption::STRING));
+    addOption(parser, ArgParseOption("a", "algorithm", "Select the search algorithm.", ArgParseOption::STRING));
     setValidValues(parser, "algorithm", options.algorithmTypeList);
     setDefaultValue(parser, "algorithm", options.algorithmTypeList[options.algorithmType]);
 }

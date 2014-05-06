@@ -348,16 +348,16 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
 // ----------------------------------------------------------------------------
 // Multiple search (DFS).
 
-template <typename TIndex, typename TNeedles, typename TLocate, typename TFinderSpec>
+template <typename TIndex, typename TQueries, typename TLocate, typename TFinderSpec>
 inline typename Size<TIndex>::Type
-countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TLocate, TFinderSpec, DfsPreorder)
+countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, TFinderSpec, DfsPreorder)
 {
-    typedef Index<TNeedles, IndexSa<> >                     TPattern;
+    typedef Index<TQueries, IndexSa<> >                     TPattern;
     typedef Finder2<TIndex, TPattern, TFinderSpec>          TFinder;
     typedef typename Size<TIndex>::Type                     TSize;
 
     TFinder finder;
-    TPattern pattern(needles);
+    TPattern pattern(queries);
     buildTrie(pattern);
 
     TSize count = 0;
@@ -374,11 +374,11 @@ countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TL
     return count;
 }
 
-template <typename TIndex, typename TNeedles, typename TLocate>
+template <typename TIndex, typename TQueries, typename TLocate>
 inline typename Size<TIndex>::Type
-countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TLocate, Backtracking<Exact>, DfsPreorder)
+countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, Backtracking<Exact>, DfsPreorder)
 {
-    return countOccurrences(options, index, needles, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
+    return countOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
 }
 
 // ----------------------------------------------------------------------------
@@ -388,7 +388,8 @@ countOccurrences(Options const & options, TIndex & index, TNeedles & needles, TL
 
 template <typename TText, typename TSpec, typename TQueries, typename TLocate>
 inline typename Size<Index<TText, IndexEsa<TSpec> > >::Type
-countOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries const &, TLocate, Backtracking<HammingDistance>, Serial)
+countOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, TLocate,
+                 Backtracking<HammingDistance>, Serial)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
@@ -396,7 +397,26 @@ countOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries con
 
 template <typename TText, typename TShape, typename TSpec, typename TQueries, typename TLocate>
 inline typename Size<Index<TText, IndexQGram<TShape, TSpec> > >::Type
-countOccurrences(Options const &, Index<TText, IndexQGram<TShape, TSpec> > &, TQueries const &, TLocate, Backtracking<HammingDistance>, Serial)
+countOccurrences(Options const &, Index<TText, IndexQGram<TShape, TSpec> > &, TQueries &, TLocate,
+                 Backtracking<HammingDistance>, Serial)
+{
+    throw RuntimeError("Unsupported index type");
+    return 0;
+}
+
+template <typename TText, typename TSpec, typename TQueries, typename TLocate>
+inline typename Size<Index<TText, IndexEsa<TSpec> > >::Type
+countOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, TLocate,
+                 Backtracking<HammingDistance>, DfsPreorder)
+{
+    throw RuntimeError("Unsupported index type");
+    return 0;
+}
+
+template <typename TText, typename TShape, typename TSpec, typename TQueries, typename TLocate>
+inline typename Size<Index<TText, IndexQGram<TShape, TSpec> > >::Type
+countOccurrences(Options const &, Index<TText, IndexQGram<TShape, TSpec> > &, TQueries &, TLocate,
+                 Backtracking<HammingDistance>, DfsPreorder)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
@@ -454,8 +474,6 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries)
 template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TIndexSpec>
 inline void run(Options const & options)
 {
-    double start, finish;
-
     typedef typename TextCollection<TAlphabet, Limits<__uint8> >::Type      TQueries;
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
     typedef Index<TText, TIndexSpec>                                        TIndex;
@@ -470,9 +488,9 @@ inline void run(Options const & options)
     if (!open(queries, toCString(options.queryFile)))
         throw RuntimeError("Error while loading queries");
 
-    start = sysTime();
+    double start = sysTime();
     unsigned long occurrences = countOccurrences(options, index, queries);
-    finish = sysTime();
+    double finish = sysTime();
 
     std::cout << length(queries) << " queries" << std::endl;
     std::cout << lengthSum(queries) << " symbols" << std::endl;

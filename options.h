@@ -72,12 +72,15 @@ struct BaseOptions
     AlphabetType    alphabetType;
     TList           alphabetTypeList;
 
+    bool            tsv;
+
     BaseOptions() :
         textCount(32),
         textSum(32),
         textLen(32),
         textIndexType(INDEX_SA),
-        alphabetType(ALPHABET_DNA)
+        alphabetType(ALPHABET_DNA),
+        tsv(false)
     {
         alphabetTypeList.push_back("dna");
         alphabetTypeList.push_back("protein");

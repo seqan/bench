@@ -109,6 +109,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
 
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
+    addOption(parser, ArgParseOption("v", "tsv", "Tab separated value output."));
 
     addSection(parser, "Main Options");
     setAlphabetType(parser, options);
@@ -139,6 +140,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 
     getArgumentValue(options.textIndexFile, parser, 0);
     getArgumentValue(options.queryFile, parser, 1);
+    getOptionValue(options.tsv, parser, "tsv");
 
     getAlphabetType(options, parser);
     getIndexType(options, parser);
@@ -352,10 +354,17 @@ inline void run(Options const & options)
     unsigned long occurrences = countOccurrences(options, index, queries);
     double finish = sysTime();
 
-    std::cout << length(queries) << " queries" << std::endl;
-    std::cout << lengthSum(queries) << " symbols" << std::endl;
-    std::cout << occurrences << " occurrences" << std::endl;
-    std::cout << std::fixed << finish - start << " sec" << std::endl;
+    if (options.tsv)
+    {
+        std::cout << occurrences << '\t' << std::fixed << finish - start << std::endl;
+    }
+    else
+    {
+        std::cout << length(queries) << " queries" << std::endl;
+        std::cout << lengthSum(queries) << " symbols" << std::endl;
+        std::cout << occurrences << " occurrences" << std::endl;
+        std::cout << std::fixed << finish - start << " sec" << std::endl;
+    }
 }
 
 int main(int argc, char const ** argv)

@@ -80,6 +80,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
 
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
+    addOption(parser, ArgParseOption("v", "tsv", "Tab separated value output."));
 
     addSection(parser, "Main Options");
     setAlphabetType(parser, options);
@@ -103,6 +104,7 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
 
     getArgumentValue(options.textFile, parser, 0);
     getArgumentValue(options.textIndexFile, parser, 1);
+    getOptionValue(options.tsv, parser, "tsv");
 
     getAlphabetType(options, parser);
     getIndexType(options, parser);
@@ -156,10 +158,17 @@ inline void run(Options & options)
     double start = sysTime();
     construct(index);
     double finish = sysTime();
-    std::cout << (unsigned long)length(text) << " texts" << std::endl;
-    std::cout << lengthSum(text) << " symbols" << std::endl;
-    std::cout << std::fixed << finish - start << " sec" << std::endl;
-//    std::cout << (unsigned)(lengthSum(text) / (finish - start)) << " symbols/sec" << std::endl;
+
+    if (options.tsv)
+    {
+        std::cout << lengthSum(text) << '\t' << std::fixed << finish - start << std::endl;
+    }
+    else
+    {
+        std::cout << (unsigned long)length(text) << " texts" << std::endl;
+        std::cout << lengthSum(text) << " symbols" << std::endl;
+        std::cout << std::fixed << finish - start << " sec" << std::endl;
+    }
 
     if (!save(index, toCString(options.textIndexFile)))
         throw RuntimeError("Error while saving full-text index");

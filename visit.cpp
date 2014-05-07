@@ -87,6 +87,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fIINDEX FILE\\fP>");
 
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
+    addOption(parser, ArgParseOption("v", "tsv", "Tab separated value output."));
 
     addSection(parser, "Main Options");
     setAlphabetType(parser, options);
@@ -112,6 +113,7 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
         return res;
 
     getArgumentValue(options.textIndexFile, parser, 0);
+    getOptionValue(options.tsv, parser, "tsv");
 
     getAlphabetType(options, parser);
     getIndexType(options, parser);
@@ -171,10 +173,18 @@ inline void run(Options & options)
         throw RuntimeError("Error while loading full-text index");
 
     double start = sysTime();
-    std::cout << countSubstrings(index, options.depth) << " nodes" << std::endl;
-//                 (unsigned long)std::pow(ValueSize<TAlphabet>::VALUE, options.depth) << std::endl;
-    double finish = sysTime();
-    std::cout << std::fixed << finish - start << " sec" << std::endl;
+    unsigned long substrings = countSubstrings(index, options.depth);
+    double finish = sysTime()
+
+    if (options.tsv)
+    {
+        std::cout << substrings << '\t' << std::fixed << finish - start << std::endl;
+    }
+    else
+    {
+        std::cout << substrings << " nodes" << std::endl;
+        std::cout << std::fixed << finish - start << " sec" << std::endl;
+    }
 }
 
 int main(int argc, char const ** argv)

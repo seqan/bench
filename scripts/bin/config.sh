@@ -32,7 +32,7 @@ function vars_dna
     QUERY_ALGORITHM="single dfs"
 }
 
-function vars_dna_XXX
+function vars_dna_celegans
 {
     SRC=~/Datasets/celegans
 
@@ -141,14 +141,17 @@ echo $CMD
 $CMD
 
 # construct text index
+echo -e "alphabet\tindex\ttime" > $DIR/construct.tsv
 for index_type in $INDEX_TYPE;
 do
     cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
     echo $CMD
     $CMD
+    echo -e "$ALPHABET\t$index_type\t$time" >> $DIR/construct.tsv
 done
 
 # visit text index
+echo -e "alphabet\tindex\tdepth\ttime" > $DIR/visit.tsv
 for index_type in $INDEX_TYPE;
 do
     for depth in $VISIT_DEPTH;
@@ -156,6 +159,7 @@ do
         cmd_visit $depth $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
         echo $CMD
         $CMD
+        echo -e "$ALPHABET\t$index_type\t$depth\t$time" >> $DIR/visit.tsv
     done
 done
 
@@ -168,6 +172,7 @@ do
 done
 
 # query patterns
+echo -e "alphabet\tindex\terrors\tplength\ttime" > $DIR/query.tsv
 for index_type in $INDEX_TYPE;
 do
     for errors in $QUERY_ERRORS;
@@ -177,6 +182,10 @@ do
             cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type $pattern_length $errors single
             echo $CMD
             $CMD
+            if [ $? -eq 0 ]
+            then
+                echo -e "$ALPHABET\t$index_type\t$errors\t$pattern_length\t$time" >> $DIR/query.tsv
+            fi
         done
     done
 done

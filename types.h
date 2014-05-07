@@ -63,7 +63,7 @@ struct Value<Limits<T1, T2>, 1>
 template <typename T1, typename T2>
 struct Value<Limits<T1, T2>, 2>
 {
-        typedef T2 Type;
+    typedef T2 Type;
 };
 }
 

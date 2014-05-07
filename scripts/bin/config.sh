@@ -141,7 +141,7 @@ echo $CMD
 $CMD
 
 # construct text index
-echo -e "alphabet\tindex\ttime" > $DIR/construct.tsv
+echo -e "alphabet\tindex\tsymbols\ttime" > $DIR/construct.tsv
 for index_type in $INDEX_TYPE;
 do
     cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type

@@ -112,19 +112,19 @@ function cmd_prepare
 # cmd_construct input output alphabet count sum length index
 function cmd_construct
 {
-    CMD="$BIN/ibench_construct $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7"
+    CMD="$BIN/ibench_construct --tsv $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7"
 }
 
 # cmd_visit depth input alphabet count sum length index
 function cmd_visit
 {
-    CMD="$BIN/ibench_visit $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -d $1"
+    CMD="$BIN/ibench_visit --tsv $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -d $1"
 }
 
 # cmd_query text pattern alphabet count sum length index plength errors algo
 function cmd_query
 {
-    CMD="$BIN/ibench_query $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
+    CMD="$BIN/ibench_query --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
 }
 
 
@@ -146,20 +146,20 @@ for index_type in $INDEX_TYPE;
 do
     cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
     echo $CMD
-    $CMD
-    echo -e "$ALPHABET\t$index_type\t$time" >> $DIR/construct.tsv
+    output=$($CMD)
+    echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
 done
 
 # visit text index
-echo -e "alphabet\tindex\tdepth\ttime" > $DIR/visit.tsv
+echo -e "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
 for index_type in $INDEX_TYPE;
 do
     for depth in $VISIT_DEPTH;
     do
         cmd_visit $depth $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
         echo $CMD
-        $CMD
-        echo -e "$ALPHABET\t$index_type\t$depth\t$time" >> $DIR/visit.tsv
+        output=$($CMD)
+        echo -e "$ALPHABET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
     done
 done
 
@@ -172,7 +172,7 @@ do
 done
 
 # query patterns
-echo -e "alphabet\tindex\terrors\tplength\ttime" > $DIR/query.tsv
+echo -e "alphabet\tindex\terrors\tplength\toccurrences\ttime" > $DIR/query.tsv
 for index_type in $INDEX_TYPE;
 do
     for errors in $QUERY_ERRORS;
@@ -181,10 +181,10 @@ do
         do
             cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type $pattern_length $errors single
             echo $CMD
-            $CMD
+            output=$($CMD)
             if [ $? -eq 0 ]
             then
-                echo -e "$ALPHABET\t$index_type\t$errors\t$pattern_length\t$time" >> $DIR/query.tsv
+                echo -e "$ALPHABET\t$index_type\t$errors\t$pattern_length\t$output" >> $DIR/query.tsv
             fi
         done
     done

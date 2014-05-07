@@ -147,7 +147,10 @@ do
     cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
     echo $CMD
     output=$($CMD)
-    echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
+    if [ $? -eq 0 ]
+    then
+        echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
+    fi
 done
 
 # visit text index
@@ -159,7 +162,10 @@ do
         cmd_visit $depth $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
         echo $CMD
         output=$($CMD)
-        echo -e "$ALPHABET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
+        if [ $? -eq 0 ]
+        then
+            echo -e "$ALPHABET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
+        fi
     done
 done
 

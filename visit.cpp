@@ -174,7 +174,7 @@ inline void run(Options & options)
 
     double start = sysTime();
     unsigned long substrings = countSubstrings(index, options.depth);
-    double finish = sysTime()
+    double finish = sysTime();
 
     if (options.tsv)
     {

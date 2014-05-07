@@ -174,7 +174,7 @@ inline void run(Options & options)
     std::cout << countSubstrings(index, options.depth) << " nodes" << std::endl;
 //                 (unsigned long)std::pow(ValueSize<TAlphabet>::VALUE, options.depth) << std::endl;
     double finish = sysTime();
-    std::cout << finish - start << " sec" << std::endl;
+    std::cout << std::fixed << finish - start << " sec" << std::endl;
 }
 
 int main(int argc, char const ** argv)

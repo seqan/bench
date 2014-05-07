@@ -158,7 +158,7 @@ inline void run(Options & options)
     double finish = sysTime();
     std::cout << (unsigned long)length(text) << " texts" << std::endl;
     std::cout << lengthSum(text) << " symbols" << std::endl;
-    std::cout << finish - start << " sec" << std::endl;
+    std::cout << std::fixed << finish - start << " sec" << std::endl;
 //    std::cout << (unsigned)(lengthSum(text) / (finish - start)) << " symbols/sec" << std::endl;
 
     if (!save(index, toCString(options.textIndexFile)))

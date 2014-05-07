@@ -355,7 +355,7 @@ inline void run(Options const & options)
     std::cout << length(queries) << " queries" << std::endl;
     std::cout << lengthSum(queries) << " symbols" << std::endl;
     std::cout << occurrences << " occurrences" << std::endl;
-    std::cout << finish - start << " sec" << std::endl;
+    std::cout << std::fixed << finish - start << " sec" << std::endl;
 }
 
 int main(int argc, char const ** argv)

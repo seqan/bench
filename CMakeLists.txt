@@ -31,9 +31,9 @@ if (NOT SEQAN_HAS_ZLIB)
   message (STATUS "  Zlib not found: building ibench without gzip decompression.")
 endif (NOT SEQAN_HAS_ZLIB)
 
-# Warn if BZip2 was not found.
+# Warn if Bzip2 was not found.
 if (NOT SEQAN_HAS_BZIP2)
-  message (STATUS "  BZip2 not found: building ibench without bzip2 decompression.")
+  message (STATUS "  Bzip2 not found: building ibench without bzip2 decompression.")
 endif (NOT SEQAN_HAS_BZIP2)
 
 # ----------------------------------------------------------------------------

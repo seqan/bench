@@ -260,4 +260,54 @@ struct Fibre<SparseString<String<TValue, TSpec>, void>, FibreIndicators>
 };
 }
 
+// ============================================================================
+// Functions
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Function save()
+// ----------------------------------------------------------------------------
+// This function is overloaded to avoid saving the text.
+
+namespace seqan {
+template <typename TText, typename TSSetSpec, typename TSpec, typename TConfig>
+inline bool save(Index<StringSet<TText, TSSetSpec>, FMIndex<TSpec, TConfig> > const & index,
+                 const char * fileName, int openMode)
+{
+    String<char> name;
+
+    name = fileName;    append(name, ".sa");
+    if (!save(getFibre(index, FibreSA()), toCString(name), openMode)) return false;
+
+    name = fileName;    append(name, ".lf");
+    if (!save(getFibre(index, FibreLF()), toCString(name), openMode)) return false;
+
+    return true;
+}
+}
+
+// ----------------------------------------------------------------------------
+// Function open()
+// ----------------------------------------------------------------------------
+// This function is overloaded to avoid loading the text.
+
+namespace seqan {
+template <typename TText, typename TSSetSpec, typename TSpec, typename TConfig>
+inline bool open(Index<StringSet<TText, TSSetSpec>, FMIndex<TSpec, TConfig> > & index,
+                 const char * fileName, int openMode)
+{
+    String<char> name;
+
+    name = fileName;    append(name, ".sa");
+    if (!open(getFibre(index, FibreSA()), toCString(name), openMode)) return false;
+
+    name = fileName;    append(name, ".lf");
+    if (!open(getFibre(index, FibreLF()), toCString(name), openMode)) return false;
+
+    setFibre(getFibre(index, FibreSA()), getFibre(index, FibreLF()), FibreLF());
+
+    return true;
+}
+}
+
 #endif  // #ifndef APP_IBENCH_TYPES_H_

@@ -141,7 +141,7 @@ echo $CMD
 $CMD
 
 # construct text index
-echo -e "alphabet\tindex\ttime" > $DIR/construct.tsv
+echo "alphabet\tindex\ttime" > $DIR/construct.tsv
 for index_type in $INDEX_TYPE;
 do
     cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
@@ -149,12 +149,12 @@ do
     output=$($CMD)
     if [ $? -eq 0 ]
     then
-        echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
+        echo "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
     fi
 done
 
 # visit text index
-echo -e "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
+echo "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
 for index_type in $INDEX_TYPE;
 do
     for depth in $VISIT_DEPTH;
@@ -164,7 +164,7 @@ do
         output=$($CMD)
         if [ $? -eq 0 ]
         then
-            echo -e "$ALPHABET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
+            echo "$ALPHABET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
         fi
     done
 done
@@ -178,7 +178,7 @@ do
 done
 
 # query patterns
-echo -e "alphabet\tindex\terrors\tplength\toccurrences\ttime" > $DIR/query.tsv
+echo "alphabet\tindex\terrors\tplength\toccurrences\ttime" > $DIR/query.tsv
 for index_type in $INDEX_TYPE;
 do
     for errors in $QUERY_ERRORS;
@@ -190,7 +190,7 @@ do
             output=$($CMD)
             if [ $? -eq 0 ]
             then
-                echo -e "$ALPHABET\t$index_type\t$errors\t$pattern_length\t$output" >> $DIR/query.tsv
+                echo "$ALPHABET\t$index_type\t$errors\t$pattern_length\t$output" >> $DIR/query.tsv
             fi
         done
     done

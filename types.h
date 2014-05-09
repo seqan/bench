@@ -134,7 +134,7 @@ struct LengthSum<StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > >
 {
     typedef TSum Type;
 };
-};
+}
 
 // ----------------------------------------------------------------------------
 // Metafunction TextCollection

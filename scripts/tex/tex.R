@@ -2,8 +2,10 @@ library("reshape")
 library("xtable")
 library("ggplot2")
 
-PATH="/Users/esiragusa/Code/seqan/core/apps/ibench/resources"
-FILENAME=paste(paste(PATH, "single", sep='/'), "tsv", sep='.')
+PATH="/Users/esiragusa/Datasets/ibench"
+FILENAME_CONSTRUCT=paste(paste(PATH, "construct", sep='/'), "tsv", sep='.')
+FILENAME_VISIT=paste(paste(PATH, "visit", sep='/'), "tsv", sep='.')
+FILENAME_QUERY=paste(paste(PATH, "query", sep='/'), "tsv", sep='.')
 
 options(scipen=999)
 
@@ -39,22 +41,43 @@ load_file <- function(filename)
         return(list(ok=FALSE))
 }
 
-if ((R = load_file(FILENAME))$ok)
+
+### PLOT VISIT ###
+
+if ((R = load_file(FILENAME_VISIT))$ok)
 {
-  TSV = R$tsv;
+  TABLE_VISIT = R$tsv;
 } else
-  print(paste("NOT FOUND:", FILENAME))
+  print(paste("NOT FOUND:", FILENAME_VISIT))
 
-
-### PLOT TIMES ###
-
-dna_0 = subset(TSV, alphabet=dna, errors=0, select=c(index, plength, time))
-fillup = data.frame(depth=c(1:10), rate=log(c(1:10)))
+table_visit = subset(TABLE_VISIT, alphabet=='dna', select=c(index, depth, time))
+#fillup = data.frame(depth=c(1:10), rate=log(c(1:10)))
 
 ggplot() +
-  geom_line(data=dna_0, aes(x=plength, y=time, group=index, shape=index, color=index)) +
-  geom_point(data=dna_0, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
+  geom_line(data=table_visit, aes(x=depth, y=time, group=index, shape=index, color=index)) +
+  geom_point(data=table_visit, aes(x=depth, y=time, group=index, shape=index, color=index), size=3) +
+  xlab("visit depth") +
+  ylab("visit time") +
+  scale_y_log10() +
+  theme_bw(base_size=12, base_family="Helvetica")
+
+
+### PLOT QUERY ###
+
+if ((R = load_file(FILENAME_QUERY))$ok)
+{
+  TABLE_QUERY = R$tsv;
+} else
+  print(paste("NOT FOUND:", FILENAME_QUERY))
+
+table_query = subset(TABLE_QUERY, alphabet=='dna' & errors==0, select=c(index, plength, time))
+#fillup = data.frame(depth=c(1:10), rate=log(c(1:10)))
+
+ggplot() +
+  geom_line(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index)) +
+  geom_point(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
   xlab("pattern length") +
   ylab("average time") +
-  theme_bw(base_size=12, base_family="Helvetica") +
-  geom_line(data=fillup, aes(x=depth, y=rate), linetype='dashed')
+  theme_bw(base_size=12, base_family="Helvetica")
+#+ geom_line(data=fillup, aes(x=depth, y=rate), linetype='dashed')
+

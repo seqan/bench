@@ -53,11 +53,13 @@ if ((R = load_file(FILENAME_VISIT))$ok)
   print(paste("NOT FOUND:", FILENAME_VISIT))
 
 table_visit = subset(TABLE_VISIT, alphabet=='dna', select=c(index, depth, time))
-#fillup = data.frame(depth=c(1:10), rate=log(c(1:10)))
+table_nodes = subset(TABLE_VISIT, alphabet=='dna' & index=='fm-tl', select=c(depth, nodes))
+table_nodes[,'nodes'] = log(table_nodes[, 'nodes'])
 
 ggplot() +
   geom_line(data=table_visit, aes(x=depth, y=time, group=index, shape=index, color=index)) +
   geom_point(data=table_visit, aes(x=depth, y=time, group=index, shape=index, color=index), size=3) +
+  geom_line(data=table_nodes, aes(x=depth, y=nodes), linetype='dotted') +
   xlab("depth") +
   ylab("log10 seconds") +
   scale_y_log10() +
@@ -83,13 +85,24 @@ ggplot() +
   geom_point(data=table_query_0, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
   geom_line(data=table_query_1, aes(x=plength, y=time, group=index, shape=index, color=index), linetype='dashed') +  
   geom_point(data=table_query_1, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
+  geom_line(data=table_nodes, aes(x=depth, y=nodes), linetype='dotted') +
   xlab("pattern length") +
-  ylab("log10 seconds") +
-  scale_y_log10() +
+  ylab("microseconds") +
   ggtitle("Search time by pattern length") +
   theme_bw(base_size=12, base_family="Helvetica")
 
-#fillup = data.frame(depth=c(1:10), rate=log(c(1:10)))
-#+ geom_line(data=fillup, aes(x=depth, y=rate), linetype='dashed')
-
 ggsave(file=PLOT_QUERY)
+
+
+
+# table_occ = subset(TABLE_QUERY, alphabet=='dna' & index=='fm-tl', select=c(plength, errors, occurrences))
+# table_occ[,'occurrences'] = table_occ[, 'occurrences'] / 1000000
+# 
+# ggplot() +
+#   geom_line(data=table_occ, aes(x=plength, y=occurrences, group=errors, color=errors)) +
+#   xlab("pattern length") +
+#   ylab("occurrences") +
+#   scale_y_log10() +
+#   ggtitle("Occurrenecs by pattern length") +
+#   theme_bw(base_size=12, base_family="Helvetica")
+

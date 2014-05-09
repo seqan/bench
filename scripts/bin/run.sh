@@ -1,5 +1,5 @@
 
-function vars_dna
+function vars_dna_ecoli
 {
     SRC=~/Datasets/ecoli
 
@@ -32,7 +32,7 @@ function vars_dna
 #    QUERY_ALGORITHM="single dfs"
 }
 
-function vars_dna_celegans
+function vars_dna
 {
     SRC=~/Datasets/celegans
 
@@ -131,7 +131,7 @@ function cmd_query
 # ======================================================================================================================
 
 SRC=~/Code/seqan/core/apps/ibench/scripts/resources
-BIN=~/Code/seqan-builds/Release-Clang/bin
+BIN=~/Code/seqan-builds/Release-Gcc/bin
 DIR=~/Datasets/ibench
 ALPHABET=$1
 

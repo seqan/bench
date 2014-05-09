@@ -29,7 +29,7 @@ function vars_dna
     # query
 #    QUERY_LOCATE=15
     QUERY_ERRORS="0 1"
-    QUERY_ALGORITHM="single dfs"
+#    QUERY_ALGORITHM="single dfs"
 }
 
 function vars_dna_celegans
@@ -62,7 +62,7 @@ function vars_dna_celegans
     # query
 #    QUERY_LOCATE=15
     QUERY_ERRORS="0 1"
-    QUERY_ALGORITHM="single dfs"
+#    QUERY_ALGORITHM="single dfs"
 }
 
 function vars_protein
@@ -95,9 +95,10 @@ function vars_protein
     # query
 #    QUERY_LOCATE=15
     QUERY_ERRORS="0 1"
-    QUERY_ALGORITHM="single dfs"
+#    QUERY_ALGORITHM="single dfs"
 }
 
+# ======================================================================================================================
 
 # cmd_prepare input output alphabet count sum length [plength]
 function cmd_prepare
@@ -127,13 +128,16 @@ function cmd_query
     CMD="$BIN/ibench_query --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
 }
 
+# ======================================================================================================================
 
+SRC=~/Code/seqan/core/apps/ibench/scripts/resources
 BIN=~/Code/seqan-builds/Release-Clang/bin
 DIR=~/Datasets/ibench
 ALPHABET=$1
 
-vars_$ALPHABET
+# ======================================================================================================================
 
+vars_$ALPHABET
 
 # prepare text
 cmd_prepare $SRC/$TEXT_INPUT $DIR/$TEXT_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH
@@ -152,6 +156,7 @@ do
         echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
     fi
 done
+cp $DIR/construct.tsv $SRC/
 
 # visit text index
 echo -e "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
@@ -168,6 +173,7 @@ do
         fi
     done
 done
+cp $DIR/visit.tsv $SRC/
 
 # prepare patterns
 for pattern_length in $PATTERN_LENGTHS;
@@ -195,3 +201,4 @@ do
         done
     done
 done
+cp $DIR/query.tsv $SRC/

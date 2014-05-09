@@ -3,7 +3,7 @@ library("xtable")
 library("ggplot2")
 library("scales")
 
-PATH="/Users/esiragusa/Datasets/ibench"
+PATH="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
 ALPHABET='dna'
 ALPHSIZE=4
 

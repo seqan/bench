@@ -1,6 +1,7 @@
 library("reshape")
 library("xtable")
 library("ggplot2")
+library("scales")
 
 PATH="/Users/esiragusa/Datasets/ibench"
 
@@ -54,17 +55,16 @@ if ((R = load_file(FILENAME_VISIT))$ok)
 
 table_visit = subset(TABLE_VISIT, alphabet=='dna', select=c(index, depth, time))
 table_nodes = subset(TABLE_VISIT, alphabet=='dna' & index=='fm-tl', select=c(depth, nodes))
-table_nodes[,'nodes'] = log(table_nodes[, 'nodes'])
+table_nodes[,'nodes'] = log(table_nodes[, 'nodes'], 4)
 
 ggplot() +
-  geom_line(data=table_visit, aes(x=depth, y=time, group=index, shape=index, color=index)) +
-  geom_point(data=table_visit, aes(x=depth, y=time, group=index, shape=index, color=index), size=3) +
-  geom_line(data=table_nodes, aes(x=depth, y=nodes), linetype='dotted') +
+  geom_line(data=table_visit, aes(x=depth, y=log10(time), group=index, shape=index, color=index)) +
+  geom_point(data=table_visit, aes(x=depth, y=log10(time), group=index, shape=index, color=index), size=3) +
+  geom_line(data=table_nodes, aes(x=depth, y=nodes/4), linetype='dotted') +
   xlab("depth") +
   ylab("log10 seconds") +
-  scale_y_log10() +
   theme_bw(base_size=12, base_family="Helvetica")
-
+  
 ggsave(file=PLOT_VISIT)
 
 

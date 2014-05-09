@@ -1,100 +1,197 @@
-#!/bin/bash
 
-#PBS -l mem=70gb
-#PBS -l nodes=1:ppn=24:Intel.X5650
-#PBS -l walltime=2:00:00
-#PBS -d /data/scratch/NO_BACKUP/esiragusa/backtracking
-#PBS -N backtracking
-#PBS -j oe
-#PBS -q batch
+function vars_dna
+{
+    SRC=~/Datasets/ecoli
 
-SELECT_JOBID=${PBS_ARRAYID}
-umask 002
+    # text
+    TEXT_INPUT="genome.fasta"
+    TEXT_NAME=ecoli.txt
+    TEXT_COUNT=8
+    TEXT_SUM=32
+    TEXT_LENGTH=32
 
-NETDIR=/data/scratch/NO_BACKUP/esiragusa/backtracking
-TMPDIR=/data/scratch.local/$USER/backtracking
-BINDIR=$NETDIR/bin
-RUNDIR=$NETDIR/run
-EXE=exec.sh
-BIN=backtracking
+    # pattern
+    PATTERN_INPUT="ecoli_1M.fastq"
+    PATTERN_NAME=ecoli.pat #.$PATTERN_LENGTHS[i]
+    PATTERN_COUNT=32
+    PATTERN_SUM=32
+    PATTERN_LENGTH=8
+    PATTERN_LENGTHS="5 10 15 20"
+#    PATTERN_COUNTS="10000 100000 1000000"
 
-RESDIR=resources
-RESEXT=tsv
+    # index
+    INDEX_NAME=ecoli #.$INDEX_TYPE
+    INDEX_TYPE="sa esa fm-tl fm-wt"
 
-LOGDIR=logs
-LOGEXT=txt
+    # visit
+    VISIT_DEPTH=$(seq 1 30)
 
-mkdir -p $TMPDIR
-mkdir -p $RESDIR
-mkdir -p $LOGDIR
+    # query
+#    QUERY_LOCATE=15
+    QUERY_ERRORS="0 1"
+    QUERY_ALGORITHM="single dfs"
+}
 
-JOBID=0
+function vars_dna_celegans
+{
+    SRC=~/Datasets/celegans
 
-for ALGO in single dfs # bfs
+    # text
+    TEXT_INPUT="celegans.fasta"
+    TEXT_NAME=celegans.txt
+    TEXT_COUNT=8
+    TEXT_SUM=32
+    TEXT_LENGTH=32
+
+    # pattern
+    PATTERN_INPUT="1M_1.fastq.gz"
+    PATTERN_NAME=celegans.pat #.$PATTERN_LENGTHS[i]
+    PATTERN_COUNT=32
+    PATTERN_SUM=32
+    PATTERN_LENGTH=8
+    PATTERN_LENGTHS="5 10 15 20 25 30 40 50 60"
+#    PATTERN_COUNTS="10000 100000 1000000"
+
+    # index
+    INDEX_NAME=celegans #.$INDEX_TYPE
+    INDEX_TYPE="sa esa fm-tl fm-wt"
+
+    # visit
+    VISIT_DEPTH=$(seq 1 30)
+
+    # query
+#    QUERY_LOCATE=15
+    QUERY_ERRORS="0 1"
+    QUERY_ALGORITHM="single dfs"
+}
+
+function vars_protein
+{
+    SRC=~/Datasets/uniprot
+
+    # text
+    TEXT_INPUT="uniprot_sprot.fasta.gz"
+    TEXT_NAME=sprot.txt
+    TEXT_COUNT=32
+    TEXT_SUM=32
+    TEXT_LENGTH=16
+
+    # pattern
+    PATTERN_INPUT="HUMAN.fasta.gz"
+    PATTERN_NAME=sprot.pat #.$PATTERN_LENGTHS[i]
+    PATTERN_COUNT=32
+    PATTERN_SUM=32
+    PATTERN_LENGTH=8
+    PATTERN_LENGTHS="5 10 15 20 25 30"
+#    PATTERN_COUNTS="10000 100000 1000000"
+
+    # index
+    INDEX_NAME=sprot #.$INDEX_TYPE
+    INDEX_TYPE="sa esa fm-wt"
+
+    # visit
+    VISIT_DEPTH=$(seq 1 10)
+
+    # query
+#    QUERY_LOCATE=15
+    QUERY_ERRORS="0 1"
+    QUERY_ALGORITHM="single dfs"
+}
+
+
+# cmd_prepare input output alphabet count sum length [plength]
+function cmd_prepare
+{
+    CMD="$BIN/ibench_dump $1 $2 -a $3 -tc $4 -ts $5 -tl $6"
+    if [ $# -eq 7 ]
+    then
+        CMD+=" -pl $7"
+    fi
+}
+
+# cmd_construct input output alphabet count sum length index
+function cmd_construct
+{
+    CMD="$BIN/ibench_construct --tsv $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7"
+}
+
+# cmd_visit depth input alphabet count sum length index
+function cmd_visit
+{
+    CMD="$BIN/ibench_visit --tsv $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -d $1"
+}
+
+# cmd_query text pattern alphabet count sum length index plength errors algo
+function cmd_query
+{
+    CMD="$BIN/ibench_query --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
+}
+
+
+BIN=~/Code/seqan-builds/Release-Clang/bin
+DIR=~/Datasets/ibench
+ALPHABET=$1
+
+vars_$ALPHABET
+
+
+# prepare text
+cmd_prepare $SRC/$TEXT_INPUT $DIR/$TEXT_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH
+echo $CMD
+$CMD
+
+# construct text index
+echo -e "alphabet\tindex\tsymbols\ttime" > $DIR/construct.tsv
+for index_type in $INDEX_TYPE;
 do
-    for DISTANCE in hamming # edit
+    cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
+    echo $CMD
+    output=$($CMD)
+    if [ $? -eq 0 ]
+    then
+        echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
+    fi
+done
+
+# visit text index
+echo -e "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
+for index_type in $INDEX_TYPE;
+do
+    for depth in $VISIT_DEPTH;
     do
-        for ORGA in ecoli celegans dmel hg18
-        do
-            GENOMEFILE="$ORGA.fasta"
-            INDEXFILE="$ORGA.masai_sa"
-            READSFILE="$ORGA.fastq"
-
-            for SEEDLEN in 15 30
-            do
-                for SEEDERR in 0 1 2
-                do
-                    for SEEDCNT in 10000 100000 1000000 10000000
-                    do
-                        ((JOBID++))
-
-                        if [ -n "${SELECT_JOBID}" ]
-                        then
-                            if [ $JOBID != $SELECT_JOBID ]
-                            then
-                                continue
-                            fi
-                        fi
-
-                        rsync -aL $RUNDIR/* $BINDIR/$BIN $NETDIR/references/$GENOMEFILE $NETDIR/indices/$INDEXFILE.* $NETDIR/reads/$READSFILE $TMPDIR/
-
-                        RESFILE=$RESDIR/$ALGO.$DISTANCE.$ORGA.$SEEDLEN.$SEEDERR.$SEEDCNT.$RESEXT
-                        LOGFILE=$LOGDIR/$ALGO.$DISTANCE.$ORGA.$SEEDLEN.$SEEDERR.$SEEDCNT.$LOGEXT
-
-                        rm -f $RESFILE
-                        rm -f $LOGFILE
-
-                        hostname >> $LOGFILE
-                        date >> $LOGFILE
-                        env >> $LOGFILE
-                        df >> $LOGFILE
-                        echo >> $LOGFILE
-
-                        ARGS=""
-                        if [ "${DISTANCE}" == "hamming" ]
-                        then
-                            ARGS+=" --no-gaps "
-                        fi
-
-                        CMD="$TMPDIR/$BIN --algorithm $ALGO $ARGS --seed-length $SEEDLEN --seed-errors $SEEDERR --seed-count $SEEDCNT -xp $TMPDIR/$INDEXFILE $TMPDIR/$GENOMEFILE $TMPDIR/$READSFILE"
-
-                        echo "${PBS_JOBID}:${PBS_ARRAYID}"
-                        echo $CMD
-                        echo "$CMD" >> $LOGFILE
-                        RESOURCES=$RESFILE EXEC_COLNAMES="\talgo\tdistance\torga\tseedlen\tseederr\tseedcnt\thits\ttotaltime" EXEC_VALUES="\t$ALGO\t$DISTANCE\t$ORGA\t$SEEDLEN\t$SEEDERR\t$SEEDCNT\tHITS\tTIME" $TMPDIR/$EXE $CMD >> $LOGFILE 2>&1
-
-                        HITS=$(grep Hits $LOGFILE | tail -1 | cut -f 5)
-                        TIME=$(grep Backtracking $LOGFILE |tail -1|cut -f 3|cut -f 1 -d " ")
-                        sed -i "s/HITS/${HITS}/g" $RESFILE
-                        sed -i "s/TIME/${TIME}/g" $RESFILE
-                    done
-                done
-            done
-        done
+        cmd_visit $depth $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
+        echo $CMD
+        output=$($CMD)
+        if [ $? -eq 0 ]
+        then
+            echo -e "$ALPHABET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
+        fi
     done
 done
 
-if [ -n "${SELECT_JOBID}" ]
-then
-	rm -rf $TMPDIR
-fi
+# prepare patterns
+for pattern_length in $PATTERN_LENGTHS;
+do
+    cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$pattern_length $ALPHABET $PATTERN_COUNT $PATTERN_SUM $PATTERN_LENGTH $pattern_length
+    echo $CMD
+    $CMD
+done
+
+# query patterns
+echo -e "alphabet\tindex\terrors\tplength\toccurrences\ttime" > $DIR/query.tsv
+for index_type in $INDEX_TYPE;
+do
+    for errors in $QUERY_ERRORS;
+    do
+        for pattern_length in $PATTERN_LENGTHS;
+        do
+            cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type $pattern_length $errors single
+            echo $CMD
+            output=$($CMD)
+            if [ $? -eq 0 ]
+            then
+                echo -e "$ALPHABET\t$index_type\t$errors\t$pattern_length\t$output" >> $DIR/query.tsv
+            fi
+        done
+    done
+done

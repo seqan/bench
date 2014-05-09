@@ -63,7 +63,6 @@ ggplot() +
   xlab("depth") +
   ylab("log10 seconds") +
   scale_y_log10() +
-  ggtitle("Bounded DFS time by depth") +
   theme_bw(base_size=12, base_family="Helvetica")
 
 ggsave(file=PLOT_VISIT)
@@ -88,7 +87,6 @@ ggplot() +
   geom_line(data=table_nodes, aes(x=depth, y=nodes), linetype='dotted') +
   xlab("pattern length") +
   ylab("microseconds") +
-  ggtitle("Search time by pattern length") +
   theme_bw(base_size=12, base_family="Helvetica")
 
 ggsave(file=PLOT_QUERY)

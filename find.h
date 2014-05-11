@@ -80,14 +80,9 @@ find(Finder2<Index<TText, TIndexSpec>, TPattern, Backtracking<HammingDistance, T
         if (finder._score == finder._scoreThreshold)
         {
             if (goDown(textIt, suffix(pattern, position(patternIt))))
-            {
                 delegate(finder);
-            }
 
             goUp(textIt);
-
-            // Termination.
-            if (isRoot(textIt)) break;
         }
 
         // Approximate case.
@@ -95,9 +90,7 @@ find(Finder2<Index<TText, TIndexSpec>, TPattern, Backtracking<HammingDistance, T
         {
             // Base case.
             if (atEnd(patternIt))
-            {
                 delegate(finder);
-            }
 
             // Recursive case.
             else if (goDown(textIt))

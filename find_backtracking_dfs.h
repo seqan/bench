@@ -46,16 +46,16 @@ namespace seqan {
 // ============================================================================
 
 // ----------------------------------------------------------------------------
-// Class Finder2
+// Class Finder_
 // ----------------------------------------------------------------------------
 
 template <typename THaystack, typename TTextSpec, typename TNeedle, typename TPatternSpec>
-struct Finder2<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtracking<HammingDistance, DfsPreorder> > :
-    Finder2<Index<THaystack, TIndexSpec>, Index<TNeedle, TPatternSpec>, void>
+struct Finder_<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtracking<HammingDistance, DfsPreorder> > :
+    Finder_<Index<THaystack, TIndexSpec>, Index<TNeedle, TPatternSpec>, void>
 {
-    typedef Finder2<Index<THaystack, TIndexSpec>, Index<TNeedle, TPatternSpec>, void>       TBase;
+    typedef Finder_<Index<THaystack, TIndexSpec>, Index<TNeedle, TPatternSpec>, void>       TBase;
 
-    Finder2() :
+    Finder_() :
         TBase()
     {}
 };
@@ -70,9 +70,9 @@ struct Finder2<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtr
 
 template <typename THaystack, typename TTextSpec, typename TNeedle, typename TPatternSpec, typename TDistance, typename TSpec>
 SEQAN_HOST_DEVICE inline typename Score_<Backtracking<TDistance, TSpec> >::Type
-_getVertexScore(Finder2<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtracking<TDistance, TSpec> > const & finder)
+_getVertexScore(Finder_<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtracking<TDistance, TSpec> > const & finder)
 {
-    return !ordEqual(parentEdgeLabel(textIterator(finder)), parentEdgeLabel(patternIterator(finder)));
+    return !ordEqual(parentEdgeLabel(_textIterator(finder)), parentEdgeLabel(_patternIterator(finder)));
 }
 
 //template <typename TTextIterator, typename TPatternIterator, typename TSize, typename TErrors, typename TDelegate>
@@ -253,8 +253,8 @@ inline void _recurseDfs(TFinder & me;
                     TErrors newErrors = errors + _getVertexScore(finder);
 
 #ifdef SEQAN_DEBUG
-                    std::cout << "text:    " << parentEdgeLabel(textIterator(finder)) << std::endl;
-                    std::cout << "pattern: " << parentEdgeLabel(patternIterator(finder)) << std::endl;
+                    std::cout << "text:    " << parentEdgeLabel(_textIterator(finder)) << std::endl;
+                    std::cout << "pattern: " << parentEdgeLabel(_patternIterator(finder)) << std::endl;
                     std::cout << "errors:  " << static_cast<unsigned>(newErrors) << std::endl;
 #endif
 
@@ -274,12 +274,12 @@ inline void _recurseDfs(TFinder & me;
 
 template <typename THaystack, typename TTextSpec, typename TNeedle, typename TPatternSpec, typename TDelegate>
 inline void
-find(Finder2<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtracking<HammingDistance, DfsPreorder> > & me
+find(Finder_<Index<THaystack, TTextSpec>, Index<TNeedle, TPatternSpec>, Backtracking<HammingDistance, DfsPreorder> > & me
      Index<THaystack, TTextSpec> & text,
      Index<TNeedle, TPatternSpec> & pattern,
      TDelegate && delegate)
 {
-    setPatternIterator(me, begin(pattern));
+    _patternIterator(finder) = begin(pattern);
 
     TTextIterator textIt(text);
     TPatternIterator patternIt(pattern);

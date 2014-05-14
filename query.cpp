@@ -227,8 +227,6 @@ findOccurrences(Options const & options, TIndex & index, TQueries & queries, TLo
 
     TSize count = 0;
 
-//    static_cast<Nothing>(TQueriesIt());
-
     find(index, pattern, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const & queriesIt, TScore)
     {
         count += countOccurrences(indexIt) * countOccurrences(queriesIt);

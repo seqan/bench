@@ -310,4 +310,56 @@ inline bool open(Index<StringSet<TText, TSSetSpec>, FMIndex<TSpec, TConfig> > & 
 }
 }
 
+// ----------------------------------------------------------------------------
+// Function indexRequire()
+// ----------------------------------------------------------------------------
+// This function is overloaded to avoid building the index except for Wotd Dir.
+
+#ifndef APP_IBENCH_CONSTRUCT_CPP_
+namespace seqan {
+template <typename TText, typename TSSetSpec, typename TSpec, typename TFibre>
+inline bool indexRequire(Index<StringSet<TText, TSSetSpec>, TSpec> & index, Tag<TFibre> const fibre)
+{
+    if (!indexSupplied(index, fibre))
+        throw RuntimeError("Index fibres not supplied.");
+
+    return true;
+}
+
+template <typename TText, typename TSSetSpec, typename TSpec>
+inline bool indexRequire(Index<StringSet<TText, TSSetSpec>, TSpec> & index, WotdDir)
+{
+    if (indexSupplied(index, WotdDir())) return true;
+    _wotdCreateFirstLevel(index);
+    return true;
+}
+}
+#endif
+
+// ----------------------------------------------------------------------------
+// Function indexCreate()
+// ----------------------------------------------------------------------------
+
+template <typename TText, typename TSpec>
+inline bool indexCreate(Index<TText, IndexWotd<TSpec> > & index, FibreSA, Trie)
+{
+    typedef Index<TText, IndexWotd<TSpec> >         TIndex;
+    typedef typename Fibre<TIndex, FibreSA>::Type   TSA;
+    typedef typename Value<TSA>::Type               TSAValue;
+    typedef typename Size<TText>::Type              TSize;
+    typedef QGramLess_<TSAValue, TText const>       TLess;
+
+    TText const & text = indexText(index);
+    TSA & sa = indexSA(index);
+    TSize textLen = length(text);
+
+    resize(sa, textLen, Exact());
+
+    // Fill the suffix array with (i, 0).
+    for (TSize i = 0; i < textLen; i++)
+        sa[i] = TSAValue(i, 0);
+
+    return true;
+}
+
 #endif  // #ifndef APP_IBENCH_TYPES_H_

@@ -10,7 +10,9 @@ ALPHSIZE=4
 FILENAME_VISIT=paste(paste(PATH, "visit", sep='/'), "tsv", sep='.')
 FILENAME_QUERY=paste(paste(PATH, "query", sep='/'), "tsv", sep='.')
 PLOT_VISIT=paste(paste(PATH, "visit", sep='/'), ALPHABET, "pdf", sep='.')
-PLOT_QUERY=paste(paste(PATH, "query", sep='/'), ALPHABET, "pdf", sep='.')
+PLOT_QUERY_0=paste(paste(PATH, "query", sep='/'), ALPHABET, "0", "pdf", sep='.')
+PLOT_QUERY_1=paste(paste(PATH, "query", sep='/'), ALPHABET, "1", "pdf", sep='.')
+PLOT_QUERY_2=paste(paste(PATH, "query", sep='/'), ALPHABET, "2", "pdf", sep='.')
 
 options(scipen=999)
 
@@ -80,15 +82,31 @@ if ((R = load_file(FILENAME_QUERY))$ok)
 
 table_query_0 = subset(TABLE_QUERY, alphabet==ALPHABET & errors==0, select=c(index, plength, time))
 table_query_1 = subset(TABLE_QUERY, alphabet==ALPHABET & errors==1, select=c(index, plength, time))
+table_query_2 = subset(TABLE_QUERY, alphabet==ALPHABET & errors==2, select=c(index, plength, time))
 
 ggplot() +
   geom_line(data=table_query_0, aes(x=plength, y=time, group=index, shape=index, color=index)) +
   geom_point(data=table_query_0, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
-  geom_line(data=table_query_1, aes(x=plength, y=time, group=index, shape=index, color=index), linetype='dashed') +  
-  geom_point(data=table_query_1, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
-  geom_line(data=table_nodes, aes(x=depth, y=nodes), linetype='dotted') +
   xlab("pattern length") +
   ylab("microseconds") +
   theme_bw(base_size=12, base_family="Helvetica")
 
-ggsave(file=PLOT_QUERY)
+ggsave(file=PLOT_QUERY_0)
+
+ggplot() +
+  geom_line(data=table_query_1, aes(x=plength, y=time, group=index, shape=index, color=index)) +  
+  geom_point(data=table_query_1, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
+  xlab("pattern length") +
+  ylab("microseconds") +
+  theme_bw(base_size=12, base_family="Helvetica")
+
+ggsave(file=PLOT_QUERY_1)
+
+ggplot() +
+  geom_line(data=table_query_2, aes(x=plength, y=time, group=index, shape=index, color=index)) +  
+  geom_point(data=table_query_2, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
+  xlab("pattern length") +
+  ylab("microseconds") +
+  theme_bw(base_size=12, base_family="Helvetica")
+
+ggsave(file=PLOT_QUERY_2)

@@ -46,10 +46,6 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -mpopcnt")
 endif (CMAKE_COMPILER_IS_GNUCXX)
 
-if (CMAKE_COMPILER_IS_GNUCXX AND APPLE)
-  set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -mno-avx")
-endif (CMAKE_COMPILER_IS_GNUCXX AND APPLE)
-
 # ----------------------------------------------------------------------------
 # Build Setup
 # ----------------------------------------------------------------------------

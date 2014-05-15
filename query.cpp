@@ -186,15 +186,12 @@ findOccurrences(Options const & options, TIndex & index, TQueries const & querie
 {
     typedef typename Size<TIndex>::Type                     TSize;
     typedef Backtracking<TDistance>                         TAlgorithm;
-
-    typedef FindTraits_<TIndex, TQueries const, TAlgorithm> Traits;
-    typedef typename Traits::TextIterator                   TIndexIt;
-    typedef typename Traits::PatternIterator                TQueriesIt;
-    typedef typename Traits::Score                          TScore;
+    typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
+    typedef typename Iterator<TQueries const, Rooted>::Type TQueriesIt;
 
     TSize count = 0;
 
-    find(index, queries, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const &, TScore)
+    find(index, queries, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
     {
         count += countOccurrences(indexIt);
         locateOccurrences(indexIt, TLocate());
@@ -216,18 +213,15 @@ findOccurrences(Options const & options, TIndex & index, TQueries & queries, TLo
     typedef typename Size<TIndex>::Type                     TSize;
     typedef Index<TQueries, IndexWotd<> >                   TPattern;
     typedef Backtracking<HammingDistance>                   TAlgorithm;
-
-    typedef FindTraits_<TIndex, TPattern, TAlgorithm>       Traits;
-    typedef typename Traits::TextIterator                   TIndexIt;
-    typedef typename Traits::PatternIterator                TQueriesIt;
-    typedef typename Traits::Score                          TScore;
+    typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
+    typedef typename Iterator<TPattern, TopDown<> >::Type   TQueriesIt;
 
     TPattern pattern(queries);
     indexCreate(pattern, FibreSA(), Trie());
 
     TSize count = 0;
 
-    find(index, pattern, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const & queriesIt, TScore)
+    find(index, pattern, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const & queriesIt, unsigned)
     {
         count += countOccurrences(indexIt) * countOccurrences(queriesIt);
         locateOccurrences(indexIt, TLocate());

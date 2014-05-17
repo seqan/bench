@@ -74,12 +74,14 @@ struct Options : BaseOptions
     AlgorithmType   algorithmType;
     TList           algorithmTypeList;
 
+    bool            edit;
     unsigned        errors;
     bool            locate;
 
     Options() :
         BaseOptions(),
         algorithmType(ALGO_SINGLE),
+        edit(false),
         errors(0),
         locate(false)
     {
@@ -117,6 +119,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
 
     addSection(parser, "Query Options");
     setAlgorithmType(parser, options);
+    addOption(parser, ArgParseOption("ed", "edit-distance", "Edit distance. Default: Hamming distance."));
     addOption(parser, ArgParseOption("e", "errors", "Number of errors.", ArgParseOption::INTEGER));
     setMinValue(parser, "errors", "0");
     setMaxValue(parser, "errors", "5");
@@ -145,6 +148,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     getIndexType(options, parser);
     getTextLimits(options, parser);
     getAlgorithmType(options, parser);
+    getOptionValue(options.edit, parser, "edit-distance");
     getOptionValue(options.errors, parser, "errors");
     getOptionValue(options.locate, parser, "locate");
 
@@ -276,9 +280,16 @@ template <typename TIndex, typename TQueries, typename TLocate>
 inline unsigned long countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate)
 {
     if (options.errors)
-        return countOccurrences(options, index, queries, TLocate(), HammingDistance());
+    {
+        if (options.edit)
+            return countOccurrences(options, index, queries, TLocate(), EditDistance());
+        else
+            return countOccurrences(options, index, queries, TLocate(), HammingDistance());
+    }
     else
+    {
         return countOccurrences(options, index, queries, TLocate(), Exact());
+    }
 }
 
 template <typename TIndex, typename TQueries>

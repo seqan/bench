@@ -181,15 +181,14 @@ inline void locateOccurrences(Iter<TIndex, TSpec> const & /* it */, False) {}
 // Single search.
 
 template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
-inline typename Size<TIndex>::Type
-findOccurrences(Options const & options, TIndex & index, TQueries const & queries, TLocate, Backtracking<TDistance>, Nothing)
+inline unsigned long findOccurrences(Options const & options, TIndex & index, TQueries const & queries, TLocate, Backtracking<TDistance>, Nothing)
 {
     typedef typename Size<TIndex>::Type                     TSize;
     typedef Backtracking<TDistance>                         TAlgorithm;
     typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
     typedef typename Iterator<TQueries const, Rooted>::Type TQueriesIt;
 
-    TSize count = 0;
+    unsigned long count = 0;
 
     find(index, queries, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
     {
@@ -207,8 +206,7 @@ findOccurrences(Options const & options, TIndex & index, TQueries const & querie
 // Multiple search (DFS).
 
 template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
-inline typename Size<TIndex>::Type
-findOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, Backtracking<TDistance>, DfsPreorder)
+inline unsigned long findOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, Backtracking<TDistance>, DfsPreorder)
 {
     typedef typename Size<TIndex>::Type                     TSize;
     typedef Index<TQueries, IndexWotd<> >                   TPattern;
@@ -219,7 +217,7 @@ findOccurrences(Options const & options, TIndex & index, TQueries & queries, TLo
     TPattern pattern(queries);
     indexCreate(pattern, FibreSA(), Trie());
 
-    TSize count = 0;
+    unsigned long count = 0;
 
     find(index, pattern, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const & queriesIt, unsigned)
     {
@@ -237,8 +235,14 @@ findOccurrences(Options const & options, TIndex & index, TQueries & queries, TLo
 // Disable HammingDistance search on tree indices lacking trie-like iterator.
 
 template <typename TText, typename TSpec, typename TQueries, typename TLocate>
-inline typename Size<Index<TText, IndexEsa<TSpec> > >::Type
-findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, TLocate, Backtracking<HammingDistance>, Nothing)
+inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, TLocate, Backtracking<HammingDistance>, Nothing)
+{
+    throw RuntimeError("Unsupported index type");
+    return 0;
+}
+
+template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TDistance>
+inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, TLocate, Backtracking<TDistance>, DfsPreorder)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
@@ -250,8 +254,7 @@ findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, T
 // Dispatch locate, distance, and search algorithm.
 
 template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
-inline typename Size<TIndex>::Type
-countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, TDistance)
+inline unsigned long countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, TDistance)
 {
     switch (options.algorithmType)
     {
@@ -270,8 +273,7 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
 }
 
 template <typename TIndex, typename TQueries, typename TLocate>
-inline typename Size<TIndex>::Type
-countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate)
+inline unsigned long countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate)
 {
     if (options.errors)
         return countOccurrences(options, index, queries, TLocate(), HammingDistance());
@@ -280,8 +282,7 @@ countOccurrences(Options const & options, TIndex & index, TQueries & queries, TL
 }
 
 template <typename TIndex, typename TQueries>
-inline typename Size<TIndex>::Type
-countOccurrences(Options const & options, TIndex & index, TQueries & queries)
+inline unsigned long countOccurrences(Options const & options, TIndex & index, TQueries & queries)
 {
 //    if (options.locate)
 //        return countOccurrences(options, index, queries, True());

@@ -61,8 +61,8 @@ inline void run(TOptions & options)
 {
     switch (options.textIndexType)
     {
-    case TOptions::INDEX_ESA:
-        return run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
+//    case TOptions::INDEX_ESA:
+//        return run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
 
     case TOptions::INDEX_SA:
         return run<TAlphabet, TLimits, TSetLimits, IndexSa<void> >(options);

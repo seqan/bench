@@ -1,71 +1,67 @@
 
+function vars_dna_common
+{
+    # text
+    TEXT_COUNT=8
+    TEXT_SUM=32
+    TEXT_LENGTH=32
+
+    # pattern
+    PATTERN_COUNT=32
+    PATTERN_SUM=32
+    PATTERN_LENGTH=8
+    PATTERN_LENGTHS=$(seq 5 5 50)
+#    PATTERN_COUNTS="10000 100000 1000000"
+
+    # index
+    INDEX_TYPE="sa esa qgram fm-tl fm-wt"
+
+    # visit
+    VISIT_DEPTH=$(seq 1 30)
+
+    # query
+#    QUERY_LOCATE=15
+    QUERY_ERRORS="0 1"
+#    QUERY_ALGORITHM="single dfs"
+}
+
 function vars_dna_ecoli
 {
     SRC=~/Datasets/ecoli
 
+    vars_dna_common
+
     # text
     TEXT_INPUT="genome.fasta"
     TEXT_NAME=ecoli.txt
-    TEXT_COUNT=8
-    TEXT_SUM=32
-    TEXT_LENGTH=32
 
     # pattern
     PATTERN_INPUT="ecoli_1M.fastq"
     PATTERN_NAME=ecoli.pat #.$PATTERN_LENGTHS[i]
-    PATTERN_COUNT=32
-    PATTERN_SUM=32
-    PATTERN_LENGTH=8
-    PATTERN_LENGTHS=$(seq 5 5 50)
-#    PATTERN_COUNTS="10000 100000 1000000"
 
     # index
     INDEX_NAME=ecoli #.$INDEX_TYPE
-    INDEX_TYPE="sa esa fm-tl fm-wt"
-
-    # visit
-    VISIT_DEPTH=$(seq 1 30)
-
-    # query
-#    QUERY_LOCATE=15
-    QUERY_ERRORS="0 1"
-#    QUERY_ALGORITHM="single dfs"
 }
 
-function vars_dna
+function vars_dna_celegans
 {
     SRC=~/Datasets/celegans
+
+    vars_dna_common
 
     # text
     TEXT_INPUT="celegans.fasta"
     TEXT_NAME=celegans.txt
-    TEXT_COUNT=8
-    TEXT_SUM=32
-    TEXT_LENGTH=32
 
     # pattern
     PATTERN_INPUT="1M_1.fastq.gz"
     PATTERN_NAME=celegans.pat #.$PATTERN_LENGTHS[i]
-    PATTERN_COUNT=32
-    PATTERN_SUM=32
-    PATTERN_LENGTH=8
-    PATTERN_LENGTHS=$(seq 5 5 50)
-#    PATTERN_COUNTS="10000 100000 1000000"
 
     # index
     INDEX_NAME=celegans #.$INDEX_TYPE
-    INDEX_TYPE="sa esa fm-tl fm-wt"
-
-    # visit
-    VISIT_DEPTH=$(seq 1 30)
-
-    # query
-#    QUERY_LOCATE=15
-    QUERY_ERRORS="0 1"
-#    QUERY_ALGORITHM="single dfs"
 }
 
-function vars_protein
+function vars_protein_uniptot
 {
     SRC=~/Datasets/uniprot
 
@@ -134,10 +130,11 @@ SRC=~/Code/seqan/core/apps/ibench/scripts/resources
 BIN=~/Code/seqan-builds/Release-Gcc/bin
 DIR=~/Datasets/ibench
 ALPHABET=$1
+DATASET=$2
 
 # ======================================================================================================================
 
-vars_$ALPHABET
+vars_$ALPHABET_$DATASET
 
 # prepare text
 cmd_prepare $SRC/$TEXT_INPUT $DIR/$TEXT_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH
@@ -145,7 +142,9 @@ echo $CMD
 $CMD
 
 # construct text index
-echo -e "alphabet\tindex\tsymbols\ttime" > $DIR/construct.tsv
+if [[ ! -e $DIR/construct.tsv ]]; then
+    echo -e "alphabet\tindex\tsymbols\ttime" > $DIR/construct.tsv
+fi
 for index_type in $INDEX_TYPE;
 do
     cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
@@ -156,10 +155,12 @@ do
         echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
     fi
 done
-cp $DIR/construct.tsv $SRC/
+#cp $DIR/construct.tsv $SRC/
 
 # visit text index
-echo -e "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
+if [[ ! -e $DIR/visit.tsv ]]; then
+    echo -e "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
+fi
 for index_type in $INDEX_TYPE;
 do
     for depth in $VISIT_DEPTH;
@@ -173,7 +174,7 @@ do
         fi
     done
 done
-cp $DIR/visit.tsv $SRC/
+#cp $DIR/visit.tsv $SRC/
 
 # prepare patterns
 for pattern_length in $PATTERN_LENGTHS;
@@ -184,7 +185,9 @@ do
 done
 
 # query patterns
-echo -e "alphabet\tindex\terrors\tplength\toccurrences\ttime" > $DIR/query.tsv
+if [[ ! -e $DIR/query.tsv ]]; then
+    echo -e "alphabet\tindex\terrors\tplength\toccurrences\ttime" > $DIR/query.tsv
+fi
 for index_type in $INDEX_TYPE;
 do
     for errors in $QUERY_ERRORS;
@@ -201,4 +204,4 @@ do
         done
     done
 done
-cp $DIR/query.tsv $SRC/
+#cp $DIR/query.tsv $SRC/

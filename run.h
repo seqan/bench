@@ -141,13 +141,13 @@ inline void run(TOptions & options)
     {
     case TOptions::ALPHABET_DNA:
         run<Dna>(options);
-
+        break;
     case TOptions::ALPHABET_PROTEIN:
         run<AminoAcid>(options);
-
+        break;
 //    case TOptions::ALPHABET_CHAR:
 //        run<char>(options);
-
+//        break;
     default:
         throw RuntimeError("Unsupported alphabet type");
     }

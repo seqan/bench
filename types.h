@@ -347,7 +347,6 @@ inline bool indexCreate(Index<TText, IndexWotd<TSpec> > & index, FibreSA, Trie)
     typedef typename Fibre<TIndex, FibreSA>::Type   TSA;
     typedef typename Value<TSA>::Type               TSAValue;
     typedef typename Size<TText>::Type              TSize;
-    typedef QGramLess_<TSAValue, TText const>       TLess;
 
     TText const & text = indexText(index);
     TSA & sa = indexSA(index);

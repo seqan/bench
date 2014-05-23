@@ -21,7 +21,7 @@ function vars_dna_common
 
     # query
 #    QUERY_LOCATE=15
-    QUERY_ERRORS="0 1"
+    QUERY_ERRORS="0 1 2"
 #    QUERY_ALGORITHM="single dfs"
 }
 

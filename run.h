@@ -62,19 +62,19 @@ inline void run(TOptions & options)
     switch (options.textIndexType)
     {
     case TOptions::INDEX_ESA:
-        return run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
+        run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
 
     case TOptions::INDEX_SA:
-        return run<TAlphabet, TLimits, TSetLimits, IndexSa<void> >(options);
+        run<TAlphabet, TLimits, TSetLimits, IndexSa<void> >(options);
 
     case TOptions::INDEX_QGRAM:
-        return run<TAlphabet, TLimits, TSetLimits, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
+        run<TAlphabet, TLimits, TSetLimits, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
 
     case TOptions::INDEX_FMTL:
-        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, TLFMIndexConfig<TSetLimits> > >(options);
+        run<TAlphabet, TLimits, TSetLimits, FMIndex<void, TLFMIndexConfig<TSetLimits> > >(options);
 
     case TOptions::INDEX_FMWT:
-        return run<TAlphabet, TLimits, TSetLimits, FMIndex<void, WTFMIndexConfig<TSetLimits> > >(options);
+        run<TAlphabet, TLimits, TSetLimits, FMIndex<void, WTFMIndexConfig<TSetLimits> > >(options);
 
     default:
         throw RuntimeError("Unsupported index type");
@@ -88,21 +88,21 @@ inline void run(TOptions & options)
     {
     case 8:
         if (options.textSum == 32)
-            return run<TAlphabet, TLimits, Limits<__uint8, __uint32> >(options);
+            run<TAlphabet, TLimits, Limits<__uint8, __uint32> >(options);
 //        if (options.textSum == 64)
-//            return run<TAlphabet, TLimits, Limits<__uint8, __uint64> >(options);
+//            run<TAlphabet, TLimits, Limits<__uint8, __uint64> >(options);
 
 //    case 16:
 //        if (options.textSum == 32)
-//            return run<TAlphabet, TLimits, Limits<__uint16, __uint32> >(options);
+//            run<TAlphabet, TLimits, Limits<__uint16, __uint32> >(options);
 //        if (options.textSum == 64)
-//            return run<TAlphabet, TLimits, Limits<__uint16, __uint64> >(options);
+//            run<TAlphabet, TLimits, Limits<__uint16, __uint64> >(options);
 
     case 32:
         if (options.textSum == 32)
-            return run<TAlphabet, TLimits, Limits<__uint32, __uint32> >(options);
+            run<TAlphabet, TLimits, Limits<__uint32, __uint32> >(options);
 //        if (options.textSum == 64)
-//            return run<TAlphabet, TLimits, Limits<__uint32, __uint64> >(options);
+//            run<TAlphabet, TLimits, Limits<__uint32, __uint64> >(options);
 
     default:
         throw RuntimeError("Unsupported text collection limit");
@@ -115,16 +115,16 @@ inline void run(TOptions & options)
     switch (options.textLen)
     {
     case 8:
-        return run<TAlphabet, Limits<__uint8> >(options);
+        run<TAlphabet, Limits<__uint8> >(options);
 
     case 16:
-        return run<TAlphabet, Limits<__uint16> >(options);
+        run<TAlphabet, Limits<__uint16> >(options);
 
     case 32:
-        return run<TAlphabet, Limits<__uint32> >(options);
+        run<TAlphabet, Limits<__uint32> >(options);
 
 //    case 64:
-//        return run<TAlphabet, Limits<__uint64> >(options);
+//        run<TAlphabet, Limits<__uint64> >(options);
 
     default:
         throw RuntimeError("Unsupported text limit");
@@ -137,13 +137,13 @@ inline void run(TOptions & options)
     switch (options.alphabetType)
     {
     case TOptions::ALPHABET_DNA:
-        return run<Dna>(options);
+        run<Dna>(options);
 
     case TOptions::ALPHABET_PROTEIN:
-        return run<AminoAcid>(options);
+        run<AminoAcid>(options);
 
 //    case TOptions::ALPHABET_CHAR:
-//        return run<char>(options);
+//        run<char>(options);
 
     default:
         throw RuntimeError("Unsupported alphabet type");

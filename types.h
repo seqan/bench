@@ -172,6 +172,16 @@ struct ShapeWeight<Dna>
     static const unsigned VALUE = 12;
 };
 
+
+// ----------------------------------------------------------------------------
+// MinLength
+// ----------------------------------------------------------------------------
+
+namespace seqan {
+template <typename TAlphabet, typename TStringSpec, typename TSpec>
+struct MinLength<StringSet<String<TAlphabet, TStringSpec>, TSpec> > : ShapeWeight<TAlphabet> {};
+}
+
 // ----------------------------------------------------------------------------
 // FmIndex Config
 // ----------------------------------------------------------------------------

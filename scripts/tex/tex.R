@@ -12,7 +12,7 @@ FILENAME_QUERY=paste(paste(PATH, "query", sep='/'), "tsv", sep='.')
 PLOT_VISIT=paste(paste(PATH, "visit", sep='/'), ALPHABET, "pdf", sep='.')
 PLOT_QUERY_0=paste(paste(PATH, "query", sep='/'), ALPHABET, "0", "pdf", sep='.')
 PLOT_QUERY_1=paste(paste(PATH, "query", sep='/'), ALPHABET, "1", "pdf", sep='.')
-PLOT_QUERY_2=paste(paste(PATH, "query", sep='/'), ALPHABET, "2", "pdf", sep='.')
+#PLOT_QUERY_2=paste(paste(PATH, "query", sep='/'), ALPHABET, "2", "pdf", sep='.')
 
 options(scipen=999)
 
@@ -102,11 +102,11 @@ ggplot() +
 
 ggsave(file=PLOT_QUERY_1)
 
-ggplot() +
-  geom_line(data=table_query_2, aes(x=plength, y=time, group=index, shape=index, color=index)) +  
-  geom_point(data=table_query_2, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
-  xlab("pattern length") +
-  ylab("microseconds") +
-  theme_bw(base_size=12, base_family="Helvetica")
-
-ggsave(file=PLOT_QUERY_2)
+# ggplot() +
+#   geom_line(data=table_query_2, aes(x=plength, y=time, group=index, shape=index, color=index)) +  
+#   geom_point(data=table_query_2, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
+#   xlab("pattern length") +
+#   ylab("microseconds") +
+#   theme_bw(base_size=12, base_family="Helvetica")
+# 
+# ggsave(file=PLOT_QUERY_2)

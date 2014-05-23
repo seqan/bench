@@ -83,7 +83,7 @@ function vars_protein_uniptot
 
     # index
     INDEX_NAME=sprot #.$INDEX_TYPE
-    INDEX_TYPE="sa esa fm-wt"
+    INDEX_TYPE="sa esa qgram fm-wt"
 
     # visit
     VISIT_DEPTH=$(seq 1 10)

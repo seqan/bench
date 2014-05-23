@@ -61,7 +61,7 @@ function vars_dna_celegans
     INDEX_NAME=celegans #.$INDEX_TYPE
 }
 
-function vars_protein_uniptot
+function vars_protein_uniprot
 {
     SRC=~/Datasets/uniprot
 

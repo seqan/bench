@@ -187,7 +187,6 @@ inline void locateOccurrences(Iter<TIndex, TSpec> const & /* it */, False) {}
 template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
 inline unsigned long findOccurrences(Options const & options, TIndex & index, TQueries const & queries, TLocate, Backtracking<TDistance>, Nothing)
 {
-    typedef typename Size<TIndex>::Type                     TSize;
     typedef Backtracking<TDistance>                         TAlgorithm;
     typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
     typedef typename Iterator<TQueries const, Rooted>::Type TQueriesIt;
@@ -212,7 +211,6 @@ inline unsigned long findOccurrences(Options const & options, TIndex & index, TQ
 template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
 inline unsigned long findOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, Backtracking<TDistance>, DfsPreorder)
 {
-    typedef typename Size<TIndex>::Type                     TSize;
     typedef Index<TQueries, IndexWotd<> >                   TPattern;
     typedef Backtracking<TDistance>                         TAlgorithm;
     typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;

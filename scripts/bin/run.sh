@@ -17,11 +17,11 @@ function vars_dna_common
     INDEX_TYPE="sa esa qgram fm-tl fm-wt"
 
     # visit
-    VISIT_DEPTH=$(seq 1 30)
+    VISIT_DEPTH=$(seq 1 20) #30
 
     # query
 #    QUERY_LOCATE=15
-    QUERY_ERRORS="0 1 2"
+    QUERY_ERRORS="0 1" #2
 #    QUERY_ALGORITHM="single dfs"
 }
 
@@ -134,7 +134,7 @@ DATASET=$2
 
 # ======================================================================================================================
 
-vars_$ALPHABET_$DATASET
+vars_$ALPHABET\_$DATASET
 
 # prepare text
 cmd_prepare $SRC/$TEXT_INPUT $DIR/$TEXT_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH

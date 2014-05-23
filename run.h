@@ -63,19 +63,19 @@ inline void run(TOptions & options)
     {
     case TOptions::INDEX_ESA:
         run<TAlphabet, TLimits, TSetLimits, IndexEsa<void> >(options);
-
+        break;
     case TOptions::INDEX_SA:
         run<TAlphabet, TLimits, TSetLimits, IndexSa<void> >(options);
-
+        break;
     case TOptions::INDEX_QGRAM:
         run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<ShapeWeight<TAlphabet>::VALUE>, BucketRefinement> >(options);
-
+        break;
     case TOptions::INDEX_FMTL:
         run<TAlphabet, TLimits, TSetLimits, FMIndex<void, TLFMIndexConfig<TSetLimits> > >(options);
-
+        break;
     case TOptions::INDEX_FMWT:
         run<TAlphabet, TLimits, TSetLimits, FMIndex<void, WTFMIndexConfig<TSetLimits> > >(options);
-
+        break;
     default:
         throw RuntimeError("Unsupported index type");
     }
@@ -91,18 +91,21 @@ inline void run(TOptions & options)
             run<TAlphabet, TLimits, Limits<__uint8, __uint32> >(options);
 //        if (options.textSum == 64)
 //            run<TAlphabet, TLimits, Limits<__uint8, __uint64> >(options);
+        break;
 
 //    case 16:
 //        if (options.textSum == 32)
 //            run<TAlphabet, TLimits, Limits<__uint16, __uint32> >(options);
 //        if (options.textSum == 64)
 //            run<TAlphabet, TLimits, Limits<__uint16, __uint64> >(options);
+//        break;
 
     case 32:
         if (options.textSum == 32)
             run<TAlphabet, TLimits, Limits<__uint32, __uint32> >(options);
 //        if (options.textSum == 64)
 //            run<TAlphabet, TLimits, Limits<__uint32, __uint64> >(options);
+        break;
 
     default:
         throw RuntimeError("Unsupported text collection limit");
@@ -116,16 +119,16 @@ inline void run(TOptions & options)
     {
     case 8:
         run<TAlphabet, Limits<__uint8> >(options);
-
+        break;
     case 16:
         run<TAlphabet, Limits<__uint16> >(options);
-
+        break;
     case 32:
         run<TAlphabet, Limits<__uint32> >(options);
-
+        break;
 //    case 64:
 //        run<TAlphabet, Limits<__uint64> >(options);
-
+        break;
     default:
         throw RuntimeError("Unsupported text limit");
     }

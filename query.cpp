@@ -213,8 +213,8 @@ template <typename TIndex, typename TQueries, typename TLocate, typename TDistan
 inline unsigned long findOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, Backtracking<TDistance>, DfsPreorder)
 {
     typedef typename Size<TIndex>::Type                     TSize;
-    typedef Index<TQueries, IndexWotd<> >                     TPattern;
-    typedef Backtracking<HammingDistance>                         TAlgorithm;
+    typedef Index<TQueries, IndexWotd<> >                   TPattern;
+    typedef Backtracking<TDistance>                         TAlgorithm;
     typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
     typedef typename Iterator<TPattern, TopDown<> >::Type   TQueriesIt;
 
@@ -273,7 +273,7 @@ inline unsigned long countOccurrences(Options const & options, TIndex & index, T
         return findOccurrences(options, index, queries, TLocate(), Backtracking<TDistance>(), Nothing());
 
     case Options::ALGO_DFS:
-        return findOccurrences(options, index, queries, TLocate(), Backtracking<TDistance>(), DfsPreorder());
+        return findOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
 
 //    case Options::ALGO_BFS:
 //        return findOccurrences(options, index, queries, TLocate(), Backtracking<TDistance, Bfs>());

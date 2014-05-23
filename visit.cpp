@@ -127,32 +127,34 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
 // Function countSubstrings()
 // ----------------------------------------------------------------------------
 
+template <typename TIter, typename TCount, typename TLength>
+inline void _countSubstrings(TIter it, TCount & count, TLength length)
+{
+    if (repLength(it) >= length)
+    {
+         ++count;
+    }
+    else if (goDown(it))
+    {
+        do
+        {
+            _countSubstrings(it, count, length);
+        }
+        while (goRight(it));
+    }
+}
+
 template <typename TIndex, typename TLength>
 inline typename Size<TIndex>::Type
 countSubstrings(TIndex & index, TLength length)
 {
-    typedef TopDown<ParentLinks<> >                     TIterSpec;
-    typedef typename Iterator<TIndex, TIterSpec>::Type  TIter;
+    typedef typename Iterator<TIndex, TopDown<> >::Type TIter;
     typedef typename Size<TIndex>::Type                 TSize;
 
     TSize count = 0;
     TIter it(index);
 
-    do
-    {
-        if (!goDown(it) || repLength(it) >= length)
-        {
-            do
-            {
-                if (repLength(it) >= length) ++count;
-
-                if (!goRight(it))
-                    while (goUp(it) && !goRight(it)) ;
-            }
-            while (repLength(it) >= length);
-        }
-    }
-    while (!isRoot(it));
+    _countSubstrings(it, count, length);
 
     return count;
 }

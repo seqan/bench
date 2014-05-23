@@ -172,12 +172,6 @@ struct ShapeWeight<Dna>
     static const unsigned VALUE = 12;
 };
 
-template <typename TValue = char>
-struct QGramShape
-{
-    typedef UngappedShape<ShapeWeight<TValue>::VALUE>   Type;
-};
-
 // ----------------------------------------------------------------------------
 // FmIndex Config
 // ----------------------------------------------------------------------------

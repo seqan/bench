@@ -68,7 +68,7 @@ inline void run(TOptions & options)
         run<TAlphabet, TLimits, TSetLimits, IndexSa<void> >(options);
 
     case TOptions::INDEX_QGRAM:
-        run<TAlphabet, TLimits, TSetLimits, IndexQGram<typename QGramShape<TAlphabet>::Type, BucketRefinement> >(options);
+        run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<ShapeWeight<TAlphabet>::VALUE>, BucketRefinement> >(options);
 
     case TOptions::INDEX_FMTL:
         run<TAlphabet, TLimits, TSetLimits, FMIndex<void, TLFMIndexConfig<TSetLimits> > >(options);

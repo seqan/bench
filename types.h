@@ -172,6 +172,11 @@ struct ShapeWeight<Dna>
     static const unsigned VALUE = 12;
 };
 
+template <typename TValue = char, typename TSpec = void>
+struct DefaultShape
+{
+    typedef UngappedShape<ShapeWeight<TValue>::VALUE>   Type;
+};
 
 // ----------------------------------------------------------------------------
 // MinLength

@@ -57,6 +57,23 @@ using namespace seqan;
 // ============================================================================
 
 // ----------------------------------------------------------------------------
+// Class Stats
+// ----------------------------------------------------------------------------
+
+struct Stats
+{
+    double          preprocessingTime;
+    double          countTime;
+    double          locateTime;
+
+    Stats() :
+        preprocessingTime(),
+        countTime(),
+        locateTime()
+    {}
+};
+
+// ----------------------------------------------------------------------------
 // Class Options
 // ----------------------------------------------------------------------------
 
@@ -67,7 +84,7 @@ struct Options : BaseOptions
 
     enum AlgorithmType
     {
-        ALGO_SINGLE, ALGO_DFS, ALGO_BFS
+        ALGO_SINGLE, ALGO_SORT, ALGO_DFS, ALGO_BFS
     };
 
     CharString      queryFile;
@@ -87,6 +104,7 @@ struct Options : BaseOptions
         locate(false)
     {
         algorithmTypeList.push_back("single");
+        algorithmTypeList.push_back("sort");
         algorithmTypeList.push_back("dfs");
         algorithmTypeList.push_back("bfs");
     }
@@ -186,7 +204,8 @@ inline void locateOccurrences(Iter<TIndex, TSpec> const & /* it */, False) {}
 // Single search.
 
 template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
-inline unsigned long findOccurrences(Options const & options, TIndex & index, TQueries const & queries, TLocate, Backtracking<TDistance>, Nothing)
+inline unsigned long findOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries,
+                                     TLocate, Backtracking<TDistance>, Nothing)
 {
     typedef Backtracking<TDistance>                         TAlgorithm;
     typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
@@ -194,12 +213,25 @@ inline unsigned long findOccurrences(Options const & options, TIndex & index, TQ
 
     unsigned long count = 0;
 
+    double timer;
+
+    if (options.algorithmType == Options::ALGO_SORT)
+    {
+        timer = sysTime();
+        radixSort(queries);
+        stats.preprocessingTime = sysTime() - timer;
+    }
+    else
+        stats.preprocessingTime = 0;
+
+    timer = sysTime();
     find(index, queries, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
     {
         count += countOccurrences(indexIt);
         locateOccurrences(indexIt, TLocate());
     },
     TAlgorithm());
+    stats.countTime = sysTime() - timer;
 
     return count;
 }
@@ -210,25 +242,32 @@ inline unsigned long findOccurrences(Options const & options, TIndex & index, TQ
 // Multiple search (DFS).
 
 template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
-inline unsigned long findOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, Backtracking<TDistance>, DfsPreorder)
+inline unsigned long findOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries,
+                                     TLocate, Backtracking<TDistance>, DfsPreorder)
 {
     typedef Index<TQueries, IndexWotd<> >                   TPattern;
     typedef Backtracking<TDistance>                         TAlgorithm;
     typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
     typedef typename Iterator<TPattern, TopDown<> >::Type   TQueriesIt;
 
+    double timer;
+
+    timer = sysTime();
     TPattern pattern(queries);
     indexCreate(pattern, FibreSA(), Trie());
     indexBuild(pattern);
+    stats.preprocessingTime = sysTime() - timer;
 
     unsigned long count = 0;
 
+    timer = sysTime();
     find(index, pattern, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const & queriesIt, unsigned)
     {
         count += countOccurrences(indexIt) * countOccurrences(queriesIt);
         locateOccurrences(indexIt, TLocate());
     },
     TAlgorithm());
+    stats.countTime = sysTime() - timer;
 
     return count;
 }
@@ -239,21 +278,24 @@ inline unsigned long findOccurrences(Options const & options, TIndex & index, TQ
 // Disable HammingDistance search on tree indices lacking trie-like iterator.
 
 template <typename TText, typename TSpec, typename TQueries, typename TLocate>
-inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, TLocate, Backtracking<HammingDistance>, Nothing)
+inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
+                                     TLocate, Backtracking<HammingDistance>, Nothing)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
 }
 
 template <typename TText, typename TSpec, typename TQueries, typename TLocate>
-inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, TLocate, Backtracking<EditDistance>, Nothing)
+inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
+                                     TLocate, Backtracking<EditDistance>, Nothing)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
 }
 
 template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TDistance>
-inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &, TLocate, Backtracking<TDistance>, DfsPreorder)
+inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
+                                     TLocate, Backtracking<TDistance>, DfsPreorder)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
@@ -265,18 +307,19 @@ inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpe
 // Dispatch locate, distance, and search algorithm.
 
 template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
-inline unsigned long countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate, TDistance)
+inline unsigned long countOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries, TLocate, TDistance)
 {
     switch (options.algorithmType)
     {
     case Options::ALGO_SINGLE:
-        return findOccurrences(options, index, queries, TLocate(), Backtracking<TDistance>(), Nothing());
+    case Options::ALGO_SORT:
+        return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<TDistance>(), Nothing());
 
     case Options::ALGO_DFS:
-        return findOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
+        return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
 
 //    case Options::ALGO_BFS:
-//        return findOccurrences(options, index, queries, TLocate(), Backtracking<TDistance, Bfs>());
+//        return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<TDistance, Bfs>());
 
     default:
         throw RuntimeError("Unsupported search algorithm");
@@ -284,28 +327,28 @@ inline unsigned long countOccurrences(Options const & options, TIndex & index, T
 }
 
 template <typename TIndex, typename TQueries, typename TLocate>
-inline unsigned long countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate)
+inline unsigned long countOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries, TLocate)
 {
     if (options.errors)
     {
 //        if (options.edit)
-//            return countOccurrences(options, index, queries, TLocate(), EditDistance());
+//            return countOccurrences(options, stats, index, queries, TLocate(), EditDistance());
 //        else
-            return countOccurrences(options, index, queries, TLocate(), HammingDistance());
+            return countOccurrences(options, stats, index, queries, TLocate(), HammingDistance());
     }
     else
     {
-        return countOccurrences(options, index, queries, TLocate(), Exact());
+        return countOccurrences(options, stats, index, queries, TLocate(), Exact());
     }
 }
 
 template <typename TIndex, typename TQueries>
-inline unsigned long countOccurrences(Options const & options, TIndex & index, TQueries & queries)
+inline unsigned long countOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries)
 {
 //    if (options.locate)
-//        return countOccurrences(options, index, queries, True());
+//        return countOccurrences(options, stats, index, queries, True());
 //    else
-        return countOccurrences(options, index, queries, False());
+        return countOccurrences(options, stats, index, queries, False());
 }
 
 // ----------------------------------------------------------------------------
@@ -329,20 +372,20 @@ inline void run(Options const & options)
     if (!open(queries, toCString(options.queryFile)))
         throw RuntimeError("Error while loading queries");
 
-    double start = sysTime();
-    unsigned long occurrences = countOccurrences(options, index, queries);
-    double finish = sysTime();
+    Stats stats;
+
+    unsigned long occurrencesCount = countOccurrences(options, stats, index, queries);
 
     if (options.tsv)
     {
-        std::cout << occurrences << '\t' << std::fixed << finish - start << std::endl;
+        std::cout << occurrencesCount << '\t' << std::fixed << stats.preprocessingTime << '\t' << stats.countTime << std::endl;
     }
     else
     {
         std::cout << length(queries) << " queries" << std::endl;
         std::cout << lengthSum(queries) << " symbols" << std::endl;
-        std::cout << occurrences << " occurrences" << std::endl;
-        std::cout << std::fixed << finish - start << " sec" << std::endl;
+        std::cout << occurrencesCount << " occurrences" << std::endl;
+        std::cout << std::fixed << stats.preprocessingTime << " + " << stats.countTime << " sec" << std::endl;
     }
 }
 

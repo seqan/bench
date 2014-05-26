@@ -248,7 +248,7 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
 
     timer = sysTime();
     TSortedQueries sortedQueries;
-    radixSort(sortedQueries, queries);
+    sortedStringSet(sortedQueries, queries);
     stats.preprocessingTime = sysTime() - timer;
 
     timer = sysTime();

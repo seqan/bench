@@ -99,7 +99,7 @@ inline void indexBuild(Index<TText, IndexWotd<TSpec> > & index)
 // ----------------------------------------------------------------------------
 
 template <typename TString, typename TSSetSpec, typename TParallelTag>
-inline void sort(StringSet<TString, TSSetSpec> & target, StringSet<TString, TSSetSpec> & me, Tag<TParallelTag> const & /* tag */)
+inline void radixSort(StringSet<TString, TSSetSpec> & me, Tag<TParallelTag> const & /* tag */)
 {
     typedef StringSet<TString, TSSetSpec>           TStringSet;
     typedef Tag<TParallelTag> const                 TThreading;
@@ -132,14 +132,16 @@ inline void sort(StringSet<TString, TSSetSpec> & target, StringSet<TString, TSSe
     // Sort ids by hash.
     sort(ids, [&hashes](TSize a, TSize b) { return hashes[a] < hashes[b]; }, TThreading());
 
-    reserve(target, length(me), Exact());
-    forEach(ids, [&](TSize id) { appendValue(target, me[id]); });
+    TStringSet sorted;
+    reserve(sorted, length(me), Exact());
+    forEach(ids, [&](TSize id) { appendValue(sorted, me[id]); });
+    swap(me, sorted);
 }
 
 template <typename TString, typename TSSetSpec>
-inline void sort(StringSet<TString, TSSetSpec> & target, StringSet<TString, TSSetSpec> & me)
+inline void radixSort(StringSet<TString, TSSetSpec> & me)
 {
-    sort(target, me, Serial());
+    radixSort(me, Serial());
 }
 
 #endif  // #ifndef APP_IBENCH_MISC_H_

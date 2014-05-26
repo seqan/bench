@@ -95,20 +95,38 @@ inline void indexBuild(Index<TText, IndexWotd<TSpec> > & index)
 }
 
 // ----------------------------------------------------------------------------
-// Function sort()
+// Function sortedIds()
 // ----------------------------------------------------------------------------
 
-template <typename TString, typename TSSetSpec, typename TParallelTag>
-inline void radixSort(StringSet<TString, TSSetSpec> & me, Tag<TParallelTag> const & /* tag */)
+template <typename TIds, typename TContainer, typename TParallelTag>
+inline void sortedIds(TIds & ids, TContainer const & me, Tag<TParallelTag> const & /* tag */)
 {
-    typedef StringSet<TString, TSSetSpec>           TStringSet;
+    typedef Tag<TParallelTag> const     TThreading;
+    typedef typename Value<TIds>::Type  TId;
+
+    // Fill ids with identity permutation.
+    resize(ids, length(me), Exact());
+    iota(ids, TId(0), TThreading());
+
+    // Sort ids by value.
+    sort(ids, [&me](TId a, TId b) { return getValue(me, a) < getValue(me, b); }, TThreading());
+}
+
+// ----------------------------------------------------------------------------
+// Function sortedIds()
+// ----------------------------------------------------------------------------
+
+template <typename TIds, typename TString, typename TSSetSpec, typename TParallelTag>
+inline void sortedIds(TIds & ids, StringSet<TString, TSSetSpec> const & me, Tag<TParallelTag> const & /* tag */)
+{
     typedef Tag<TParallelTag> const                 TThreading;
+    typedef StringSet<TString, TSSetSpec> const     TStringSet;
     typedef typename Reference<TStringSet>::Type    TStringRef;
-    typedef typename Size<TStringSet>::Type         TSize;
+    typedef typename Value<TIds>::Type              TId;
 
 //    static const unsigned MIN_LENGTH = Max<MinLength<TStringSet>::VALUE, 1>::VALUE;
 
-    typedef UngappedShape<12>               TShapeSpec;
+    typedef UngappedShape<12>                       TShapeSpec;
     typedef typename Value<TString>::Type           TAlphabet;
     typedef Shape<TAlphabet, TShapeSpec>            TShape;
     typedef typename Value<TShape>::Type            THash;
@@ -125,23 +143,73 @@ inline void radixSort(StringSet<TString, TSSetSpec> & me, Tag<TParallelTag> cons
     TThreading());
 
     // Fill ids with identity permutation.
-    String<TSize> ids;
     resize(ids, length(me), Exact());
-    iota(ids, TSize(0), TThreading());
+    iota(ids, TId(0), TThreading());
 
     // Sort ids by hash.
-    sort(ids, [&hashes](TSize a, TSize b) { return hashes[a] < hashes[b]; }, TThreading());
+    sort(ids, [&hashes](TId a, TId b) { return hashes[a] < hashes[b]; }, TThreading());
+}
+
+// ----------------------------------------------------------------------------
+// Function shuffle()
+// ----------------------------------------------------------------------------
+
+template <typename TString, typename TSSetSpec, typename TIds>
+inline void shuffle(StringSet<TString, TSSetSpec> & me, TIds & ids)
+{
+    typedef StringSet<TString, TSSetSpec>           TStringSet;
+    typedef typename Value<TIds>::Type              TId;
 
     TStringSet sorted;
     reserve(sorted, length(me), Exact());
-    forEach(ids, [&](TSize id) { appendValue(sorted, me[id]); });
+    forEach(ids, [&](TId id) { appendValue(sorted, me[id]); });
     swap(me, sorted);
+}
+
+// ----------------------------------------------------------------------------
+// Function radixSort()
+// ----------------------------------------------------------------------------
+
+template <typename TContainer, typename TParallelTag>
+inline void radixSort(TContainer & me, Tag<TParallelTag> const & /* tag */)
+{
+    typedef Tag<TParallelTag> const                 TThreading;
+    typedef typename Id<TContainer>::Type           TId;
+    typedef String<TId>                             TIds;
+
+    // Obtain sorted ids.
+    TIds ids;
+    sortedIds(ids, me, TThreading());
+
+    // Reorder container elements.
+    shuffle(me, ids);
 }
 
 template <typename TString, typename TSSetSpec>
 inline void radixSort(StringSet<TString, TSSetSpec> & me)
 {
     radixSort(me, Serial());
+}
+
+// ----------------------------------------------------------------------------
+// Function radixSort()
+// ----------------------------------------------------------------------------
+
+template <typename TTarget, typename TString, typename TSSetSpec>
+inline void radixSort(TTarget & target, StringSet<TString, TSSetSpec> & me)
+{
+    typedef StringSet<TString, TSSetSpec>                   TStringSet;
+    typedef typename StringSetPosition<TStringSet>::Type    TPos;
+    typedef typename Id<TStringSet>::Type                   TId;
+    typedef String<TId>                                     TIds;
+
+    // Obtain sorted ids.
+    TIds ids;
+    sortedIds(ids, me, Serial());
+
+    setHost(target, me);
+    reserve(target, length(me), Exact());
+    forEach(ids, [&](TId id) { appendInfix(target, TPos(id, 0), TPos(id, length(me[id])), Exact()); });
 }
 
 #endif  // #ifndef APP_IBENCH_MISC_H_

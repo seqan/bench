@@ -213,19 +213,46 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
 
     unsigned long count = 0;
 
+    stats.preprocessingTime = 0;
+
+    double timer = sysTime();
+    find(index, queries, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
+    {
+        count += countOccurrences(indexIt);
+        locateOccurrences(indexIt, TLocate());
+    },
+    TAlgorithm());
+    stats.countTime = sysTime() - timer;
+
+    return count;
+}
+
+// ----------------------------------------------------------------------------
+// Function findOccurrences()
+// ----------------------------------------------------------------------------
+// Single search (Sorted).
+
+template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
+inline unsigned long findOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries,
+                                     TLocate, Backtracking<TDistance>, SortedList)
+{
+    typedef Backtracking<TDistance>                                 TAlgorithm;
+    typedef typename Iterator<TIndex, TopDown<> >::Type             TIndexIt;
+    typedef typename Iterator<TQueries const, Rooted>::Type         TQueriesIt;
+    typedef StringSet<TQueries, Segment<TQueries> >                 TSortedQueries;
+    typedef typename Iterator<TSortedQueries const, Rooted>::Type   TSortedQueriesIt;
+
+    unsigned long count = 0;
+
     double timer;
 
-    if (options.algorithmType == Options::ALGO_SORT)
-    {
-        timer = sysTime();
-        radixSort(queries);
-        stats.preprocessingTime = sysTime() - timer;
-    }
-    else
-        stats.preprocessingTime = 0;
+    timer = sysTime();
+    TSortedQueries sortedQueries;
+    radixSort(sortedQueries, queries);
+    stats.preprocessingTime = sysTime() - timer;
 
     timer = sysTime();
-    find(index, queries, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
+    find(index, sortedQueries, options.errors, [&](TIndexIt const & indexIt, TSortedQueriesIt const &, unsigned)
     {
         count += countOccurrences(indexIt);
         locateOccurrences(indexIt, TLocate());
@@ -277,17 +304,9 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
 // ----------------------------------------------------------------------------
 // Disable HammingDistance search on tree indices lacking trie-like iterator.
 
-template <typename TText, typename TSpec, typename TQueries, typename TLocate>
+template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TDistance>
 inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<HammingDistance>, Nothing)
-{
-    throw RuntimeError("Unsupported index type");
-    return 0;
-}
-
-template <typename TText, typename TSpec, typename TQueries, typename TLocate>
-inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<EditDistance>, Nothing)
+                                     TLocate, Backtracking<TDistance>, Nothing)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
@@ -295,11 +314,19 @@ inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, Inde
 
 template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TDistance>
 inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<TDistance>, DfsPreorder)
+                                     TLocate, Backtracking<TDistance>, SortedList)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
 }
+
+//template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TDistance>
+//inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
+//                                     TLocate, Backtracking<TDistance>, DfsPreorder)
+//{
+//    throw RuntimeError("Unsupported index type");
+//    return 0;
+//}
 
 // ----------------------------------------------------------------------------
 // Function countOccurrences()
@@ -312,8 +339,10 @@ inline unsigned long countOccurrences(Options const & options, Stats & stats, TI
     switch (options.algorithmType)
     {
     case Options::ALGO_SINGLE:
-    case Options::ALGO_SORT:
         return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<TDistance>(), Nothing());
+
+    case Options::ALGO_SORT:
+        return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<TDistance>(), SortedList());
 
     case Options::ALGO_DFS:
         return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());

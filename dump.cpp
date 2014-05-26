@@ -193,13 +193,7 @@ inline void run(Options & options)
     TText text;
     assign(text, seqs);
 
-    double start = sysTime();
-    TText sorted;
-    sort(sorted, text);
-    double finish = sysTime();
-    std::cout << std::fixed << finish - start << " sec" << std::endl;
-
-    if (!save(sorted, toCString(options.outputFile)))
+    if (!save(text, toCString(options.outputFile)))
         throw RuntimeError("Error while saving text");
 }
 

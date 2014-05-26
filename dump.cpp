@@ -50,6 +50,7 @@
 #include "options.h"
 #include "types.h"
 #include "run.h"
+#include "misc.h"
 
 using namespace seqan;
 
@@ -151,48 +152,6 @@ inline void randomize(TString & me)
 }
 
 // ----------------------------------------------------------------------------
-// Function sort()
-// ----------------------------------------------------------------------------
-
-template <typename TString, typename TSSetSpec, typename TParallelTag>
-inline void sort(StringSet<TString, TSSetSpec> & target, StringSet<TString, TSSetSpec> & me, Tag<TParallelTag> const & /* tag */)
-{
-    typedef StringSet<TString, TSSetSpec>           TStringSet;
-    typedef Tag<TParallelTag> const                 TThreading;
-    typedef typename Reference<TStringSet>::Type    TStringRef;
-    typedef typename Size<TStringSet>::Type         TSize;
-
-//    static const unsigned MIN_LENGTH = Max<MinLength<TStringSet>::VALUE, 1>::VALUE;
-
-    typedef UngappedShape<12>               TShapeSpec;
-    typedef typename Value<TString>::Type           TAlphabet;
-    typedef Shape<TAlphabet, TShapeSpec>            TShape;
-    typedef typename Value<TShape>::Type            THash;
-
-    // Fill hashes.
-    String<THash> hashes;
-    resize(hashes, length(me), Exact());
-    transform(hashes, me, [](TStringRef string)
-    {
-        TShape shape;
-        SEQAN_ASSERT_LEQ(weight(shape), length(string));
-        return hash(shape, begin(string, Standard()));
-    },
-    TThreading());
-
-    // Fill ids with identity permutation.
-    String<TSize> ids;
-    resize(ids, length(me), Exact());
-    iota(ids, TSize(0), TThreading());
-
-    // Sort ids by hash.
-    sort(ids, [&hashes](TSize a, TSize b) { return hashes[a] < hashes[b]; }, TThreading());
-
-    reserve(target, length(me), Exact());
-    forEach(ids, [&](TSize id) { appendValue(target, me[id]); });
-}
-
-// ----------------------------------------------------------------------------
 // Function run()
 // ----------------------------------------------------------------------------
 
@@ -236,7 +195,7 @@ inline void run(Options & options)
 
     double start = sysTime();
     TText sorted;
-    sort(sorted, text, Serial());
+    sort(sorted, text);
     double finish = sysTime();
     std::cout << std::fixed << finish - start << " sec" << std::endl;
 

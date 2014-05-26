@@ -48,6 +48,7 @@
 #include "options.h"
 #include "types.h"
 #include "run.h"
+#include "misc.h"
 
 using namespace seqan;
 
@@ -121,42 +122,6 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
     getOptionValue(options.depth, parser, "depth");
 
     return ArgumentParser::PARSE_OK;
-}
-
-// ----------------------------------------------------------------------------
-// Function countSubstrings()
-// ----------------------------------------------------------------------------
-
-template <typename TIter, typename TCount, typename TLength>
-inline void _countSubstrings(TIter it, TCount & count, TLength length)
-{
-    if (repLength(it) >= length)
-    {
-         ++count;
-    }
-    else if (goDown(it))
-    {
-        do
-        {
-            _countSubstrings(it, count, length);
-        }
-        while (goRight(it));
-    }
-}
-
-template <typename TIndex, typename TLength>
-inline typename Size<TIndex>::Type
-countSubstrings(TIndex & index, TLength length)
-{
-    typedef typename Iterator<TIndex, TopDown<> >::Type TIter;
-    typedef typename Size<TIndex>::Type                 TSize;
-
-    TSize count = 0;
-    TIter it(index);
-
-    _countSubstrings(it, count, length);
-
-    return count;
 }
 
 // ----------------------------------------------------------------------------

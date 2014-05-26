@@ -48,6 +48,7 @@
 #include "options.h"
 #include "types.h"
 #include "run.h"
+#include "misc.h"
 
 using namespace seqan;
 
@@ -218,6 +219,7 @@ inline unsigned long findOccurrences(Options const & options, TIndex & index, TQ
 
     TPattern pattern(queries);
     indexCreate(pattern, FibreSA(), Trie());
+    indexBuild(pattern);
 
     unsigned long count = 0;
 
@@ -286,9 +288,9 @@ inline unsigned long countOccurrences(Options const & options, TIndex & index, T
 {
     if (options.errors)
     {
-        if (options.edit)
-            return countOccurrences(options, index, queries, TLocate(), EditDistance());
-        else
+//        if (options.edit)
+//            return countOccurrences(options, index, queries, TLocate(), EditDistance());
+//        else
             return countOccurrences(options, index, queries, TLocate(), HammingDistance());
     }
     else

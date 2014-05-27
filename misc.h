@@ -35,6 +35,8 @@
 #ifndef APP_IBENCH_MISC_H_
 #define APP_IBENCH_MISC_H_
 
+#include <seqan/misc/edit_environment.h>
+
 using namespace seqan;
 
 // ============================================================================
@@ -281,6 +283,10 @@ find(Index<THaystack, THaystackSpec> & text,
     typedef typename Infix<TSA const>::Type             TOccurrences;
     typedef typename Value<TOccurrences>::Type          TOccurrence;
 
+    typedef String<TAlphabet>                           TQGram;
+    typedef StringEnumerator<TQGram, EditEnvironment<HammingDistance, 2> > TNeighborhood;
+    typedef typename Iterator<TNeighborhood>::Type      TNeighborhoodIt;
+
     static const unsigned Q = WEIGHT<TShape>::VALUE;
 
     TShape & shape = indexShape(pattern);
@@ -288,7 +294,7 @@ find(Index<THaystack, THaystackSpec> & text,
 
     static const unsigned long QGRAMS = Power<ValueSize<TAlphabet>::VALUE, Q>::VALUE;
 
-    String<TAlphabet> qgram;
+    TQGram qgram;
 
     // Generate all q-grams.
     for (unsigned long qhash = 0; qhash < QGRAMS; qhash++)
@@ -297,35 +303,27 @@ find(Index<THaystack, THaystackSpec> & text,
         TTextIt textIt(text);
         goDown(textIt, qgram);
 
-        // Generate 1-neighborhood of current q-gram.
-        for (unsigned i = 0; i < Q; i++)
+        TNeighborhood neighborhood(qgram);
+        for (TNeighborhoodIt itU = begin(neighborhood); !atEnd(itU); goNext(itU))
         {
-            unsigned j = Q - i - 1;
+            hash(shape, begin(*itU));
+            unsigned errors = 0;
+            errors += (ordValue(qgram[itU.mod[0].errorPos]) != itU.mod[0].character);
+            errors += (ordValue(qgram[itU.mod[1].errorPos]) != itU.mod[1].character);
 
-            unsigned c = ordValue(qgram[j]);
-            for (unsigned a = 0; a < ValueSize<TAlphabet>::VALUE; a++)
+            TOccurrences const & occs = getOccurrences(pattern, shape);
+
+            forEach(occs, [&](TOccurrence const & occ)
             {
-                unsigned errors = (a != c);
-                if (i > 0 && errors == 0) continue;
+                TNeedle const & needle = needles[getSeqNo(occ)];
+                TNeedleIt needleIt = begin(needle, Standard()) + Q;
 
-                qgram[j] = a;
-
-                hash(shape, begin(qgram, Standard()));
-                TOccurrences const & occs = getOccurrences(pattern, shape);
-
-                forEach(occs, [&](TOccurrence const & occ)
+                _findBacktracking(textIt, needle, needleIt, errors, threshold, [&](TTextIt endIt, unsigned errors)
                 {
-                    TNeedle const & needle = needles[getSeqNo(occ)];
-                    TNeedleIt needleIt = begin(needle, Standard()) + Q;
-
-                    _findBacktracking(textIt, needle, needleIt, errors, threshold, [&](TTextIt endIt, unsigned errors)
-                    {
-                        delegate(endIt, begin(needles, Standard()) + getSeqNo(occ), errors);
-                    },
-                    HammingDistance());
-                });
-            }
-            qgram[j] = c;
+                    delegate(endIt, begin(needles, Standard()) + getSeqNo(occ), errors);
+                },
+                HammingDistance());
+            });
         }
     }
 

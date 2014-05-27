@@ -203,6 +203,12 @@ inline void run(Options & options)
 
     if (!save(text, toCString(options.outputFile)))
         throw RuntimeError("Error while saving text");
+
+    if (!options.tsv)
+    {
+        std::cout << length(text) << " sequences" << std::endl;
+        std::cout << lengthSum(text) << " symbols" << std::endl;
+    }
 }
 
 int main(int argc, char const ** argv)

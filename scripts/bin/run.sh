@@ -24,7 +24,7 @@ function vars_dna_common
     QUERY_ERRORS="0 1" #2
 
     # multi-query
-    MULTI_COUNTS="10000 100000 1000000 10000000"
+    MULTI_COUNTS="10000 100000 1000000" # 10000000"
     MULTI_LENGTHS="15 30"
 }
 

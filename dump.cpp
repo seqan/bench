@@ -125,7 +125,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     getAlphabetType(options, parser);
     getTextLimits(options, parser);
     getOptionValue(options.limitLength, parser, "limit-length");
-    getOptionValue(options.limitLength, parser, "limit-count");
+    getOptionValue(options.limitCount, parser, "limit-count");
 
     return ArgumentParser::PARSE_OK;
 }

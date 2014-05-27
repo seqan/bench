@@ -249,7 +249,7 @@ function exec_query_multi
                         output=$($CMD)
                         if [ $? -eq 0 ]
                         then
-                            echo -e "$ALPHABET\t$index_type\t$errors\t$multi_length\t$multi_count\t$output" >> $DIR/multi.tsv
+                            echo -e "$ALPHABET\t$index_type\t$errors\t$multi_length\t$multi_count\t$algo\t$output" >> $DIR/multi.tsv
                         fi
                     done
                 done

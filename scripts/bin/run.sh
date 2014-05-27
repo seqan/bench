@@ -242,7 +242,7 @@ function exec_query_multi
             do
                 for multi_length in $MULTI_LENGTHS;
                 do
-                    for algo in "single sort dfs";
+                    for algo in single sort dfs;
                     do
                         cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
                         echo $CMD

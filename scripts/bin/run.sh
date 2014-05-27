@@ -250,11 +250,11 @@ function exec_query_multi
                     do
                         cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
                         echo $CMD
-#                        output=$($CMD)
-#                        if [ $? -eq 0 ]
-#                        then
-#                            echo -e "$ALPHABET\t$index_type\t$errors\t$multi_length\t$multi_count\t$algo\t$output" >> $DIR/multi.tsv
-#                        fi
+                        output=$($CMD)
+                        if [ $? -eq 0 ]
+                        then
+                            echo -e "$ALPHABET\t$index_type\t$errors\t$multi_length\t$multi_count\t$algo\t$output" >> $DIR/multi.tsv
+                        fi
                     done
 #                done
             done

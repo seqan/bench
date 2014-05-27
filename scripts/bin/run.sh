@@ -11,6 +11,7 @@ function vars_dna_common
     PATTERN_SUM_BIT=32
     PATTERN_LENGTH_BIT=8
     PATTERN_LENGTHS=$(seq 5 5 50)
+    PATTERN_COUNT=1000000
 
     # index
     INDEX_TYPE="sa esa qgram fm-tl fm-wt"
@@ -24,7 +25,7 @@ function vars_dna_common
 
     # multi-query
     MULTI_COUNTS="10000 100000 1000000 10000000"
-    MULTI_LENGTHS=$(seq 15 30)
+    MULTI_LENGTHS="15 30"
 }
 
 function vars_dna_ecoli
@@ -38,7 +39,7 @@ function vars_dna_ecoli
     TEXT_NAME=ecoli.txt
 
     # pattern
-    PATTERN_INPUT="ecoli_1M.fastq"
+    PATTERN_INPUT="realworld_ecoli_illumina_ERR022075_10M_1.fastq"
     PATTERN_NAME=ecoli.pat #.$PATTERN_LENGTHS[i]
 
     # index
@@ -81,7 +82,7 @@ function vars_protein_uniprot
     PATTERN_SUM_BIT=32
     PATTERN_LENGTH_BIT=8
     PATTERN_LENGTHS=$(seq 5 5 30)
-#    PATTERN_COUNTS="10000 100000 1000000"
+    PATTERN_COUNT=1000000
 
     # index
     INDEX_NAME=sprot #.$INDEX_TYPE
@@ -101,11 +102,11 @@ function vars_protein_uniprot
 function cmd_prepare
 {
     CMD="$BIN/ibench_dump $1 $2 -a $3 -tc $4 -ts $5 -tl $6"
-    if [ $# -eq 7 ]
+    if [ $# -ge 7 ]
     then
         CMD+=" -ll $7"
     fi
-    if [ $# -eq 8 ]
+    if [ $# -ge 8 ]
     then
         CMD+=" -lc $8"
     fi
@@ -183,7 +184,7 @@ function exec_prepare_patterns
 {
     for pattern_length in $PATTERN_LENGTHS;
     do
-        cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$pattern_length $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $pattern_length
+        cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$pattern_length $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $pattern_length $PATTERN_COUNT
         echo $CMD
         $CMD
     done
@@ -220,7 +221,7 @@ function exec_prepare_patterns_multi
     do
         for multi_length in $MULTI_LENGTHS;
         do
-            cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$multi_length.$multi_count $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $pattern_length $pattern_count
+            cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$multi_length.$multi_count $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $multi_length $multi_count
             echo $CMD
             $CMD
         done
@@ -241,7 +242,7 @@ function exec_query_multi
             do
                 for multi_length in $MULTI_LENGTHS;
                 do
-                    for algo in "simple sort dfs";
+                    for algo in "single sort dfs";
                     do
                         cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
                         echo $CMD
@@ -275,11 +276,11 @@ vars_$ALPHABET\_$DATASET
 
 # ======================================================================================================================
 
-exec_prepare_text
-exec_construct_text
+#exec_prepare_text
+#exec_construct_text
 #exec_visit_text
 #exec_prepare_patterns
 #exec_query
-exec_prepare_patterns_multi
+#exec_prepare_patterns_multi
 exec_query_multi
 

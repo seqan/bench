@@ -304,17 +304,17 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
 // ----------------------------------------------------------------------------
 // Disable HammingDistance search on tree indices lacking trie-like iterator.
 
-template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TDistance>
+template <typename TText, typename TSpec, typename TQueries, typename TLocate>
 inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<TDistance>, Nothing)
+                                     TLocate, Backtracking<HammingDistance>, Nothing)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
 }
 
-template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TDistance>
+template <typename TText, typename TSpec, typename TQueries, typename TLocate>
 inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<TDistance>, SortedList)
+                                     TLocate, Backtracking<HammingDistance>, SortedList)
 {
     throw RuntimeError("Unsupported index type");
     return 0;

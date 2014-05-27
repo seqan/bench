@@ -407,14 +407,14 @@ inline void run(Options const & options)
 
     if (options.tsv)
     {
-        std::cout << occurrencesCount << '\t' << std::fixed << stats.preprocessingTime << '\t' << stats.countTime << std::endl;
+        std::cout << occurrencesCount << '\t' << std::fixed << stats.countTime << '\t' << stats.preprocessingTime << std::endl;
     }
     else
     {
         std::cout << length(queries) << " queries" << std::endl;
         std::cout << lengthSum(queries) << " symbols" << std::endl;
         std::cout << occurrencesCount << " occurrences" << std::endl;
-        std::cout << std::fixed << stats.preprocessingTime << " + " << stats.countTime << " sec" << std::endl;
+        std::cout << std::fixed << stats.countTime << " + " << stats.preprocessingTime << " sec" << std::endl;
     }
 }
 

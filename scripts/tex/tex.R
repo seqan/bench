@@ -119,15 +119,20 @@ for (ERRORS in 0:1)
     PLOT_MULTI=paste(paste(PATH, "multi", sep='/'), ALPHABET, ERRORS, PLENGTH, "pdf", sep='.')
     
     table_multi = subset(TABLE_MULTI, alphabet==ALPHABET & errors==ERRORS, select=c(index, algorithm, plength, pcount, time, preprocessing))
-    table_multi <- transform(table_multi, time = (time + preprocessing) / pcount)
-
-    table_multi_bar = subset(table_multi, pcount==PCOUNT & plength==PLENGTH, select=c(index, algorithm, time))
-    table_multi_bar$algorithm <- factor(table_multi_bar$algorithm, levels=table_multi_bar$algorithm, ordered = TRUE)
-
-    ggplot() +
-      geom_bar(data=table_multi_bar, aes(algorithm, y=time, fill=index), position="dodge", stat="identity", ordered=TRUE) +
-      theme_bw(base_size=12, base_family="Helvetica")
+    table_multi$algorithm <- factor(table_multi$algorithm, levels=table_multi$algorithm, ordered = TRUE)
     
+    table_multi_t <- transform(table_multi, time = time / pcount)
+    table_multi_p <- transform(table_multi, time = (time + preprocessing) / pcount)
+    
+    table_multi_t = subset(table_multi_t, pcount==PCOUNT & plength==PLENGTH, select=c(index, algorithm, time))
+    table_multi_p = subset(table_multi_p, pcount==PCOUNT & plength==PLENGTH, select=c(index, algorithm, time))
+    
+    ggplot() +
+      geom_bar(data=table_multi_p, aes(algorithm, y=time, colour=index), position="dodge", stat="identity", ordered=TRUE) +
+      geom_bar(data=table_multi_t, aes(algorithm, y=time, fill=index), position="dodge", stat="identity", ordered=TRUE) +
+      ylab("seconds") +
+      theme_bw(base_size=12, base_family="Helvetica")
+      
     ggsave(file=PLOT_MULTI)
   }
 }

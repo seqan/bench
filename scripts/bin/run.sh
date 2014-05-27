@@ -232,7 +232,7 @@ function exec_prepare_patterns_multi
 # multi-query patterns
 function exec_query_multi
 {
-    if [[ ! -e $DIR/query.tsv ]]; then
+    if [[ ! -e $DIR/multi.tsv ]]; then
         echo -e "alphabet\tindex\terrors\tplength\tpcount\talgorithm\toccurrences\ttime\tpreprocessing" > $DIR/multi.tsv
     fi
     for index_type in $INDEX_TYPE;

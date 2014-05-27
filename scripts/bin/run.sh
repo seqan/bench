@@ -58,7 +58,7 @@ function vars_dna_celegans
     TEXT_NAME=celegans.txt
 
     # pattern
-    PATTERN_INPUT="1M_1.fastq.gz"
+    PATTERN_INPUT="SRR065390_10M_1.fastq"
     PATTERN_NAME=celegans.pat #.$PATTERN_LENGTHS[i]
 
     # index
@@ -285,6 +285,6 @@ vars_$ALPHABET\_$DATASET
 #exec_visit_text
 #exec_prepare_patterns
 #exec_query
-#exec_prepare_patterns_multi
+exec_prepare_patterns_multi
 exec_query_multi
 

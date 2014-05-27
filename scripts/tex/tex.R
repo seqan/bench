@@ -111,11 +111,11 @@ if ((R = load_file(FILENAME_MULTI))$ok)
 } else
   print(paste("NOT FOUND:", FILENAME_MULTI))
 
-PCOUNT=1000000
+PCOUNT=10000000
+PLENGTHS=c(15,30)
 for (ERRORS in 0:1)
 {
-  for (PLENGTH in c(15,30))
-  {
+    PLENGTH=PLENGTHS[ERRORS+1]
     PLOT_MULTI=paste(paste(PATH, "multi", sep='/'), ALPHABET, ERRORS, PLENGTH, "pdf", sep='.')
     
     table_multi = subset(TABLE_MULTI, alphabet==ALPHABET & errors==ERRORS, select=c(index, algorithm, plength, pcount, time, preprocessing))
@@ -134,30 +134,30 @@ for (ERRORS in 0:1)
       theme_bw(base_size=12, base_family="Helvetica")
       
     ggsave(file=PLOT_MULTI)
-  }
 }
 
 
 ERRORS=1
 PLENGTH=30
-INDEX='fm-tl'
-PLOT_MULTI_IDX=paste(paste(PATH, "multi", sep='/'), ALPHABET, ERRORS, INDEX, "pdf", sep='.')
-table_multi_idx = subset(TABLE_MULTI, alphabet==ALPHABET & errors==ERRORS & plength==PLENGTH & index==INDEX, select=c(algorithm, pcount, time, preprocessing))
+for (INDEX in c('sa', 'fm-tl'))
+{
+  PLOT_MULTI_IDX=paste(paste(PATH, "multi", sep='/'), ALPHABET, ERRORS, INDEX, "pdf", sep='.')
+  table_multi_idx = subset(TABLE_MULTI, alphabet==ALPHABET & errors==ERRORS & plength==PLENGTH & index==INDEX, select=c(algorithm, pcount, time, preprocessing))
+  
+  table_multi_idx_t <- transform(table_multi_idx, time = time / pcount)
+  table_multi_idx_p <- transform(table_multi_idx, time = (time + preprocessing) / pcount)
+  
+  ggplot() +
+    geom_line(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='solid') +
+    geom_point(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=3) +
+    geom_line(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='dashed') +
+    geom_point(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=2) +
+    xlab("pattern count") +
+    ylab("seconds") +
+    scale_x_log10() +
+    theme_bw(base_size=12, base_family="Helvetica")
 
-table_multi_idx_t <- transform(table_multi_idx, time = time / pcount)
-table_multi_idx_p <- transform(table_multi_idx, time = (time + preprocessing) / pcount)
-
-ggplot() +
-  geom_line(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='solid') +
-  geom_point(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=3) +
-  geom_line(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='dashed') +
-  geom_point(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=2) +
-  xlab("pattern count") +
-  ylab("seconds") +
-  scale_x_log10() +
-  theme_bw(base_size=12, base_family="Helvetica")
-
-ggsave(file=PLOT_MULTI_IDX)
-
+  ggsave(file=PLOT_MULTI_IDX)
+}
 
 

@@ -1,3 +1,4 @@
+#!/bin/bash
 
 function vars_dna_common
 {
@@ -24,7 +25,7 @@ function vars_dna_common
     QUERY_ERRORS="0 1" #2
 
     # multi-query
-    MULTI_COUNTS="10000 100000 1000000" # 10000000"
+    MULTI_COUNTS="10000 100000 1000000 10000000"
     MULTI_LENGTHS="15 30"
 }
 
@@ -240,19 +241,22 @@ function exec_query_multi
         do
             for multi_count in $MULTI_COUNTS;
             do
-                for multi_length in $MULTI_LENGTHS;
-                do
+#                for multi_length in $MULTI_LENGTHS;
+#                do
+                    multi_lengths=($MULTI_LENGTHS)
+                    multi_length=${multi_lengths[$errors]}
+
                     for algo in single sort dfs;
                     do
                         cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
                         echo $CMD
-                        output=$($CMD)
-                        if [ $? -eq 0 ]
-                        then
-                            echo -e "$ALPHABET\t$index_type\t$errors\t$multi_length\t$multi_count\t$algo\t$output" >> $DIR/multi.tsv
-                        fi
+#                        output=$($CMD)
+#                        if [ $? -eq 0 ]
+#                        then
+#                            echo -e "$ALPHABET\t$index_type\t$errors\t$multi_length\t$multi_count\t$algo\t$output" >> $DIR/multi.tsv
+#                        fi
                     done
-                done
+#                done
             done
         done
     done

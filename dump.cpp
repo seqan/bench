@@ -65,11 +65,13 @@ using namespace seqan;
 struct Options : BaseOptions
 {
     CharString      outputFile;
-    unsigned        prefixLen;
+    unsigned        limitLength;
+    unsigned        limitCount;
 
     Options() :
         BaseOptions(),
-        prefixLen(0)
+        limitLength(0),
+        limitCount(0)
     {}
 };
 
@@ -98,8 +100,10 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setTextLimits(parser, options);
 
     addSection(parser, "Dump Options");
-    addOption(parser, ArgParseOption("pl", "prefix-length", "Cut the texts.", ArgParseOption::INTEGER));
-    setDefaultValue(parser, "prefix-length", options.prefixLen);
+    addOption(parser, ArgParseOption("ll", "limit-length", "Limit the length of the texts.", ArgParseOption::INTEGER));
+    setDefaultValue(parser, "limit-length", options.limitLength);
+    addOption(parser, ArgParseOption("lc", "limit-count", "Limit the number of texts.", ArgParseOption::INTEGER));
+    setDefaultValue(parser, "limit-count", options.limitLength);
 }
 
 // ----------------------------------------------------------------------------
@@ -120,7 +124,8 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 
     getAlphabetType(options, parser);
     getTextLimits(options, parser);
-    getOptionValue(options.prefixLen, parser, "prefix-length");
+    getOptionValue(options.limitLength, parser, "limit-length");
+    getOptionValue(options.limitLength, parser, "limit-count");
 
     return ArgumentParser::PARSE_OK;
 }
@@ -172,10 +177,13 @@ inline void run(Options & options)
         if (readRecord(id, seq, seqStream) != 0)
             throw RuntimeError("Error while reading text");
 
-        if (options.prefixLen > 0 && options.prefixLen < length(seq))
-            resize(seq, options.prefixLen);
+        if (options.limitLength > 0 && options.limitLength < length(seq))
+            resize(seq, options.limitLength);
 
         appendValue(seqs, seq, Generous());
+
+        if (options.limitCount > 0 && options.limitCount <= length(seqs))
+            break;
     }
 
     if (maxLength(seqs) > MaxValue<typename Value<TLimits, 1>::Type>::VALUE)

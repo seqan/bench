@@ -137,19 +137,27 @@ for (ERRORS in 0:1)
   }
 }
 
-#  table_multi = subset(table_multi, index=='fm-tl' | index=='sa' | index=='qgram')
-#  table_multi_single = subset(table_multi, algorithm=='single' & plength==PLENGTH, select=c(index, pcount, time))
-#  table_multi_sort = subset(table_multi, algorithm=='sort' & plength==PLENGTH, select=c(index, pcount, time))
-#  table_multi_dfs = subset(table_multi, algorithm=='dfs' & plength==PLENGTH, select=c(index, pcount, time))
-#ggplot() +
-#  geom_line(data=table_multi_single, aes(x=pcount, y=time, group=index, shape=index, color=index), linetype='solid') +
-#  geom_line(data=table_multi_sort, aes(x=pcount, y=time, group=index, shape=index, color=index), linetype='longdash') +  
-#  geom_line(data=table_multi_dfs, aes(x=pcount, y=time, group=index, shape=index, color=index), linetype='dotdash') +
-#  xlab("patterns count") +
-#  ylab("seconds") +
-#  scale_x_continuous(trans=log_trans(), breaks=c(10000,100000,1000000)) +
-#  theme_bw(base_size=12, base_family="Helvetica")
 
-#}
+ERRORS=1
+PLENGTH=30
+INDEX='fm-tl'
+PLOT_MULTI_IDX=paste(paste(PATH, "multi", sep='/'), ALPHABET, ERRORS, INDEX, "pdf", sep='.')
+table_multi_idx = subset(TABLE_MULTI, alphabet==ALPHABET & errors==ERRORS & plength==PLENGTH & index==INDEX, select=c(algorithm, pcount, time, preprocessing))
+
+table_multi_idx_t <- transform(table_multi_idx, time = time / pcount)
+table_multi_idx_p <- transform(table_multi_idx, time = (time + preprocessing) / pcount)
+
+ggplot() +
+  geom_line(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='solid') +
+  geom_point(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=3) +
+  geom_line(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='dashed') +
+  geom_point(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=2) +
+  xlab("pattern count") +
+  ylab("seconds") +
+  scale_x_log10() +
+  theme_bw(base_size=12, base_family="Helvetica")
+
+ggsave(file=PLOT_MULTI_IDX)
+
 
 

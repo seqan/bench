@@ -241,7 +241,8 @@ function exec_query_multi
             do
                 for multi_length in $MULTI_LENGTHS;
                 do
-                    for algo in simple sort dfs
+                    for algo in "simple sort dfs";
+                    do
                         cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
                         echo $CMD
                         output=$($CMD)
@@ -257,6 +258,11 @@ function exec_query_multi
 }
 
 # ======================================================================================================================
+
+if [ ! $# -eq 2 ]
+then
+    exit
+fi
 
 #SRC=~/Code/seqan/core/apps/ibench/scripts/resources
 BIN=~/Code/seqan-builds/Release-Gcc/bin

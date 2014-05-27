@@ -154,28 +154,34 @@ struct TextCollection
 // QGramIndex Config
 // ----------------------------------------------------------------------------
 
-template <typename TValue = char>
+template <typename TValue = char, typename TSpec = void>
 struct ShapeWeight
 {
     static const unsigned VALUE = 3;
 };
 
-template <>
-struct ShapeWeight<AminoAcid>
+template <typename TSpec>
+struct ShapeWeight<AminoAcid, TSpec>
 {
     static const unsigned VALUE = 5;
 };
 
-template <>
-struct ShapeWeight<Dna>
+template <typename TSpec>
+struct ShapeWeight<Dna, TSpec>
 {
     static const unsigned VALUE = 12;
+};
+
+template <>
+struct ShapeWeight<Dna, Nothing>
+{
+    static const unsigned VALUE = 10;
 };
 
 template <typename TValue = char, typename TSpec = void>
 struct DefaultShape
 {
-    typedef UngappedShape<ShapeWeight<TValue>::VALUE>   Type;
+    typedef UngappedShape<ShapeWeight<TValue, TSpec>::VALUE>   Type;
 };
 
 // ----------------------------------------------------------------------------

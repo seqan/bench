@@ -203,4 +203,132 @@ inline void sortedStringSet(StringSet<THost, Segment<TSpec> > & target, StringSe
     forEach(ids, [&](TId id) { appendInfix(target, TPos(id, 0), TPos(id, length(me[id])), Exact()); });
 }
 
+// ----------------------------------------------------------------------------
+// Function indexCreate()
+// ----------------------------------------------------------------------------
+
+#ifdef SEQAN_CXX11_STANDARD
+template <typename TText, typename TShapeSpec, typename TSpec>
+inline bool indexCreate(Index<TText, IndexQGram<TShapeSpec, TSpec> > & index, FibreSADir, Trie)
+{
+    typedef Index<TText, IndexQGram<TShapeSpec, TSpec> >    TIndex;
+    typedef typename Fibre<TIndex, FibreSA>::Type           TSA;
+    typedef typename Value<TSA>::Type                       TSAValue;
+    typedef typename Fibre<TIndex, FibreDir>::Type          TDir;
+    typedef typename Fibre<TIndex, FibreShape>::Type        TShape;
+    typedef typename Fibre<TIndex, FibreBucketMap>::Type    TBucketMap;
+    typedef typename Size<TText>::Type                      TSize;
+    typedef typename Iterator<TText const, Standard>::Type  TTextIt;
+    typedef typename Reference<TText const>::Type           TTextRef;
+
+    TText const & text = indexText(index);
+    TSA & sa = indexSA(index);
+    TDir & dir = indexDir(index);
+    TShape & shape = indexShape(index);
+    TBucketMap & bucketMap = indexBucketMap(index);
+
+    TSize textLen = length(text);
+    resize(sa, textLen, Exact());
+
+    // Init directory.
+//    setStepSize(index, 0);
+    resize(dir, _fullDirLength(index), Exact());
+    _qgramClearDir(dir, bucketMap);
+
+    // Count qgrams.
+    forEach(text, [&](TTextRef t)
+    {
+        ++dir[requestBucket(bucketMap, hash(shape, begin(t, Standard())))];
+    });
+
+    // Compute cumulative sum.
+    _qgramCummulativeSum(dir, False());
+
+    // Fill suffix array.
+    iterate(text, [&](TTextIt it)
+    {
+        sa[dir[getBucket(bucketMap, hash(shape, begin(value(it), Standard()))) + 1]++] = TSAValue(position(it), 0);
+    });
+
+    return true;
+}
+#endif
+
+// ----------------------------------------------------------------------------
+// Function find(index, qgramIndex, errors, [](...){}, Backtracking<TDistance>());
+// ----------------------------------------------------------------------------
+
+template <typename THaystack, typename THaystackSpec, typename TNeedles, typename TShapeSpec, typename TNeedleSpec,
+          typename TThreshold, typename TDelegate, typename TSpec>
+inline void
+find(Index<THaystack, THaystackSpec> & text,
+     Index<TNeedles, IndexQGram<TShapeSpec, TNeedleSpec> > & pattern,
+     TThreshold threshold,
+     TDelegate && delegate,
+     Backtracking<HammingDistance, TSpec>)
+{
+    typedef Index<THaystack, THaystackSpec>             TText;
+    typedef typename Iterator<TText, TopDown<> >::Type  TTextIt;
+
+    typedef typename Value<TNeedles const>::Type        TNeedle;
+    typedef typename Iterator<TNeedle, Standard>::Type  TNeedleIt;
+
+    typedef IndexQGram<TShapeSpec, TNeedleSpec>         TPatternSpec;
+    typedef Index<TNeedles, TPatternSpec>               TPattern;
+    typedef typename Fibre<TPattern, FibreShape>::Type  TShape;
+    typedef typename Host<TShape>::Type                 TAlphabet;
+    typedef typename Fibre<TPattern, FibreSA>::Type     TSA;
+    typedef typename Infix<TSA const>::Type             TOccurrences;
+    typedef typename Value<TOccurrences>::Type          TOccurrence;
+
+    static const unsigned Q = WEIGHT<TShape>::VALUE;
+
+    TShape & shape = indexShape(pattern);
+    TNeedles & needles = indexText(pattern);
+
+    static const unsigned long QGRAMS = Power<ValueSize<TAlphabet>::VALUE, Q>::VALUE;
+
+    String<TAlphabet> qgram;
+
+    // Generate all q-grams.
+    for (unsigned long qhash = 0; qhash < QGRAMS; qhash++)
+    {
+        unhash(qgram, qhash, Q);
+        TTextIt textIt(text);
+        goDown(textIt, qgram);
+
+        // Generate 1-neighborhood of current q-gram.
+        for (unsigned i = 0; i < Q; i++)
+        {
+            unsigned j = Q - i - 1;
+
+            unsigned c = ordValue(qgram[j]);
+            for (unsigned a = 0; a < ValueSize<TAlphabet>::VALUE; a++)
+            {
+                unsigned errors = (a != c);
+                if (i > 0 && errors == 0) continue;
+
+                qgram[j] = a;
+
+                hash(shape, begin(qgram, Standard()));
+                TOccurrences const & occs = getOccurrences(pattern, shape);
+
+                forEach(occs, [&](TOccurrence const & occ)
+                {
+                    TNeedle const & needle = needles[getSeqNo(occ)];
+                    TNeedleIt needleIt = begin(needle, Standard()) + Q;
+
+                    _findBacktracking(textIt, needle, needleIt, errors, threshold, [&](TTextIt endIt, unsigned errors)
+                    {
+                        delegate(endIt, begin(needles, Standard()) + getSeqNo(occ), errors);
+                    },
+                    HammingDistance());
+                });
+            }
+            qgram[j] = c;
+        }
+    }
+
+}
+
 #endif  // #ifndef APP_IBENCH_MISC_H_

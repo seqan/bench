@@ -2,16 +2,15 @@
 function vars_dna_common
 {
     # text
-    TEXT_COUNT=8
-    TEXT_SUM=32
-    TEXT_LENGTH=32
+    TEXT_COUNT_BIT=8
+    TEXT_SUM_BIT=32
+    TEXT_LENGTH_BIT=32
 
     # pattern
-    PATTERN_COUNT=32
-    PATTERN_SUM=32
-    PATTERN_LENGTH=8
+    PATTERN_COUNT_BIT=32
+    PATTERN_SUM_BIT=32
+    PATTERN_LENGTH_BIT=8
     PATTERN_LENGTHS=$(seq 5 5 50)
-#    PATTERN_COUNTS="10000 100000 1000000"
 
     # index
     INDEX_TYPE="sa esa qgram fm-tl fm-wt"
@@ -22,7 +21,10 @@ function vars_dna_common
     # query
 #    QUERY_LOCATE=15
     QUERY_ERRORS="0 1" #2
-#    QUERY_ALGORITHM="single dfs"
+
+    # multi-query
+    MULTI_COUNTS="10000 100000 1000000 10000000"
+    MULTI_LENGTHS=$(seq 15 30)
 }
 
 function vars_dna_ecoli
@@ -68,16 +70,16 @@ function vars_protein_uniprot
     # text
     TEXT_INPUT="uniprot_sprot.fasta.gz"
     TEXT_NAME=sprot.txt
-    TEXT_COUNT=32
-    TEXT_SUM=32
-    TEXT_LENGTH=16
+    TEXT_COUNT_BIT=32
+    TEXT_SUM_BIT=32
+    TEXT_LENGTH_BIT=16
 
     # pattern
     PATTERN_INPUT="HUMAN.fasta.gz"
     PATTERN_NAME=sprot.pat #.$PATTERN_LENGTHS[i]
-    PATTERN_COUNT=32
-    PATTERN_SUM=32
-    PATTERN_LENGTH=8
+    PATTERN_COUNT_BIT=32
+    PATTERN_SUM_BIT=32
+    PATTERN_LENGTH_BIT=8
     PATTERN_LENGTHS=$(seq 5 5 30)
 #    PATTERN_COUNTS="10000 100000 1000000"
 
@@ -91,18 +93,21 @@ function vars_protein_uniprot
     # query
 #    QUERY_LOCATE=15
     QUERY_ERRORS="0 1"
-#    QUERY_ALGORITHM="single dfs"
 }
 
 # ======================================================================================================================
 
-# cmd_prepare input output alphabet count sum length [plength]
+# cmd_prepare input output alphabet count sum length [plength] [pcount]
 function cmd_prepare
 {
     CMD="$BIN/ibench_dump $1 $2 -a $3 -tc $4 -ts $5 -tl $6"
     if [ $# -eq 7 ]
     then
-        CMD+=" -pl $7"
+        CMD+=" -ll $7"
+    fi
+    if [ $# -eq 8 ]
+    then
+        CMD+=" -lc $8"
     fi
 }
 
@@ -126,82 +131,149 @@ function cmd_query
 
 # ======================================================================================================================
 
-SRC=~/Code/seqan/core/apps/ibench/scripts/resources
+# prepare text
+function exec_prepare_text
+{
+    cmd_prepare $SRC/$TEXT_INPUT $DIR/$TEXT_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT
+    echo $CMD
+    $CMD
+}
+
+# construct text index
+function exec_construct_text
+{
+    if [[ ! -e $DIR/construct.tsv ]]; then
+        echo -e "alphabet\tindex\tsymbols\ttime" > $DIR/construct.tsv
+    fi
+    for index_type in $INDEX_TYPE;
+    do
+        cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type
+        echo $CMD
+        output=$($CMD)
+        if [ $? -eq 0 ]
+        then
+            echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
+        fi
+    done
+}
+
+# visit text index
+function exec_visit_text
+{
+    if [[ ! -e $DIR/visit.tsv ]]; then
+        echo -e "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
+    fi
+    for index_type in $INDEX_TYPE;
+    do
+        for depth in $VISIT_DEPTH;
+        do
+            cmd_visit $depth $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type
+            echo $CMD
+            output=$($CMD)
+            if [ $? -eq 0 ]
+            then
+                echo -e "$ALPHABET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
+            fi
+        done
+    done
+}
+
+# prepare patterns
+function exec_prepare_patterns
+{
+    for pattern_length in $PATTERN_LENGTHS;
+    do
+        cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$pattern_length $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $pattern_length
+        echo $CMD
+        $CMD
+    done
+}
+
+# query patterns
+function exec_query
+{
+    if [[ ! -e $DIR/query.tsv ]]; then
+        echo -e "alphabet\tindex\terrors\tplength\toccurrences\ttime\tpreprocessing" > $DIR/query.tsv
+    fi
+    for index_type in $INDEX_TYPE;
+    do
+        for errors in $QUERY_ERRORS;
+        do
+            for pattern_length in $PATTERN_LENGTHS;
+            do
+                cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length $errors single
+                echo $CMD
+                output=$($CMD)
+                if [ $? -eq 0 ]
+                then
+                    echo -e "$ALPHABET\t$index_type\t$errors\t$pattern_length\t$output" >> $DIR/query.tsv
+                fi
+            done
+        done
+    done
+}
+
+# prepare multi patterns
+function exec_prepare_patterns_multi
+{
+    for multi_count in $MULTI_COUNTS;
+    do
+        for multi_length in $MULTI_LENGTHS;
+        do
+            cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$multi_length.$multi_count $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $pattern_length $pattern_count
+            echo $CMD
+            $CMD
+        done
+    done
+}
+
+# multi-query patterns
+function exec_query_multi
+{
+    if [[ ! -e $DIR/query.tsv ]]; then
+        echo -e "alphabet\tindex\terrors\tplength\toccurrences\ttime\tpreprocessing" > $DIR/multi.tsv
+    fi
+    for index_type in $INDEX_TYPE;
+    do
+        for errors in $QUERY_ERRORS;
+        do
+            for multi_count in $MULTI_COUNTS;
+            do
+                for multi_length in $MULTI_LENGTHS;
+                do
+                    for algo in simple sort dfs
+                        cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
+                        echo $CMD
+                        output=$($CMD)
+                        if [ $? -eq 0 ]
+                        then
+                            echo -e "$ALPHABET\t$index_type\t$errors\t$multi_length\t$multi_count\t$output" >> $DIR/multi.tsv
+                        fi
+                    done
+                done
+            done
+        done
+    done
+}
+
+# ======================================================================================================================
+
+#SRC=~/Code/seqan/core/apps/ibench/scripts/resources
 BIN=~/Code/seqan-builds/Release-Gcc/bin
 DIR=~/Datasets/ibench
 ALPHABET=$1
 DATASET=$2
 
-# ======================================================================================================================
-
+# configure vars
 vars_$ALPHABET\_$DATASET
 
-# prepare text
-cmd_prepare $SRC/$TEXT_INPUT $DIR/$TEXT_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH
-echo $CMD
-$CMD
+# ======================================================================================================================
 
-# construct text index
-if [[ ! -e $DIR/construct.tsv ]]; then
-    echo -e "alphabet\tindex\tsymbols\ttime" > $DIR/construct.tsv
-fi
-for index_type in $INDEX_TYPE;
-do
-    cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
-    echo $CMD
-    output=$($CMD)
-    if [ $? -eq 0 ]
-    then
-        echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
-    fi
-done
-#cp $DIR/construct.tsv $SRC/
+exec_prepare_text
+exec_construct_text
+#exec_visit_text
+#exec_prepare_patterns
+#exec_query
+exec_prepare_patterns_multi
+exec_query_multi
 
-# visit text index
-if [[ ! -e $DIR/visit.tsv ]]; then
-    echo -e "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
-fi
-for index_type in $INDEX_TYPE;
-do
-    for depth in $VISIT_DEPTH;
-    do
-        cmd_visit $depth $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type
-        echo $CMD
-        output=$($CMD)
-        if [ $? -eq 0 ]
-        then
-            echo -e "$ALPHABET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
-        fi
-    done
-done
-#cp $DIR/visit.tsv $SRC/
-
-# prepare patterns
-for pattern_length in $PATTERN_LENGTHS;
-do
-    cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$pattern_length $ALPHABET $PATTERN_COUNT $PATTERN_SUM $PATTERN_LENGTH $pattern_length
-    echo $CMD
-    $CMD
-done
-
-# query patterns
-if [[ ! -e $DIR/query.tsv ]]; then
-    echo -e "alphabet\tindex\terrors\tplength\toccurrences\ttime" > $DIR/query.tsv
-fi
-for index_type in $INDEX_TYPE;
-do
-    for errors in $QUERY_ERRORS;
-    do
-        for pattern_length in $PATTERN_LENGTHS;
-        do
-            cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT $TEXT_SUM $TEXT_LENGTH $index_type $pattern_length $errors single
-            echo $CMD
-            output=$($CMD)
-            if [ $? -eq 0 ]
-            then
-                echo -e "$ALPHABET\t$index_type\t$errors\t$pattern_length\t$output" >> $DIR/query.tsv
-            fi
-        done
-    done
-done
-#cp $DIR/query.tsv $SRC/

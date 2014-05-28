@@ -451,8 +451,7 @@ inline void run(Options const & options)
 
     if (options.tsv)
     {
-        std::cout << length(queries) << '\t' << occurrencesCount << '\t' <<
-        std::fixed << stats.countTime << '\t' << stats.preprocessingTime << std::endl;
+        std::cout << occurrencesCount << '\t' << std::fixed << stats.countTime << '\t' << stats.preprocessingTime << std::endl;
     }
     else
     {

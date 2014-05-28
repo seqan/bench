@@ -1,4 +1,4 @@
-alphabet	dataset	index	errors	plength	pcount	occurrences	time	preprocessing
+alphabet	dataset	index	errors	plength	occurrences	time	preprocessing
 dna	celegans	sa	0	5	207346111989	1.335835	0.000000
 dna	celegans	sa	0	10	602027321	2.140393	0.000000
 dna	celegans	sa	0	15	12723782	1.669401	0.000000

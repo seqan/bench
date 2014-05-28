@@ -304,12 +304,14 @@ find(Index<THaystack, THaystackSpec> & text,
     {
         unhash(qgram, qhash, Q);
         TTextIt textIt(text);
-        goDown(textIt, qgram);
+        if (!goDown(textIt, qgram))
+            continue;
 
         TNeighborhood neighborhood(qgram);
         for (TNeighborhoodIt itU = begin(neighborhood); !atEnd(itU); goNext(itU))
         {
             hash(shape, begin(*itU));
+
             unsigned errors = 0;
             for (unsigned i = 0; i < THRESHOLD; i++)
                 errors += (ordValue(qgram[itU.mod[i].errorPos]) != itU.mod[i].character);

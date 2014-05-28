@@ -246,7 +246,7 @@ function exec_query_multi
                     multi_lengths=($MULTI_LENGTHS)
                     multi_length=${multi_lengths[$errors]}
 
-                    for algo in single sort dfs;
+                    for algo in single sort dfs bfs;
                     do
                         cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
                         echo $CMD
@@ -280,11 +280,11 @@ vars_$ALPHABET\_$DATASET
 
 # ======================================================================================================================
 
-#exec_prepare_text
-#exec_construct_text
-#exec_visit_text
-#exec_prepare_patterns
-#exec_query
+exec_prepare_text
+exec_construct_text
+exec_visit_text
+exec_prepare_patterns
+exec_query
 exec_prepare_patterns_multi
 exec_query_multi
 

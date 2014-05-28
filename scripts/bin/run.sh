@@ -145,7 +145,7 @@ function exec_prepare_text
 function exec_construct_text
 {
     if [[ ! -e $DIR/construct.tsv ]]; then
-        echo -e "alphabet\tindex\tsymbols\ttime" > $DIR/construct.tsv
+        echo -e "alphabet\tdataset\tindex\tsymbols\ttime" > $DIR/construct.tsv
     fi
     for index_type in $INDEX_TYPE;
     do
@@ -154,7 +154,7 @@ function exec_construct_text
         output=$($CMD)
         if [ $? -eq 0 ]
         then
-            echo -e "$ALPHABET\t$index_type\t$output" >> $DIR/construct.tsv
+            echo -e "$ALPHABET\t$DATASET\t$index_type\t$output" >> $DIR/construct.tsv
         fi
     done
 }
@@ -163,7 +163,7 @@ function exec_construct_text
 function exec_visit_text
 {
     if [[ ! -e $DIR/visit.tsv ]]; then
-        echo -e "alphabet\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
+        echo -e "alphabet\tdataset\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
     fi
     for index_type in $INDEX_TYPE;
     do
@@ -174,7 +174,7 @@ function exec_visit_text
             output=$($CMD)
             if [ $? -eq 0 ]
             then
-                echo -e "$ALPHABET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
+                echo -e "$ALPHABET\t$DATASET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
             fi
         done
     done
@@ -195,7 +195,7 @@ function exec_prepare_patterns
 function exec_query
 {
     if [[ ! -e $DIR/query.tsv ]]; then
-        echo -e "alphabet\tindex\terrors\tplength\toccurrences\ttime\tpreprocessing" > $DIR/query.tsv
+        echo -e "alphabet\tdataset\tindex\terrors\tplength\tpcount\toccurrences\ttime\tpreprocessing" > $DIR/query.tsv
     fi
     for index_type in $INDEX_TYPE;
     do
@@ -208,7 +208,7 @@ function exec_query
                 output=$($CMD)
                 if [ $? -eq 0 ]
                 then
-                    echo -e "$ALPHABET\t$index_type\t$errors\t$pattern_length\t$output" >> $DIR/query.tsv
+                    echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$pattern_length\t$output" >> $DIR/query.tsv
                 fi
             done
         done
@@ -233,7 +233,7 @@ function exec_prepare_patterns_multi
 function exec_query_multi
 {
     if [[ ! -e $DIR/multi.tsv ]]; then
-        echo -e "alphabet\tindex\terrors\tplength\tpcount\talgorithm\toccurrences\ttime\tpreprocessing" > $DIR/multi.tsv
+        echo -e "alphabet\tdataset\tindex\terrors\tplength\tpcount\talgorithm\toccurrences\ttime\tpreprocessing" > $DIR/multi.tsv
     fi
     for index_type in $INDEX_TYPE;
     do
@@ -253,7 +253,7 @@ function exec_query_multi
                         output=$($CMD)
                         if [ $? -eq 0 ]
                         then
-                            echo -e "$ALPHABET\t$index_type\t$errors\t$multi_length\t$multi_count\t$algo\t$output" >> $DIR/multi.tsv
+                            echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$multi_length\t$multi_count\t$algo\t$output" >> $DIR/multi.tsv
                         fi
                     done
 #                done

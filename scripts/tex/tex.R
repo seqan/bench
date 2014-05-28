@@ -110,7 +110,6 @@ if ((R = load_file(FILENAME_MULTI))$ok)
 } else
   print(paste("NOT FOUND:", FILENAME_MULTI))
 
-PCOUNT=10000000
 PLENGTHS=c(15,30)
 for (ERRORS in 0:1)
 {
@@ -122,6 +121,8 @@ for (ERRORS in 0:1)
     
     table_multi_t <- transform(table_multi, time = time / pcount)
     table_multi_p <- transform(table_multi, time = (time + preprocessing) / pcount)
+    
+    PCOUNT=max(table_multi_t['pcount'])
     
     table_multi_t = subset(table_multi_t, pcount==PCOUNT & plength==PLENGTH, select=c(index, algorithm, time))
     table_multi_p = subset(table_multi_p, pcount==PCOUNT & plength==PLENGTH, select=c(index, algorithm, time))

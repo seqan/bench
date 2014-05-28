@@ -49,7 +49,7 @@ load_file <- function(filename)
 ### PLOT VISIT ###
 
 FILENAME_VISIT=paste(paste(PATH, "visit", sep='/'), "tsv", sep='.')
-PLOT_VISIT=paste(paste(PATH, "visit", sep='/'), ALPHABET, "pdf", sep='.')
+PLOT_VISIT=paste(paste(PATH, "visit", sep='/'), ALPHABET, DATASET, "pdf", sep='.')
 
 if ((R = load_file(FILENAME_VISIT))$ok)
 {
@@ -84,7 +84,7 @@ if ((R = load_file(FILENAME_QUERY))$ok)
 
 for (ERRORS in 0:1)
 {
-  PLOT_QUERY=paste(paste(PATH, "query", sep='/'), ALPHABET, ERRORS, "pdf", sep='.')
+  PLOT_QUERY=paste(paste(PATH, "query", sep='/'), ALPHABET, DATASET, ERRORS, "pdf", sep='.')
 
   table_query = subset(TABLE_QUERY, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, plength, pcount, time))
   table_query <- transform(table_query, time = time / pcount)
@@ -114,7 +114,7 @@ PLENGTHS=c(15,30)
 for (ERRORS in 0:1)
 {
     PLENGTH=PLENGTHS[ERRORS+1]
-    PLOT_MULTI=paste(paste(PATH, "multi", sep='/'), ALPHABET, ERRORS, PLENGTH, "pdf", sep='.')
+    PLOT_MULTI=paste(paste(PATH, "multi", sep='/'), ALPHABET, DATASET, ERRORS, PLENGTH, "pdf", sep='.')
     
     table_multi = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, algorithm, plength, pcount, time, preprocessing))
     table_multi$algorithm <- factor(table_multi$algorithm, levels=table_multi$algorithm, ordered = TRUE)
@@ -141,7 +141,7 @@ ERRORS=1
 PLENGTH=30
 for (INDEX in c('sa', 'fm-tl'))
 {
-  PLOT_MULTI_IDX=paste(paste(PATH, "multi", sep='/'), ALPHABET, ERRORS, INDEX, "pdf", sep='.')
+  PLOT_MULTI_IDX=paste(paste(PATH, "multi", sep='/'), ALPHABET, DATASET, ERRORS, INDEX, "pdf", sep='.')
   table_multi_idx = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS & plength==PLENGTH & index==INDEX, select=c(algorithm, pcount, time, preprocessing))
   
   table_multi_idx_t <- transform(table_multi_idx, time = time / pcount)

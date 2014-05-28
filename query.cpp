@@ -238,7 +238,6 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
 {
     typedef Backtracking<TDistance>                                 TAlgorithm;
     typedef typename Iterator<TIndex, TopDown<> >::Type             TIndexIt;
-    typedef typename Iterator<TQueries const, Rooted>::Type         TQueriesIt;
     typedef StringSet<TQueries, Segment<TQueries> >                 TSortedQueries;
     typedef typename Iterator<TSortedQueries const, Rooted>::Type   TSortedQueriesIt;
 

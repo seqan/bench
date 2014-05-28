@@ -57,8 +57,8 @@ if ((R = load_file(FILENAME_VISIT))$ok)
 } else
   print(paste("NOT FOUND:", FILENAME_VISIT))
 
-table_visit = subset(TABLE_VISIT, alphabet==ALPHABET, select=c(index, depth, time))
-table_nodes = subset(TABLE_VISIT, alphabet==ALPHABET & index=='fm-wt', select=c(depth, nodes))
+table_visit = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET, select=c(index, depth, time))
+table_nodes = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET & index=='fm-wt', select=c(depth, nodes))
 table_nodes[,'nodes'] = log(table_nodes[, 'nodes'], ALPHSIZE)
 
 ggplot() +
@@ -86,7 +86,7 @@ for (ERRORS in 0:1)
 {
   PLOT_QUERY=paste(paste(PATH, "query", sep='/'), ALPHABET, ERRORS, "pdf", sep='.')
 
-  table_query = subset(TABLE_QUERY, alphabet==ALPHABET & errors==ERRORS, select=c(index, plength, time))
+  table_query = subset(TABLE_QUERY, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, plength, time))
   table_query <- transform(table_query, time = time / pcount)
   
   ggplot() +
@@ -117,7 +117,7 @@ for (ERRORS in 0:1)
     PLENGTH=PLENGTHS[ERRORS+1]
     PLOT_MULTI=paste(paste(PATH, "multi", sep='/'), ALPHABET, ERRORS, PLENGTH, "pdf", sep='.')
     
-    table_multi = subset(TABLE_MULTI, alphabet==ALPHABET & errors==ERRORS, select=c(index, algorithm, plength, pcount, time, preprocessing))
+    table_multi = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, algorithm, plength, pcount, time, preprocessing))
     table_multi$algorithm <- factor(table_multi$algorithm, levels=table_multi$algorithm, ordered = TRUE)
     
     table_multi_t <- transform(table_multi, time = time / pcount)
@@ -141,7 +141,7 @@ PLENGTH=30
 for (INDEX in c('sa', 'fm-tl'))
 {
   PLOT_MULTI_IDX=paste(paste(PATH, "multi", sep='/'), ALPHABET, ERRORS, INDEX, "pdf", sep='.')
-  table_multi_idx = subset(TABLE_MULTI, alphabet==ALPHABET & errors==ERRORS & plength==PLENGTH & index==INDEX, select=c(algorithm, pcount, time, preprocessing))
+  table_multi_idx = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS & plength==PLENGTH & index==INDEX, select=c(algorithm, pcount, time, preprocessing))
   
   table_multi_idx_t <- transform(table_multi_idx, time = time / pcount)
   table_multi_idx_p <- transform(table_multi_idx, time = (time + preprocessing) / pcount)

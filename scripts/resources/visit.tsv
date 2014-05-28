@@ -1,141 +1,101 @@
-alphabet	index	depth	nodes	time
-dna	sa	1	4	0.000013
-dna	sa	2	16	0.000055
-dna	sa	3	64	0.000184
-dna	sa	4	256	0.000540
-dna	sa	5	1024	0.001644
-dna	sa	6	4096	0.005007
-dna	sa	7	16384	0.016098
-dna	sa	8	65536	0.051495
-dna	sa	9	262144	0.156633
-dna	sa	10	1048538	0.439546
-dna	sa	11	4140293	1.122971
-dna	sa	12	13929911	2.398052
-dna	sa	13	32473321	4.080828
-dna	sa	14	53325644	5.832050
-dna	sa	15	69671981	7.565185
-dna	sa	16	80084460	9.275031
-dna	sa	17	86096329	10.981614
-dna	sa	18	89444607	12.684177
-dna	sa	19	91302030	14.481615
-dna	sa	20	92369288	16.010635
-dna	esa	1	4	0.000004
-dna	esa	2	16	0.000010
-dna	esa	3	64	0.000025
-dna	esa	4	256	0.000080
-dna	esa	5	1024	0.000290
-dna	esa	6	4096	0.001065
-dna	esa	7	16384	0.003179
-dna	esa	8	65536	0.009104
-dna	esa	9	262144	0.030158
-dna	esa	10	1048538	0.095865
-dna	esa	11	4140293	0.208582
-dna	esa	12	13929911	0.528359
-dna	esa	13	32473321	1.111475
-dna	esa	14	53325644	1.788810
-dna	esa	15	69671981	2.223436
-dna	esa	16	80084460	2.421301
-dna	esa	17	86096329	2.538763
-dna	esa	18	89444607	2.620248
-dna	esa	19	91302030	2.760846
-dna	esa	20	92369288	2.731142
-dna	qgram	1	4	0.000012
-dna	qgram	2	16	0.000016
-dna	qgram	3	64	0.000027
-dna	qgram	4	256	0.000074
-dna	qgram	5	1024	0.000247
-dna	qgram	6	4096	0.000810
-dna	qgram	7	16384	0.003083
-dna	qgram	8	65536	0.011683
-dna	qgram	9	262144	0.039024
-dna	qgram	10	1048538	0.058097
-dna	qgram	11	4140293	0.137814
-dna	qgram	12	13929911	0.450101
-dna	qgram	13	32473321	3.828957
-dna	qgram	14	53325644	5.823081
-dna	qgram	15	69671981	7.727740
-dna	qgram	16	80084460	9.545726
-dna	qgram	17	86096329	11.385404
-dna	qgram	18	89444607	13.032234
-dna	qgram	19	91302030	14.719552
-dna	qgram	20	92369288	16.452543
-dna	fm-tl	1	4	0.000001
-dna	fm-tl	2	16	0.000003
-dna	fm-tl	3	64	0.000006
-dna	fm-tl	4	256	0.000018
-dna	fm-tl	5	1024	0.000063
-dna	fm-tl	6	4096	0.000234
-dna	fm-tl	7	16384	0.000836
-dna	fm-tl	8	65536	0.003144
-dna	fm-tl	9	262144	0.012364
-dna	fm-tl	10	1048538	0.056189
-dna	fm-tl	11	4140293	0.219298
-dna	fm-tl	12	13929911	0.828527
-dna	fm-tl	13	32473321	2.937641
-dna	fm-tl	14	53325644	7.900663
-dna	fm-tl	15	69671981	15.877398
-dna	fm-tl	16	80084460	26.036630
-dna	fm-tl	17	86096329	37.536293
-dna	fm-tl	18	89444607	49.695540
-dna	fm-tl	19	91302030	62.352118
-dna	fm-tl	20	92369288	75.293876
-dna	fm-wt	1	4	0.000002
-dna	fm-wt	2	16	0.000004
-dna	fm-wt	3	64	0.000009
-dna	fm-wt	4	256	0.000031
-dna	fm-wt	5	1024	0.000112
-dna	fm-wt	6	4096	0.000389
-dna	fm-wt	7	16384	0.001401
-dna	fm-wt	8	65536	0.005252
-dna	fm-wt	9	262144	0.023555
-dna	fm-wt	10	1048538	0.101509
-dna	fm-wt	11	4140293	0.380539
-dna	fm-wt	12	13929911	1.385561
-dna	fm-wt	13	32473321	4.929781
-dna	fm-wt	14	53325644	13.375298
-dna	fm-wt	15	69671981	28.705073
-dna	fm-wt	16	80084460	46.047118
-dna	fm-wt	17	86096329	66.750842
-dna	fm-wt	18	89444607	90.728070
-dna	fm-wt	19	91302030	113.214967
-dna	fm-wt	20	92369288	135.969060
-protein	sa	1	23	0.000096
-protein	sa	2	528	0.002189
-protein	sa	3	10095	0.015444
-protein	sa	4	172059	0.161397
-protein	sa	5	3125967	1.423286
-protein	sa	6	32291873	5.932726
-protein	sa	7	81071487	9.961311
-protein	sa	8	96907042	12.299387
-protein	sa	9	101674356	14.354878
-protein	sa	10	104751972	16.537698
-protein	esa	1	193003200	2.895520
-protein	esa	2	192460783	3.000364
-protein	esa	3	191918088	3.053563
-protein	esa	4	191375377	3.082592
-protein	esa	5	190832690	3.110251
-protein	esa	6	190290034	3.118506
-protein	esa	7	189747391	2.701565
-protein	esa	8	189204790	2.700530
-protein	esa	9	188662294	2.709139
-protein	esa	10	188120064	2.705733
-protein	qgram	1	23	0.000015
-protein	qgram	2	528	0.000106
-protein	qgram	3	10069	0.000850
-protein	qgram	4	171850	0.008433
-protein	qgram	5	3125967	0.068518
-protein	qgram	6	32291873	5.648616
-protein	qgram	7	81071487	10.269165
-protein	qgram	8	96907042	12.434254
-protein	qgram	9	101674356	14.875199
-protein	qgram	10	104751972	16.941260
-protein	fm-wt	1	23	0.000007
-protein	fm-wt	2	528	0.000088
-protein	fm-wt	3	10095	0.001547
-protein	fm-wt	4	172059	0.022878
-protein	fm-wt	5	3125967	0.445276
-protein	fm-wt	6	32291873	7.650201
-protein	fm-wt	7	81071487	85.306749
-protein	fm-wt	8	96907042	269.969649
-protein	fm-wt	9	101674356	496.566641
-protein	fm-wt	10	104751972	732.850496
+alphabet	dataset	index	depth	nodes	time
+dna	celegans	sa	1	4	0.000014
+dna	celegans	sa	2	16	0.000058
+dna	celegans	sa	3	64	0.000184
+dna	celegans	sa	4	256	0.000546
+dna	celegans	sa	5	1024	0.001625
+dna	celegans	sa	6	4096	0.005057
+dna	celegans	sa	7	16384	0.016056
+dna	celegans	sa	8	65536	0.050972
+dna	celegans	sa	9	262144	0.157041
+dna	celegans	sa	10	1048538	0.441895
+dna	celegans	sa	11	4140293	1.119091
+dna	celegans	sa	12	13929911	2.389221
+dna	celegans	sa	13	32473321	4.093769
+dna	celegans	sa	14	53325644	6.140238
+dna	celegans	sa	15	69671981	7.588685
+dna	celegans	sa	16	80084460	9.292708
+dna	celegans	sa	17	86096329	10.982490
+dna	celegans	sa	18	89444607	12.729992
+dna	celegans	sa	19	91302030	14.404524
+dna	celegans	sa	20	92369288	15.995767
+dna	celegans	esa	1	4	0.000006
+dna	celegans	esa	2	16	0.000011
+dna	celegans	esa	3	64	0.000027
+dna	celegans	esa	4	256	0.000082
+dna	celegans	esa	5	1024	0.000297
+dna	celegans	esa	6	4096	0.001055
+dna	celegans	esa	7	16384	0.003200
+dna	celegans	esa	8	65536	0.009186
+dna	celegans	esa	9	262144	0.029741
+dna	celegans	esa	10	1048538	0.096062
+dna	celegans	esa	11	4140293	0.239177
+dna	celegans	esa	12	13929911	0.464276
+dna	celegans	esa	13	32473321	0.995819
+dna	celegans	esa	14	53325644	1.641681
+dna	celegans	esa	15	69671981	2.118388
+dna	celegans	esa	16	80084460	2.398932
+dna	celegans	esa	17	86096329	2.687630
+dna	celegans	esa	18	89444607	2.622747
+dna	celegans	esa	19	91302030	2.670229
+dna	celegans	esa	20	92369288	2.856087
+dna	celegans	qgram	1	4	0.000011
+dna	celegans	qgram	2	16	0.000014
+dna	celegans	qgram	3	64	0.000026
+dna	celegans	qgram	4	256	0.000072
+dna	celegans	qgram	5	1024	0.000252
+dna	celegans	qgram	6	4096	0.000834
+dna	celegans	qgram	7	16384	0.003095
+dna	celegans	qgram	8	65536	0.011625
+dna	celegans	qgram	9	262144	0.038942
+dna	celegans	qgram	10	1048538	0.057826
+dna	celegans	qgram	11	4140293	0.135924
+dna	celegans	qgram	12	13929911	0.453498
+dna	celegans	qgram	13	32473321	3.670203
+dna	celegans	qgram	14	53325644	5.847715
+dna	celegans	qgram	15	69671981	7.721086
+dna	celegans	qgram	16	80084460	9.681954
+dna	celegans	qgram	17	86096329	11.323391
+dna	celegans	qgram	18	89444607	13.084478
+dna	celegans	qgram	19	91302030	14.811572
+dna	celegans	qgram	20	92369288	16.436941
+dna	celegans	fm-tl	1	4	0.000003
+dna	celegans	fm-tl	2	16	0.000004
+dna	celegans	fm-tl	3	64	0.000007
+dna	celegans	fm-tl	4	256	0.000020
+dna	celegans	fm-tl	5	1024	0.000063
+dna	celegans	fm-tl	6	4096	0.000232
+dna	celegans	fm-tl	7	16384	0.000918
+dna	celegans	fm-tl	8	65536	0.003146
+dna	celegans	fm-tl	9	262144	0.013157
+dna	celegans	fm-tl	10	1048538	0.056255
+dna	celegans	fm-tl	11	4140293	0.211187
+dna	celegans	fm-tl	12	13929911	0.826187
+dna	celegans	fm-tl	13	32473321	2.945198
+dna	celegans	fm-tl	14	53325644	7.874727
+dna	celegans	fm-tl	15	69671981	15.836618
+dna	celegans	fm-tl	16	80084460	25.914221
+dna	celegans	fm-tl	17	86096329	37.258811
+dna	celegans	fm-tl	18	89444607	49.607297
+dna	celegans	fm-tl	19	91302030	61.876129
+dna	celegans	fm-tl	20	92369288	74.814616
+dna	celegans	fm-wt	1	4	0.000004
+dna	celegans	fm-wt	2	16	0.000006
+dna	celegans	fm-wt	3	64	0.000011
+dna	celegans	fm-wt	4	256	0.000034
+dna	celegans	fm-wt	5	1024	0.000119
+dna	celegans	fm-wt	6	4096	0.000437
+dna	celegans	fm-wt	7	16384	0.001657
+dna	celegans	fm-wt	8	65536	0.005259
+dna	celegans	fm-wt	9	262144	0.025459
+dna	celegans	fm-wt	10	1048538	0.095997
+dna	celegans	fm-wt	11	4140293	0.370020
+dna	celegans	fm-wt	12	13929911	1.377305
+dna	celegans	fm-wt	13	32473321	4.912490
+dna	celegans	fm-wt	14	53325644	13.406926
+dna	celegans	fm-wt	15	69671981	27.617006
+dna	celegans	fm-wt	16	80084460	45.897964
+dna	celegans	fm-wt	17	86096329	66.863857
+dna	celegans	fm-wt	18	89444607	89.580692
+dna	celegans	fm-wt	19	91302030	113.613613
+dna	celegans	fm-wt	20	92369288	136.136468

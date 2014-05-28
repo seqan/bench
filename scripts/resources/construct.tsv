@@ -1,10 +1,6 @@
-alphabet	index	symbols	time
-dna	sa	100267633	50.347138
-dna	esa	100267633	70.603639
-dna	qgram	100267633	52.033704
-dna	fm-tl	100267633	58.282648
-dna	fm-wt	100267633	59.495654
-protein	sa	193019802	140.406527
-protein	esa	193019802	145.975022
-protein	qgram	193019802	139.988264
-protein	fm-wt	193019802	159.874006
+alphabet	dataset	index	symbols	time
+dna	celegans	sa	100267633	50.580499
+dna	celegans	esa	100267633	68.664328
+dna	celegans	qgram	100267633	52.165303
+dna	celegans	fm-tl	100267633	58.262004
+dna	celegans	fm-wt	100267633	59.478930

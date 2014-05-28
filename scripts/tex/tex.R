@@ -6,7 +6,7 @@ library("scales")
 PATH="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
 ALPHABET='dna'
 ALPHSIZE=4
-DATASET='ecoli'
+DATASET='celegans'
 
 
 ### FUNCTIONS ###
@@ -86,8 +86,10 @@ for (ERRORS in 0:1)
 {
   PLOT_QUERY=paste(paste(PATH, "query", sep='/'), ALPHABET, DATASET, ERRORS, "pdf", sep='.')
 
-  table_query = subset(TABLE_QUERY, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, plength, pcount, time))
-  table_query <- transform(table_query, time = time / pcount)
+  #table_query = subset(TABLE_QUERY, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, plength, pcount, time))
+  #table_query <- transform(table_query, time = time / pcount)
+  table_query = subset(TABLE_QUERY, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, plength, time))
+  table_query <- transform(table_query, time = time / 1000000)
   
   ggplot() +
     geom_line(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index)) +

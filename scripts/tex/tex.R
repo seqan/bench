@@ -86,7 +86,7 @@ for (ERRORS in 0:1)
 {
   PLOT_QUERY=paste(paste(PATH, "query", sep='/'), ALPHABET, ERRORS, "pdf", sep='.')
 
-  table_query = subset(TABLE_QUERY, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, plength, time))
+  table_query = subset(TABLE_QUERY, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, plength, pcount, time))
   table_query <- transform(table_query, time = time / pcount)
   
   ggplot() +

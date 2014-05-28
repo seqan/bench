@@ -195,7 +195,7 @@ function exec_prepare_patterns
 function exec_query
 {
     if [[ ! -e $DIR/query.tsv ]]; then
-        echo -e "alphabet\tdataset\tindex\terrors\tplength\tpcount\toccurrences\ttime\tpreprocessing" > $DIR/query.tsv
+        echo -e "alphabet\tdataset\tindex\terrors\tplength\toccurrences\ttime\tpreprocessing" > $DIR/query.tsv
     fi
     for index_type in $INDEX_TYPE;
     do

@@ -203,9 +203,9 @@ inline void locateOccurrences(Iter<TIndex, TSpec> const & /* it */, False) {}
 // ----------------------------------------------------------------------------
 // Single search.
 
-template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
+template <typename TIndex, typename TQueries, typename TLocate, typename TDistance, typename TSpec>
 inline unsigned long findOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries,
-                                     TLocate, Backtracking<TDistance>, Nothing)
+                                     TLocate, Backtracking<TDistance, TSpec>, Nothing)
 {
     typedef Backtracking<TDistance>                         TAlgorithm;
     typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
@@ -232,9 +232,9 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
 // ----------------------------------------------------------------------------
 // Single search (Sorted).
 
-template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
+template <typename TIndex, typename TQueries, typename TLocate, typename TDistance, typename TSpec>
 inline unsigned long findOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries,
-                                     TLocate, Backtracking<TDistance>, SortedList)
+                                     TLocate, Backtracking<TDistance, TSpec>, SortedList)
 {
     typedef Backtracking<TDistance>                                 TAlgorithm;
     typedef typename Iterator<TIndex, TopDown<> >::Type             TIndexIt;
@@ -268,9 +268,9 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
 // ----------------------------------------------------------------------------
 // Multiple search (DFS).
 
-template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
+template <typename TIndex, typename TQueries, typename TLocate, typename TDistance, typename TSpec>
 inline unsigned long findOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries,
-                                     TLocate, Backtracking<TDistance>, DfsPreorder)
+                                     TLocate, Backtracking<TDistance, TSpec>, DfsPreorder)
 {
     typedef Index<TQueries, IndexWotd<> >                   TPattern;
     typedef Backtracking<TDistance>                         TAlgorithm;
@@ -304,17 +304,17 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
 // ----------------------------------------------------------------------------
 // Multiple search (BFS).
 
-template <typename TIndex, typename TQueries, typename TLocate, typename TDistance>
-inline unsigned long findOccurrences(Options const & options, Stats & stats, TIndex & index, TQueries & queries,
-                                     TLocate, Backtracking<TDistance>, BfsIterator)
+template <typename TIndex, typename TQueries, typename TLocate, unsigned THRESHOLD>
+inline unsigned long findOccurrences(Options const & /* options */, Stats & stats, TIndex & index, TQueries & queries,
+                                     TLocate, Backtracking<HammingDistance, Threshold<THRESHOLD> >, BfsIterator)
 {
-    typedef typename Value<TQueries>::Type                  TQuery;
-    typedef typename Value<TQuery>::Type                    TAlphabet;
-    typedef typename DefaultShape<TAlphabet, Nothing>::Type TShape;
-    typedef Index<TQueries, IndexQGram<TShape> >            TPattern;
-    typedef Backtracking<TDistance>                         TAlgorithm;
-    typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
-    typedef typename Iterator<TQueries const, Standard>::Type TQueriesIt;
+    typedef typename Value<TQueries>::Type                          TQuery;
+    typedef typename Value<TQuery>::Type                            TAlphabet;
+    typedef typename DefaultShape<TAlphabet, Nothing>::Type         TShape;
+    typedef Index<TQueries, IndexQGram<TShape> >                    TPattern;
+    typedef Backtracking<HammingDistance, Threshold<THRESHOLD> >    TAlgorithm;
+    typedef typename Iterator<TIndex, TopDown<> >::Type             TIndexIt;
+    typedef typename Iterator<TQueries const, Standard>::Type       TQueriesIt;
 
     double timer;
 
@@ -327,7 +327,7 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
     unsigned long count = 0;
 
     timer = sysTime();
-    find(index, pattern, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
+    find(index, pattern, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
     {
         count += countOccurrences(indexIt);
         locateOccurrences(indexIt, TLocate());
@@ -343,25 +343,25 @@ inline unsigned long findOccurrences(Options const & options, Stats & stats, TIn
 // ----------------------------------------------------------------------------
 // Disable HammingDistance search on tree indices lacking trie-like iterator.
 
-template <typename TText, typename TSpec, typename TQueries, typename TLocate>
+template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TAlgoSpec>
 inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<HammingDistance>, Nothing)
+                                     TLocate, Backtracking<HammingDistance, TAlgoSpec>, Nothing)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
 }
 
-template <typename TText, typename TSpec, typename TQueries, typename TLocate>
+template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TAlgoSpec>
 inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<HammingDistance>, SortedList)
+                                     TLocate, Backtracking<HammingDistance, TAlgoSpec>, SortedList)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
 }
 
-template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TDistance>
+template <typename TText, typename TSpec, typename TQueries, typename TLocate, unsigned THRESHOLD>
 inline unsigned long findOccurrences(Options const &, Stats &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<TDistance>, BfsIterator)
+                                     TLocate, Backtracking<HammingDistance, Threshold<THRESHOLD> >, BfsIterator)
 {
     throw RuntimeError("Unsupported index type");
     return 0;
@@ -387,7 +387,13 @@ inline unsigned long countOccurrences(Options const & options, Stats & stats, TI
         return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
 
     case Options::ALGO_BFS:
-        return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<HammingDistance>(), BfsIterator());
+        switch (options.errors)
+        {
+        case 1:
+            return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<HammingDistance, Threshold<1> >(), BfsIterator());
+        case 2:
+            return findOccurrences(options, stats, index, queries, TLocate(), Backtracking<HammingDistance, Threshold<2> >(), BfsIterator());
+        }
 
     default:
         throw RuntimeError("Unsupported search algorithm");

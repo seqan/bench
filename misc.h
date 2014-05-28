@@ -257,17 +257,19 @@ inline bool indexCreate(Index<TText, IndexQGram<TShapeSpec, TSpec> > & index, Fi
 #endif
 
 // ----------------------------------------------------------------------------
-// Function find(index, qgramIndex, errors, [](...){}, Backtracking<TDistance>());
+// Function find(index, qgramIndex, errors, [](...){}, Backtracking<HammingDistance, Threshold<2> >());
 // ----------------------------------------------------------------------------
 
+template <unsigned THRESHOLD>
+struct Threshold;
+
 template <typename THaystack, typename THaystackSpec, typename TNeedles, typename TShapeSpec, typename TNeedleSpec,
-          typename TThreshold, typename TDelegate, typename TSpec>
+          typename TDelegate, unsigned THRESHOLD>
 inline void
 find(Index<THaystack, THaystackSpec> & text,
      Index<TNeedles, IndexQGram<TShapeSpec, TNeedleSpec> > & pattern,
-     TThreshold threshold,
      TDelegate && delegate,
-     Backtracking<HammingDistance, TSpec>)
+     Backtracking<HammingDistance, Threshold<THRESHOLD> >)
 {
     typedef Index<THaystack, THaystackSpec>             TText;
     typedef typename Iterator<TText, TopDown<> >::Type  TTextIt;
@@ -284,7 +286,8 @@ find(Index<THaystack, THaystackSpec> & text,
     typedef typename Value<TOccurrences>::Type          TOccurrence;
 
     typedef String<TAlphabet>                           TQGram;
-    typedef StringEnumerator<TQGram, EditEnvironment<HammingDistance, 2> > TNeighborhood;
+    typedef EditEnvironment<HammingDistance, THRESHOLD> TEnvironment;
+    typedef StringEnumerator<TQGram, TEnvironment>      TNeighborhood;
     typedef typename Iterator<TNeighborhood>::Type      TNeighborhoodIt;
 
     static const unsigned Q = WEIGHT<TShape>::VALUE;
@@ -308,8 +311,8 @@ find(Index<THaystack, THaystackSpec> & text,
         {
             hash(shape, begin(*itU));
             unsigned errors = 0;
-            errors += (ordValue(qgram[itU.mod[0].errorPos]) != itU.mod[0].character);
-            errors += (ordValue(qgram[itU.mod[1].errorPos]) != itU.mod[1].character);
+            for (unsigned i = 0; i < THRESHOLD; i++)
+                errors += (ordValue(qgram[itU.mod[i].errorPos]) != itU.mod[i].character);
 
             TOccurrences const & occs = getOccurrences(pattern, shape);
 
@@ -318,7 +321,7 @@ find(Index<THaystack, THaystackSpec> & text,
                 TNeedle const & needle = needles[getSeqNo(occ)];
                 TNeedleIt needleIt = begin(needle, Standard()) + Q;
 
-                _findBacktracking(textIt, needle, needleIt, errors, threshold, [&](TTextIt endIt, unsigned errors)
+                _findBacktracking(textIt, needle, needleIt, errors, THRESHOLD, [&](TTextIt endIt, unsigned errors)
                 {
                     delegate(endIt, begin(needles, Standard()) + getSeqNo(occ), errors);
                 },

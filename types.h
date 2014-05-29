@@ -173,6 +173,12 @@ struct ShapeWeight<Dna, TSpec>
 };
 
 template <>
+struct ShapeWeight<AminoAcid, Nothing>
+{
+    static const unsigned VALUE = 4;
+};
+
+template <>
 struct ShapeWeight<Dna, Nothing>
 {
     static const unsigned VALUE = 10;

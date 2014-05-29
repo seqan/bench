@@ -178,16 +178,17 @@ inline void run(Options & options)
         if (readRecord(id, seq, seqStream) != 0)
             throw RuntimeError("Error while reading text");
 
-        if (options.limitLength <= 0 || options.limitLength >= length(seq))
+        if (options.limitLength <= 0)
         {
             appendValue(seqs, seq, Generous());
         }
         else
         {
-            TSize seqLen = length(seq);
-            for (TSize pos = 0; pos < seqLen - options.limitLength; pos += options.limitLength)
+            TSize seqCount = length(seq) / options.limitLength;
+
+            for (TSize seqId = 0; seqId < seqCount; seqId++)
             {
-                appendValue(seqs, infix(seq, pos, pos + options.limitLength), Generous());
+                appendValue(seqs, infix(seq, seqId * options.limitLength, (seqId + 1) * options.limitLength), Generous());
 
                 if (options.limitCount > 0 && options.limitCount <= length(seqs))
                     break;

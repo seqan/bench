@@ -178,8 +178,6 @@ protein	uniprot	fm-wt	0	10	100000	dfs	377219	0.174128	0.011650
 protein	uniprot	fm-wt	0	10	1000000	single	3650346	2.387593	0.000000
 protein	uniprot	fm-wt	0	10	1000000	sort	3650346	1.679043	0.119318
 protein	uniprot	fm-wt	0	10	1000000	dfs	3650346	1.494486	0.238175
-protein	uniprot	fm-wt	1	20	10000	single	23408	1.319125	0.000000
-protein	uniprot	fm-wt	1	20	10000	sort	23408	1.158464	0.000610
 protein	uniprot	fm-wt	1	20	10000	single	23408	1.316253	0.000000
 protein	uniprot	fm-wt	1	20	10000	sort	23408	1.159688	0.000613
 protein	uniprot	fm-wt	1	20	10000	bfs	23408	1.278403	0.001173

@@ -95,6 +95,10 @@ function vars_protein_uniprot
     # query
 #    QUERY_LOCATE=15
     QUERY_ERRORS="0 1"
+
+    # multi-query
+    MULTI_COUNTS="10000 100000 1000000"
+    MULTI_LENGTHS="10 20"
 }
 
 # ======================================================================================================================

@@ -165,6 +165,7 @@ inline void run(Options & options)
 {
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
     typedef StringSet<CharString, Owner<ConcatDirect<> > >                  TCharStringSet;
+    typedef typename Size<CharString>::Type                                 TSize;
 
     SequenceStream seqStream(toCString(options.textFile));
 
@@ -177,10 +178,21 @@ inline void run(Options & options)
         if (readRecord(id, seq, seqStream) != 0)
             throw RuntimeError("Error while reading text");
 
-        if (options.limitLength > 0 && options.limitLength < length(seq))
-            resize(seq, options.limitLength);
+        if (options.limitLength <= 0 || options.limitLength >= length(seq))
+        {
+            appendValue(seqs, seq, Generous());
+        }
+        else
+        {
+            TSize seqLen = length(seq);
+            for (TSize pos = 0; pos < seqLen - options.limitLength; pos += options.limitLength)
+            {
+                appendValue(seqs, infix(seq, pos, pos + options.limitLength), Generous());
 
-        appendValue(seqs, seq, Generous());
+                if (options.limitCount > 0 && options.limitCount <= length(seqs))
+                    break;
+            }
+        }
 
         if (options.limitCount > 0 && options.limitCount <= length(seqs))
             break;

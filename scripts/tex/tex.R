@@ -4,9 +4,16 @@ library("ggplot2")
 library("scales")
 
 PATH="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
-ALPHABET='dna'
-ALPHSIZE=4
-DATASET='celegans'
+
+#DATASET='celegans'
+#ALPHABET='dna'
+#ALPHSIZE=4
+#PLENGTHS=c(15,30)
+
+DATASET='uniprot'
+ALPHABET='protein'
+ALPHSIZE=24
+PLENGTHS=c(10,20)
 
 
 ### FUNCTIONS ###
@@ -112,7 +119,6 @@ if ((R = load_file(FILENAME_MULTI))$ok)
 } else
   print(paste("NOT FOUND:", FILENAME_MULTI))
 
-PLENGTHS=c(15,30)
 for (ERRORS in 0:1)
 {
     PLENGTH=PLENGTHS[ERRORS+1]
@@ -140,8 +146,8 @@ for (ERRORS in 0:1)
 
 
 ERRORS=1
-PLENGTH=30
-for (INDEX in c('sa', 'fm-tl'))
+PLENGTH=PLENGTHS[ERRORS+1]
+for (INDEX in c('sa', 'fm-wt'))
 {
   PLOT_MULTI_IDX=paste(paste(PATH, "multi", sep='/'), ALPHABET, DATASET, ERRORS, INDEX, "pdf", sep='.')
   table_multi_idx = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS & plength==PLENGTH & index==INDEX, select=c(algorithm, pcount, time, preprocessing))

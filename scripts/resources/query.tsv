@@ -125,3 +125,9 @@ protein	uniprot	fm-wt	1	15	3818875	124.719379	0.000000
 protein	uniprot	fm-wt	1	20	3125052	134.118686	0.000000
 protein	uniprot	fm-wt	1	25	2539660	143.665228	0.000000
 protein	uniprot	fm-wt	1	30	2230990	152.968456	0.000000
+protein	uniprot	esa	0	5	0	0.015613	0.000000
+protein	uniprot	esa	0	10	0	0.015772	0.000000
+protein	uniprot	esa	0	15	0	0.015908	0.000000
+protein	uniprot	esa	0	20	0	0.015948	0.000000
+protein	uniprot	esa	0	25	0	0.016034	0.000000
+protein	uniprot	esa	0	30	0	0.015274	0.000000

@@ -101,6 +101,12 @@ protein	uniprot	sa	1	15	3818875	277.227719	0.000000
 protein	uniprot	sa	1	20	3125052	277.781306	0.000000
 protein	uniprot	sa	1	25	2539660	277.704939	0.000000
 protein	uniprot	sa	1	30	2230990	276.637739	0.000000
+protein	uniprot	esa	0	5	0	0.015613	0.000000
+protein	uniprot	esa	0	10	0	0.015772	0.000000
+protein	uniprot	esa	0	15	0	0.015908	0.000000
+protein	uniprot	esa	0	20	0	0.015948	0.000000
+protein	uniprot	esa	0	25	0	0.016034	0.000000
+protein	uniprot	esa	0	30	0	0.015274	0.000000
 protein	uniprot	qgram	0	5	186259124	0.229420	0.000000
 protein	uniprot	qgram	0	10	3650346	0.923947	0.000000
 protein	uniprot	qgram	0	15	2563873	0.912867	0.000000
@@ -125,9 +131,3 @@ protein	uniprot	fm-wt	1	15	3818875	124.719379	0.000000
 protein	uniprot	fm-wt	1	20	3125052	134.118686	0.000000
 protein	uniprot	fm-wt	1	25	2539660	143.665228	0.000000
 protein	uniprot	fm-wt	1	30	2230990	152.968456	0.000000
-protein	uniprot	esa	0	5	0	0.015613	0.000000
-protein	uniprot	esa	0	10	0	0.015772	0.000000
-protein	uniprot	esa	0	15	0	0.015908	0.000000
-protein	uniprot	esa	0	20	0	0.015948	0.000000
-protein	uniprot	esa	0	25	0	0.016034	0.000000
-protein	uniprot	esa	0	30	0	0.015274	0.000000

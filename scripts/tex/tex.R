@@ -3,7 +3,8 @@ library("xtable")
 library("ggplot2")
 library("scales")
 
-PATH="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
+INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
+OUTPUT="/Users/esiragusa/Dissertation/plots"
 
 #DATASET='celegans'
 #ALPHABET='dna'
@@ -55,8 +56,8 @@ load_file <- function(filename)
 
 ### PLOT VISIT ###
 
-FILENAME_VISIT=paste(paste(PATH, "visit", sep='/'), "tsv", sep='.')
-PLOT_VISIT=paste(paste(PATH, "visit", sep='/'), ALPHABET, DATASET, "pdf", sep='.')
+FILENAME_VISIT=paste(paste(INPUT, "visit", sep='/'), "tsv", sep='.')
+PLOT_VISIT=paste(paste(OUTPUT, "visit", sep='/'), ALPHABET, DATASET, "pdf", sep='.')
 
 if ((R = load_file(FILENAME_VISIT))$ok)
 {
@@ -81,7 +82,7 @@ ggsave(file=PLOT_VISIT)
 
 ### PLOT QUERY ###
 
-FILENAME_QUERY=paste(paste(PATH, "query", sep='/'), "tsv", sep='.')
+FILENAME_QUERY=paste(paste(INPUT, "query", sep='/'), "tsv", sep='.')
 
 if ((R = load_file(FILENAME_QUERY))$ok)
 {
@@ -91,7 +92,7 @@ if ((R = load_file(FILENAME_QUERY))$ok)
 
 for (ERRORS in 0:1)
 {
-  PLOT_QUERY=paste(paste(PATH, "query", sep='/'), ALPHABET, DATASET, ERRORS, "pdf", sep='.')
+  PLOT_QUERY=paste(paste(OUTPUT, "query", sep='/'), ALPHABET, DATASET, ERRORS, "pdf", sep='.')
 
   #table_query = subset(TABLE_QUERY, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, plength, pcount, time))
   #table_query <- transform(table_query, time = time / pcount)
@@ -111,7 +112,7 @@ for (ERRORS in 0:1)
 
 ### PLOT MULTI QUERY ###
 
-FILENAME_MULTI=paste(paste(PATH, "multi", sep='/'), "tsv", sep='.')
+FILENAME_MULTI=paste(paste(INPUT, "multi", sep='/'), "tsv", sep='.')
 
 if ((R = load_file(FILENAME_MULTI))$ok)
 {
@@ -122,7 +123,7 @@ if ((R = load_file(FILENAME_MULTI))$ok)
 for (ERRORS in 0:1)
 {
     PLENGTH=PLENGTHS[ERRORS+1]
-    PLOT_MULTI=paste(paste(PATH, "multi", sep='/'), ALPHABET, DATASET, ERRORS, PLENGTH, "pdf", sep='.')
+    PLOT_MULTI=paste(paste(OUTPUT, "multi", sep='/'), ALPHABET, DATASET, ERRORS, PLENGTH, "pdf", sep='.')
     
     table_multi = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, algorithm, plength, pcount, time, preprocessing))
     table_multi$algorithm <- factor(table_multi$algorithm, levels=table_multi$algorithm, ordered = TRUE)
@@ -149,7 +150,7 @@ ERRORS=1
 PLENGTH=PLENGTHS[ERRORS+1]
 for (INDEX in c('sa', 'fm-wt'))
 {
-  PLOT_MULTI_IDX=paste(paste(PATH, "multi", sep='/'), ALPHABET, DATASET, ERRORS, INDEX, "pdf", sep='.')
+  PLOT_MULTI_IDX=paste(paste(OUTPUT, "multi", sep='/'), ALPHABET, DATASET, ERRORS, INDEX, "pdf", sep='.')
   table_multi_idx = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS & plength==PLENGTH & index==INDEX, select=c(algorithm, pcount, time, preprocessing))
   
   table_multi_idx_t <- transform(table_multi_idx, time = time / pcount)

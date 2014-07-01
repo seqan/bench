@@ -4,17 +4,17 @@ library("ggplot2")
 library("scales")
 
 INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
-OUTPUT="/Users/esiragusa/Dissertation/plots"
+OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"
 
-#DATASET='celegans'
-#ALPHABET='dna'
-#ALPHSIZE=4
-#PLENGTHS=c(15,30)
+DATASET='celegans'
+ALPHABET='dna'
+ALPHSIZE=4
+PLENGTHS=c(15,30)
 
-DATASET='uniprot'
-ALPHABET='protein'
-ALPHSIZE=24
-PLENGTHS=c(10,20)
+#DATASET='uniprot'
+#ALPHABET='protein'
+#ALPHSIZE=24
+#PLENGTHS=c(10,20)
 
 
 ### FUNCTIONS ###

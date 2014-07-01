@@ -98,6 +98,7 @@ if ((R = load_file(FILENAME_VISIT))$ok)
 table_visit = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET, select=c(index, depth, time))
 #table_nodes = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET & index=='fm-wt', select=c(depth, nodes))
 #table_nodes[,'nodes'] = 10^log(table_nodes[, 'nodes'], ALPHSIZE)
+#  geom_line(data=table_nodes, aes(x=depth, y=nodes/ALPHSIZE), linetype='dotted') +
 
 ggplot() +
   geom_line(data=table_visit, aes(x=depth, y=time, group=index, shape=index, color=index)) +
@@ -108,8 +109,6 @@ ggplot() +
   xlab("Depth") +
   ylab("Time (seconds)") +
   theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
-
-#  geom_line(data=table_nodes, aes(x=depth, y=nodes/ALPHSIZE), linetype='dotted') +
 
 ggsave(file=PLOT_VISIT, scale=SCALE)
 
@@ -178,6 +177,7 @@ for (ERRORS in 0:1)
       geom_bar(data=table_multi_t, aes(algorithm, y=time, fill=index), position="dodge", stat="identity", ordered=TRUE) +
       scale_fill_discrete(name="Index", breaks=INDEX_NAMES, labels=INDEX_LABELS) +
       scale_color_discrete(name="Index", breaks=INDEX_NAMES, labels=INDEX_LABELS) +
+      scale_x_discrete(breaks=ALGORITHM_NAMES, labels=ALGORITHM_LABELS) +
       scale_y_continuous(labels=scientific_10) +
       xlab("Algorithm") +
       ylab("Time (seconds/patterns)") +

@@ -6,6 +6,11 @@ library("scales")
 INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
 OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"
 
+SCALE=0.4
+FONT_SIZE=10
+POINT_SIZE=2
+FONT_FAMILY='Helvetica'
+
 DATASET='celegans'
 ALPHABET='dna'
 ALPHSIZE=4
@@ -71,13 +76,13 @@ table_nodes[,'nodes'] = log(table_nodes[, 'nodes'], ALPHSIZE)
 
 ggplot() +
   geom_line(data=table_visit, aes(x=depth, y=log10(time), group=index, shape=index, color=index)) +
-  geom_point(data=table_visit, aes(x=depth, y=log10(time), group=index, shape=index, color=index), size=3) +
+  geom_point(data=table_visit, aes(x=depth, y=log10(time), group=index, shape=index, color=index), size=POINT_SIZE) +
   geom_line(data=table_nodes, aes(x=depth, y=nodes/ALPHSIZE), linetype='dotted') +
-  xlab("depth") +
-  ylab("log10 seconds") +
-  theme_bw(base_size=12, base_family="Helvetica")
+  xlab("Depth") +
+  ylab("Log time (seconds)") +
+  theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
-ggsave(file=PLOT_VISIT)
+ggsave(file=PLOT_VISIT, scale=SCALE)
 
 
 ### PLOT QUERY ###
@@ -101,12 +106,12 @@ for (ERRORS in 0:1)
   
   ggplot() +
     geom_line(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index)) +
-    geom_point(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index), size=3) +
-    xlab("pattern length") +
-    ylab("seconds") +
-    theme_bw(base_size=12, base_family="Helvetica")
+    geom_point(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index), size=POINT_SIZE) +
+    xlab("Pattern length") +
+    ylab("Time (seconds)") +
+    theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 
-  ggsave(file=PLOT_QUERY)
+  ggsave(file=PLOT_QUERY, scale=SCALE)
 }
 
 
@@ -139,10 +144,10 @@ for (ERRORS in 0:1)
     ggplot() +
       geom_bar(data=table_multi_p, aes(algorithm, y=time, colour=index), position="dodge", stat="identity", ordered=TRUE) +
       geom_bar(data=table_multi_t, aes(algorithm, y=time, fill=index), position="dodge", stat="identity", ordered=TRUE) +
-      ylab("seconds") +
-      theme_bw(base_size=12, base_family="Helvetica")
+      ylab("Time (seconds/patterns)") +
+      theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
       
-    ggsave(file=PLOT_MULTI)
+    ggsave(file=PLOT_MULTI, scale=SCALE)
 }
 
 
@@ -158,15 +163,15 @@ for (INDEX in c('sa', 'fm-wt'))
   
   ggplot() +
     geom_line(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='solid') +
-    geom_point(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=3) +
+    geom_point(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=POINT_SIZE) +
     geom_line(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='dashed') +
-    geom_point(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=2) +
-    xlab("pattern count") +
-    ylab("seconds") +
+    geom_point(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=POINT_SIZE-1) +
+    xlab("Patterns") +
+    ylab("Time (seconds/patterns)") +
     scale_x_log10() +
-    theme_bw(base_size=12, base_family="Helvetica")
+    theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 
-  ggsave(file=PLOT_MULTI_IDX)
+  ggsave(file=PLOT_MULTI_IDX, scale=SCALE)
 }
 
 

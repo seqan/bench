@@ -2,14 +2,34 @@ library("reshape")
 library("xtable")
 library("ggplot2")
 library("scales")
+library("extrafont")
+
+# To be run once after installing package extrafont
+#font_import()
+#loadfonts()
+
+#library("Cairo")
+#mainfont <- 'Cambria'
+#CairoFonts(regular=paste(mainfont,"style=Regular",sep=":"),
+#           bold=paste(mainfont,"style=Bold",sep=":"),
+#           italic=paste(mainfont,"style=Italic",sep=":"),
+#           bolditalic=paste(mainfont,"style=Bold Italic,BoldItalic",sep=":"))
+#pdf <- CairoPDF
+#png <- CairoPNG
 
 INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
 OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"
 
 SCALE=0.4
-FONT_SIZE=10
+FONT_SIZE=11
 POINT_SIZE=2
-FONT_FAMILY='Helvetica'
+FONT_FAMILY='Cambria'
+
+INDEX_NAMES=c("esa","fm-tl","fm-wt","qgram","sa")
+INDEX_LABELS=c("ESA","FM-2","FM-WT","q-Gram","SA")
+
+ALGORITHM_NAMES=c("single","sort","dfs","bfs")
+ALGORITHM_LABELS=c("Naive","Sorted","Dfs","Bfs")
 
 DATASET='celegans'
 ALPHABET='dna'
@@ -58,6 +78,11 @@ load_file <- function(filename)
         return(list(ok=FALSE))
 }
 
+scientific_10 <- function(x)
+{
+  parse(text=gsub("e", " %*% 10^", scientific_format()(x)))
+}
+
 
 ### PLOT VISIT ###
 
@@ -71,17 +96,21 @@ if ((R = load_file(FILENAME_VISIT))$ok)
   print(paste("NOT FOUND:", FILENAME_VISIT))
 
 table_visit = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET, select=c(index, depth, time))
-table_nodes = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET & index=='fm-wt', select=c(depth, nodes))
-table_nodes[,'nodes'] = log(table_nodes[, 'nodes'], ALPHSIZE)
+#table_nodes = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET & index=='fm-wt', select=c(depth, nodes))
+#table_nodes[,'nodes'] = 10^log(table_nodes[, 'nodes'], ALPHSIZE)
 
 ggplot() +
-  geom_line(data=table_visit, aes(x=depth, y=log10(time), group=index, shape=index, color=index)) +
-  geom_point(data=table_visit, aes(x=depth, y=log10(time), group=index, shape=index, color=index), size=POINT_SIZE) +
-  geom_line(data=table_nodes, aes(x=depth, y=nodes/ALPHSIZE), linetype='dotted') +
+  geom_line(data=table_visit, aes(x=depth, y=time, group=index, shape=index, color=index)) +
+  geom_point(data=table_visit, aes(x=depth, y=time, group=index, shape=index, color=index), size=POINT_SIZE) +
+  scale_shape_discrete(name="Index", breaks=INDEX_NAMES, labels=INDEX_LABELS) +
+  scale_color_discrete(name="Index", breaks=INDEX_NAMES, labels=INDEX_LABELS) +
+  scale_y_log10(labels=scientific_10) +
   xlab("Depth") +
-  ylab("Log time (seconds)") +
+  ylab("Time (seconds)") +
   theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
-  
+
+#  geom_line(data=table_nodes, aes(x=depth, y=nodes/ALPHSIZE), linetype='dotted') +
+
 ggsave(file=PLOT_VISIT, scale=SCALE)
 
 
@@ -107,8 +136,11 @@ for (ERRORS in 0:1)
   ggplot() +
     geom_line(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index)) +
     geom_point(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index), size=POINT_SIZE) +
+    scale_shape_discrete(name="Index", breaks=INDEX_NAMES, labels=INDEX_LABELS) +
+    scale_color_discrete(name="Index", breaks=INDEX_NAMES, labels=INDEX_LABELS) +
     xlab("Pattern length") +
     ylab("Time (seconds)") +
+    scale_y_continuous(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 
   ggsave(file=PLOT_QUERY, scale=SCALE)
@@ -144,6 +176,10 @@ for (ERRORS in 0:1)
     ggplot() +
       geom_bar(data=table_multi_p, aes(algorithm, y=time, colour=index), position="dodge", stat="identity", ordered=TRUE) +
       geom_bar(data=table_multi_t, aes(algorithm, y=time, fill=index), position="dodge", stat="identity", ordered=TRUE) +
+      scale_fill_discrete(name="Index", breaks=INDEX_NAMES, labels=INDEX_LABELS) +
+      scale_color_discrete(name="Index", breaks=INDEX_NAMES, labels=INDEX_LABELS) +
+      scale_y_continuous(labels=scientific_10) +
+      xlab("Algorithm") +
       ylab("Time (seconds/patterns)") +
       theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
       
@@ -166,9 +202,12 @@ for (INDEX in c('sa', 'fm-wt'))
     geom_point(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=POINT_SIZE) +
     geom_line(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='dashed') +
     geom_point(data=table_multi_idx_t, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=POINT_SIZE-1) +
+    scale_shape_discrete(name="Algorithm", breaks=ALGORITHM_NAMES, labels=ALGORITHM_LABELS) +
+    scale_color_discrete(name="Algorithm", breaks=ALGORITHM_NAMES, labels=ALGORITHM_LABELS) +
     xlab("Patterns") +
     ylab("Time (seconds/patterns)") +
     scale_x_log10() +
+    scale_y_continuous(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 
   ggsave(file=PLOT_MULTI_IDX, scale=SCALE)

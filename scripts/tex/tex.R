@@ -2,7 +2,8 @@ library("reshape")
 library("xtable")
 library("ggplot2")
 library("scales")
-library("extrafont")
+library("Cairo")
+#library("extrafont")
 
 # To be run once after installing package extrafont
 #font_import()
@@ -21,15 +22,15 @@ INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
 OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"
 
 SCALE=0.4
-FONT_SIZE=11
+FONT_SIZE=10
 POINT_SIZE=2
 FONT_FAMILY='Cambria'
 
-INDEX_NAMES=c("esa","fm-tl","fm-wt","qgram","sa")
-INDEX_LABELS=c("ESA","FM-2","FM-WT","q-Gram","SA")
+INDEX_NAMES=c("esa","sa","qgram","fm-wt","fm-tl")
+INDEX_LABELS=c("ESA","SA","q-Gram","FM-WT","FM-TL")
 
-ALGORITHM_NAMES=c("single","sort","dfs","bfs")
-ALGORITHM_LABELS=c("Naive","Sorted","Dfs","Bfs")
+ALGORITHM_NAMES=c("single","sort","dfs")   #,"bfs")
+ALGORITHM_LABELS=c("Single","Sorted","Multiple") #,"Bfs")
 
 DATASET='celegans'
 ALPHABET='dna'
@@ -110,7 +111,7 @@ ggplot() +
   ylab("Time (seconds)") +
   theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 
-ggsave(file=PLOT_VISIT, scale=SCALE)
+ggsave(file=PLOT_VISIT, scale=SCALE, device=cairo_pdf)
 
 
 ### PLOT QUERY ###
@@ -142,7 +143,7 @@ for (ERRORS in 0:1)
     scale_y_continuous(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 
-  ggsave(file=PLOT_QUERY, scale=SCALE)
+  ggsave(file=PLOT_QUERY, scale=SCALE, device=cairo_pdf)
 }
 
 
@@ -183,7 +184,7 @@ for (ERRORS in 0:1)
       ylab("Time (seconds/patterns)") +
       theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
       
-    ggsave(file=PLOT_MULTI, scale=SCALE)
+    ggsave(file=PLOT_MULTI, scale=SCALE, device=cairo_pdf)
 }
 
 
@@ -210,7 +211,7 @@ for (INDEX in c('sa', 'fm-wt'))
     scale_y_continuous(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 
-  ggsave(file=PLOT_MULTI_IDX, scale=SCALE)
+  ggsave(file=PLOT_MULTI_IDX, scale=SCALE, device=cairo_pdf)
 }
 
 

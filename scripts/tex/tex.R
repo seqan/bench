@@ -163,6 +163,7 @@ for (ERRORS in 0:1)
     PLOT_MULTI=paste(paste(OUTPUT, "multi", sep='/'), ALPHABET, DATASET, ERRORS, PLENGTH, "pdf", sep='.')
     
     table_multi = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, algorithm, plength, pcount, time, preprocessing))
+    table_multi = subset(table_multi, algorithm!='bfs', select=c(index, algorithm, plength, pcount, time, preprocessing))
     table_multi$algorithm <- factor(table_multi$algorithm, levels=table_multi$algorithm, ordered = TRUE)
     
     table_multi_t <- transform(table_multi, time = time / pcount)

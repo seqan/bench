@@ -28,6 +28,7 @@ FONT_FAMILY='Cambria'
 
 INDEX_NAMES=c("esa","sa","qgram","fm-wt","fm-tl")
 INDEX_LABELS=c("ESA","SA","q-Gram","FM-WT","FM-TL")
+INDEX_SCALING=c('sa', 'fm-tl')
 
 ALGORITHM_NAMES=c("single","sort","dfs")   #,"bfs")
 ALGORITHM_LABELS=c("Single","Sorted","Multiple") #,"Bfs")
@@ -132,7 +133,7 @@ for (ERRORS in 0:1)
   #table_query <- transform(table_query, time = time / pcount)
   table_query = subset(TABLE_QUERY, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, plength, time))
   table_query <- transform(table_query, time = time / 1000000)
-  
+    
   ggplot() +
     geom_line(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index)) +
     geom_point(data=table_query, aes(x=plength, y=time, group=index, shape=index, color=index), size=POINT_SIZE) +
@@ -157,13 +158,14 @@ if ((R = load_file(FILENAME_MULTI))$ok)
 } else
   print(paste("NOT FOUND:", FILENAME_MULTI))
 
+TABLE_MULTI = subset(TABLE_MULTI, algorithm != 'bfs')
+
 for (ERRORS in 0:1)
 {
     PLENGTH=PLENGTHS[ERRORS+1]
     PLOT_MULTI=paste(paste(OUTPUT, "multi", sep='/'), ALPHABET, DATASET, ERRORS, PLENGTH, "pdf", sep='.')
     
     table_multi = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS, select=c(index, algorithm, plength, pcount, time, preprocessing))
-    table_multi = subset(table_multi, algorithm!='bfs', select=c(index, algorithm, plength, pcount, time, preprocessing))
     table_multi$algorithm <- factor(table_multi$algorithm, levels=table_multi$algorithm, ordered = TRUE)
     
     table_multi_t <- transform(table_multi, time = time / pcount)
@@ -191,7 +193,7 @@ for (ERRORS in 0:1)
 
 ERRORS=1
 PLENGTH=PLENGTHS[ERRORS+1]
-for (INDEX in c('sa', 'fm-wt'))
+for (INDEX in INDEX_SCALING)
 {
   PLOT_MULTI_IDX=paste(paste(OUTPUT, "multi", sep='/'), ALPHABET, DATASET, ERRORS, INDEX, "pdf", sep='.')
   table_multi_idx = subset(TABLE_MULTI, alphabet==ALPHABET & dataset==DATASET & errors==ERRORS & plength==PLENGTH & index==INDEX, select=c(algorithm, pcount, time, preprocessing))
@@ -199,6 +201,9 @@ for (INDEX in c('sa', 'fm-wt'))
   table_multi_idx_t <- transform(table_multi_idx, time = time / pcount)
   table_multi_idx_p <- transform(table_multi_idx, time = (time + preprocessing) / pcount)
   
+  table_multi_idx_breaks=c(10000,100000,1000000,10000000)
+  table_multi_idx_labels=c('10k', '100k', '1M', '10M')
+
   ggplot() +
     geom_line(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='solid') +
     geom_point(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=POINT_SIZE) +
@@ -208,7 +213,7 @@ for (INDEX in c('sa', 'fm-wt'))
     scale_color_discrete(name="Algorithm", breaks=ALGORITHM_NAMES, labels=ALGORITHM_LABELS) +
     xlab("Patterns") +
     ylab("Time (seconds/patterns)") +
-    scale_x_log10() +
+    scale_x_log10(breaks=table_multi_idx_breaks, labels=table_multi_idx_labels) +
     scale_y_continuous(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 

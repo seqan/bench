@@ -68,12 +68,14 @@ add_executable(ibench_dump dump.cpp options.h types.h run.h misc.h)
 add_executable(ibench_construct construct.cpp options.h types.h run.h misc.h)
 add_executable(ibench_visit visit.cpp options.h types.h run.h misc.h)
 add_executable(ibench_query query.cpp options.h types.h run.h misc.h find_backtracking_dfs.h find_backtracking_bfs.h)
+add_executable(ibench_filter filter.cpp options.h types.h run.h misc.h)
 
 # Add dependencies found by find_package (SeqAn).
 target_link_libraries (ibench_dump ${SEQAN_LIBRARIES})
 target_link_libraries (ibench_construct ${SEQAN_LIBRARIES})
 target_link_libraries (ibench_visit ${SEQAN_LIBRARIES})
 target_link_libraries (ibench_query ${SEQAN_LIBRARIES})
+target_link_libraries (ibench_filter ${SEQAN_LIBRARIES})
 
 # ----------------------------------------------------------------------------
 # Installation
@@ -81,11 +83,11 @@ target_link_libraries (ibench_query ${SEQAN_LIBRARIES})
 
 # Set variables for installing, depending on the selected build type.
 if (NOT SEQAN_PREFIX_SHARE_DOC)
-  seqan_setup_install_vars (ibench_dump ibench_construct ibench_visit ibench_query)
+  seqan_setup_install_vars (ibench_dump ibench_construct ibench_visit ibench_query ibench_filter)
 endif (NOT SEQAN_PREFIX_SHARE_DOC)
 
 # Install ibench in ${PREFIX}/bin directory
-install (TARGETS ibench_dump ibench_construct ibench_visit ibench_query
+install (TARGETS ibench_dump ibench_construct ibench_visit ibench_query ibench_filter
          DESTINATION bin)
 
 # Install non-binary files for the package to "." for app builds and

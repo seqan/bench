@@ -32,6 +32,8 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
+#define APP_IBENCH_FILTER_CPP_
+
 // ============================================================================
 // Prerequisites
 // ============================================================================
@@ -139,7 +141,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setMaxValue(parser, "error-rate", "10");
     setDefaultValue(parser, "error-rate", options.errorRate);
     addOption(parser, ArgParseOption("ed", "edit-distance", "Edit distance. Default: Hamming distance."));
-    addOption(parser, ArgParseOption("v", "verify", "Verify candidate locations. Default: filter only."));
+    addOption(parser, ArgParseOption("vf", "verify", "Verify candidate locations. Default: filter only."));
 
     addSection(parser, "Seeds Filtering Options");
 
@@ -249,12 +251,16 @@ inline unsigned long filter(Options const & options, Stats & stats, TText & text
     TPatternIndex patternIndex(queries);
     TPattern pattern(patternIndex);
 
+    unsigned threshold = 1;
+    for (unsigned i = 0; i < length(queries); ++i)
+        setMinThreshold(pattern, i, threshold);
+
     for (THaystackSize i = 0; i < length(text); ++i)
     {
         TFinder finder(text[i]);
-        while (find(finder, pattern, (double)length(front(queries))/options.errorRate))
+        while (find(finder, pattern, (double)(length(front(queries)) * options.errorRate)))
         {
-
+            count++;
             // Verify match.
 //            Finder<TContigSeq> verifyFinder(fragStore.contigStore[i].seq);
 //            setPosition(verifyFinder, beginPosition(finder));

@@ -405,7 +405,7 @@ inline bool open(Index<StringSet<TText, TSSetSpec>, FMIndex<TSpec, TConfig> > & 
 // ----------------------------------------------------------------------------
 // This function is overloaded to avoid building the index except for Wotd Dir.
 
-#ifndef APP_IBENCH_CONSTRUCT_CPP_
+#if !defined(APP_IBENCH_CONSTRUCT_CPP_) && !defined(APP_IBENCH_FILTER_CPP_)
 namespace seqan {
 template <typename TText, typename TSSetSpec, typename TSpec, typename TFibre>
 inline bool indexRequire(Index<StringSet<TText, TSSetSpec>, TSpec> & index, Tag<TFibre> const fibre)

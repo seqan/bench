@@ -101,7 +101,7 @@ struct Options : BaseOptions
 
     unsigned        qgramsWeight;
     unsigned        qgramsThreshold;
-    std::string     qgramsShape;
+    TString         qgramsShape;
 
     Options() :
         BaseOptions(),
@@ -135,7 +135,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setShortDescription(parser, "Benchmark filtration efficiency");
     setCategory(parser, "Stringology");
 
-    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT\\fP> <\\fIQUERY FILE\\fP>");
+    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT|INDEX FILE\\fP> <\\fIQUERY FILE\\fP>");
 
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
@@ -198,6 +198,26 @@ inline unsigned shapeWeight(TString const & shape)
 }
 
 // ----------------------------------------------------------------------------
+// Function runOnline()
+// ----------------------------------------------------------------------------
+
+template <typename TOptions>
+inline bool runOnline(TOptions const & options)
+{
+    return options.algorithmType == Options::ALGO_QGRAMS;
+}
+
+// ----------------------------------------------------------------------------
+// Function runOffline()
+// ----------------------------------------------------------------------------
+
+template <typename TOptions>
+inline bool runOffline(TOptions const & options)
+{
+    return !runOnline(options);
+}
+
+// ----------------------------------------------------------------------------
 // Function parseCommandLine()
 // ----------------------------------------------------------------------------
 
@@ -210,8 +230,13 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     if (res != ArgumentParser::PARSE_OK)
         return res;
 
-    getArgumentValue(options.textFile, parser, 0);
-//    getArgumentValue(options.textIndexFile, parser, 0);
+    getAlgorithmType(options, parser);
+
+    if (runOnline(options))
+        getArgumentValue(options.textFile, parser, 0);
+    else
+        getArgumentValue(options.textIndexFile, parser, 0);
+
     getArgumentValue(options.queryFile, parser, 1);
     getOptionValue(options.tsv, parser, "tsv");
 
@@ -219,7 +244,6 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     getIndexType(options, parser);
     getTextLimits(options, parser);
 
-    getAlgorithmType(options, parser);
     getOptionValue(options.editDistance, parser, "edit-distance");
 
     unsigned errorRate;
@@ -288,28 +312,61 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 // ----------------------------------------------------------------------------
 // Exact or approximate seeds.
 
-template <typename TText, typename TQueries, typename TDistance, typename TSpec>
+template <typename TIndex, typename TQueries, typename TAlgorithm>
 inline unsigned long
-filterOffline(Options const & options, TText & text, TQueries & queries, Backtracking<TDistance, TSpec>)
+filterOffline(Options const & options, TIndex & index, TQueries & queries, TAlgorithm const & algo)
 {
-//    typedef Backtracking<TDistance>                         TAlgorithm;
-//    typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
-//    typedef typename Iterator<TQueries const, Rooted>::Type TQueriesIt;
-//
-//    unsigned long count = 0;
-//
+    typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
+    typedef typename Iterator<TQueries const, Rooted>::Type TQueriesIt;
+    typedef StringSet<TQueries, Segment<TQueries> >         TSeeds;
+    typedef typename Iterator<TSeeds const, Rooted>::Type   TSeedsIt;
+    typedef typename StringSetPosition<TSeeds>::Type        TSeedPos;
+    typedef unsigned                                        TSize;
+
 //    double timer = sysTime();
-//    find(index, queries, options.errors, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
-//    {
-//        count += filter(indexIt);
-//        locateOccurrences(indexIt, TLocate());
-//    },
-//    TAlgorithm());
+
+    TSeeds seeds(queries);
+
+    iterate(queries, [&](TQueriesIt const & it)
+    {
+        TSize needleLength = length(value(it));
+        TSize needleErrors = needleLength * options.errorRate;
+        TSize seedsCount = static_cast<TSize>(std::ceil((needleErrors + 1) / (options.seedsErrors + 1.0)));
+        TSize seedsLength = needleLength / seedsCount;
+
+        for (TSize seedId = 0; seedId < seedsCount; ++seedId)
+            appendInfixWithLength(seeds, TSeedPos(position(it), seedId * seedsLength), seedsLength, Generous());
+    },
+    Rooted(), Serial());
+
+    unsigned long count = 0;
+
+    find(index, seeds, options.seedsErrors, [&](TIndexIt const & indexIt, TSeedsIt const &, unsigned)
+    {
+        count += countOccurrences(indexIt);
+    },
+    algo);
+
 //    stats.countTime = sysTime() - timer;
-//
-//    return count;
+
+    return count;
 }
 
+template <typename TText, typename TQueries, typename TAlgorithm>
+inline unsigned long
+filterOffline(Options const &, Index<TText, IndexEsa<void> > &, TQueries &, TAlgorithm const &)
+{
+    throw RuntimeError("Unsupported index");
+    return 0;
+}
+
+template <typename TText, typename TQueries, typename TIndexSpec, typename TAlgorithm>
+inline unsigned long
+filterOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TAlgorithm const &)
+{
+    throw RuntimeError("Unsupported index");
+    return 0;
+}
 
 // ----------------------------------------------------------------------------
 // Function filterOnlineInit()
@@ -392,32 +449,23 @@ filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorit
 // ----------------------------------------------------------------------------
 // Function filter()
 // ----------------------------------------------------------------------------
-// Dispatch locate, distance, and search algorithm.
 
-template <typename TText, typename TQueries>
-inline unsigned long filter(Options const & options, TText & text, TQueries & queries)
-{
-    switch (options.algorithmType)
-    {
-//        switch (options.seedsErrors)
-//        {
-//        case 1:
-//            return filter(options, stats, index, queries, TLocate(), Backtracking<HammingDistance, Threshold<1> >(), BfsIterator());
-//        case 2:
-//            return filter(options, stats, index, queries, TLocate(), Backtracking<HammingDistance, Threshold<2> >(), BfsIterator());
-//        }
-
-    case Options::ALGO_SEEDS:
-//        return filterOffline(options, text, queries);
-//        return filterOnline(options, text, queries, Pigeonhole<void>());//Hamming_
-
-    case Options::ALGO_QGRAMS:
-        return filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
-
-    default:
-        throw RuntimeError("Unsupported filter");
-    }
-}
+//template <typename TText, typename TQueries>
+//inline unsigned long filter(Options const & options, TText & text, TQueries & queries)
+//{
+//    switch (options.algorithmType)
+//    {
+//    case Options::ALGO_SEEDS:
+//        return filterOffline(options, index, queries);
+////        return filterOnline(options, text, queries, Pigeonhole<void>());//Hamming_
+//
+//    case Options::ALGO_QGRAMS:
+//        return filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
+//
+//    default:
+//        throw RuntimeError("Unsupported filter");
+//    }
+//}
 
 // ----------------------------------------------------------------------------
 // Function run()
@@ -430,36 +478,41 @@ inline void run(Options const & options)
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
     typedef Index<TText, TIndexSpec>                                        TIndex;
 
-    TText text;
-
-    if (!open(text, toCString(options.textFile)))
-        throw RuntimeError("Error while loading text");
-
-//    TIndex index;
-//
-//    if (!open(index, toCString(options.textIndexFile)))
-//        throw RuntimeError("Error while loading full-text index");
-
     TQueries queries;
 
     if (!open(queries, toCString(options.queryFile)))
         throw RuntimeError("Error while loading queries");
 
-//    Stats stats;
+    TIndex index;
+    TText text;
+    unsigned long verificationsCount = 0;
 
-    unsigned long hitsCount = filter(options, text, queries);
+    if (runOffline(options))
+    {
+        if (!open(index, toCString(options.textIndexFile)))
+            throw RuntimeError("Error while loading full-text index");
 
-//    if (options.tsv)
-//    {
-//        std::cout << hitsCount << '\t' << std::fixed << stats.countTime << '\t' << stats.preprocessingTime << std::endl;
-//    }
-//    else
-//    {
+        verificationsCount = filterOffline(options, index, queries, Backtracking<HammingDistance>());
+    }
+    else
+    {
+        if (!open(text, toCString(options.textFile)))
+            throw RuntimeError("Error while loading text");
+
+        verificationsCount = filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
+    }
+
+    if (options.tsv)
+    {
+//        std::cout << hitsCount << '\t' << std::fixed << stats.time << std::endl;
+    }
+    else
+    {
         std::cout << length(queries) << " queries" << std::endl;
         std::cout << lengthSum(queries) << " symbols" << std::endl;
-        std::cout << hitsCount << " hits" << std::endl;
-//        std::cout << std::fixed << stats.countTime << " + " << stats.preprocessingTime << " sec" << std::endl;
-//    }
+        std::cout << verificationsCount << " verifications" << std::endl;
+//        std::cout << std::fixed << stats.time << " sec" << std::endl;
+    }
 }
 
 int main(int argc, char const ** argv)

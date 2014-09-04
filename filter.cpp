@@ -44,7 +44,9 @@
 
 #include <seqan/basic.h>
 #include <seqan/sequence.h>
+#include <seqan/find.h>
 #include <seqan/index.h>
+#include <seqan/index/find_pigeonhole.h>
 #include <seqan/arg_parse.h>
 
 #include "options.h"
@@ -265,15 +267,31 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 //    });
 //}
 
-// ----------------------------------------------------------------------------
-// Function filter()
-// ----------------------------------------------------------------------------
-// Seeds filters.
-
-//template <typename TIndex, typename TQueries, typename TLocate, typename TDistance, typename TSpec>
-//inline unsigned long filter(Options const & options, Stats & stats, TIndex & index, TQueries & queries,
-//                            TLocate, Backtracking<TDistance, TSpec>, Nothing)
+//template <typename TIndex, typename TSpec>
+//inline void verify(Iter<TIndex, TSpec> const & it, True)
 //{
+//    Finder<TContigSeq> verifyFinder(fragStore.contigStore[i].seq);
+//    setPosition(verifyFinder, beginPosition(finder));
+//    Pattern<TReadSeq, HammingSimple> verifyPattern(fragStore.readSeqStore[position(pattern).i1]);
+//    unsigned readLength = length(fragStore.readSeqStore[position(pattern).i1]);
+//    int minScore = -static_cast<int>(options.errorRate * readLength);
+//    while (find(verifyFinder, verifyPattern, minScore) && position(verifyFinder) < endPosition(infix(finder)))
+//    {
+//        TAlignedRead match(length(fragStore.alignedReadStore), position(pattern).i1, i,
+//                           beginPosition(verifyFinder), endPosition(verifyFinder));
+//        appendValue(fragStore.alignedReadStore, match);
+//    }
+//}
+
+// ----------------------------------------------------------------------------
+// Function filterOffline()
+// ----------------------------------------------------------------------------
+// Exact or approximate seeds.
+
+template <typename TText, typename TQueries, typename TDistance, typename TSpec>
+inline unsigned long
+filterOffline(Options const & options, TText & text, TQueries & queries, Backtracking<TDistance, TSpec>)
+{
 //    typedef Backtracking<TDistance>                         TAlgorithm;
 //    typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
 //    typedef typename Iterator<TQueries const, Rooted>::Type TQueriesIt;
@@ -290,15 +308,33 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 //    stats.countTime = sysTime() - timer;
 //
 //    return count;
-//}
+}
+
+
+// ----------------------------------------------------------------------------
+// Function filterOnlineInit()
+// ----------------------------------------------------------------------------
+
+template <typename TPattern, typename TSpec>
+inline void filterOnlineInit(TPattern & pattern, Options const & options, Pigeonhole<TSpec>)
+{
+    _patternInit(pattern, options.errorRate);
+}
+
+template <typename TPattern>
+inline void filterOnlineInit(TPattern & pattern, Options const & options, Swift<SwiftSemiGlobal>)
+{
+    pattern.params.minThreshold = options.qgramsThreshold;
+    _patternInit(pattern, options.errorRate, 0);
+}
 
 // ----------------------------------------------------------------------------
 // Function filterOnline()
 // ----------------------------------------------------------------------------
-// q-Gram filters.
 
 template <typename TText, typename TQueries, typename TAlgorithm, typename TShape>
-inline unsigned long filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const &, TShape const & shape)
+inline unsigned long
+filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo, TShape const & shape)
 {
 //    typedef IndexQGram<TShape, OpenAddressing>              TIndexSpec;
     typedef IndexQGram<TShape>                              TIndexSpec;
@@ -315,9 +351,7 @@ inline unsigned long filterOnline(Options const & options, TText & text, TQuerie
 
     TPatternIndex patternIndex(queries, shape);
     TPattern pattern(patternIndex);
-    pattern.params.minThreshold = options.qgramsThreshold;
-//    setStepSize(patternIndex, 0);
-    _patternInit(pattern, options.errorRate, 0);
+    filterOnlineInit(pattern, options, algo);
 
     for (THaystackSize i = 0; i < length(text); ++i)
     {
@@ -325,17 +359,6 @@ inline unsigned long filterOnline(Options const & options, TText & text, TQuerie
         while (find(finder, pattern, options.errorRate))
         {
             count++;
-
-//            Finder<TContigSeq> verifyFinder(fragStore.contigStore[i].seq);
-//            setPosition(verifyFinder, beginPosition(finder));
-//            Pattern<TReadSeq, HammingSimple> verifyPattern(fragStore.readSeqStore[position(pattern).i1]);
-//            unsigned readLength = length(fragStore.readSeqStore[position(pattern).i1]);
-//            int minScore = -static_cast<int>(options.errorRate * readLength);
-//            while (find(verifyFinder, verifyPattern, minScore) && position(verifyFinder) < endPosition(infix(finder))) {
-//                TAlignedRead match(length(fragStore.alignedReadStore), position(pattern).i1, i,
-//                                   beginPosition(verifyFinder), endPosition(verifyFinder));
-//                appendValue(fragStore.alignedReadStore, match);
-//            }
         }
     }
 
@@ -347,9 +370,11 @@ inline unsigned long filterOnline(Options const & options, TText & text, TQuerie
 // ----------------------------------------------------------------------------
 // Function filterOnline()
 // ----------------------------------------------------------------------------
+// q-Grams or exact seeds.
 
 template <typename TText, typename TQueries, typename TAlgorithm>
-inline unsigned long filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
+inline unsigned long
+filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
 {
 //    Shape<Dna, UngappedShape<9> > contiguous;
     Shape<Dna, SimpleShape>     contiguous;
@@ -374,7 +399,6 @@ inline unsigned long filter(Options const & options, TText & text, TQueries & qu
 {
     switch (options.algorithmType)
     {
-//    case Options::ALGO_SEEDS_APPROXIMATE:
 //        switch (options.seedsErrors)
 //        {
 //        case 1:
@@ -383,9 +407,9 @@ inline unsigned long filter(Options const & options, TText & text, TQueries & qu
 //            return filter(options, stats, index, queries, TLocate(), Backtracking<HammingDistance, Threshold<2> >(), BfsIterator());
 //        }
 
-//    case Options::ALGO_SEEDS:
+    case Options::ALGO_SEEDS:
 //        return filterOffline(options, text, queries);
-//        return filterOnline(options, stats, text, queries, Pigeonhole<void>());
+//        return filterOnline(options, text, queries, Pigeonhole<void>());//Hamming_
 
     case Options::ALGO_QGRAMS:
         return filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());

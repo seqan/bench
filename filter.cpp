@@ -90,7 +90,7 @@ struct Options : BaseOptions
     AlgorithmType   algorithmType;
     TList           algorithmTypeList;
 
-    unsigned        errorRate;
+    double          errorRate;
     bool            editDistance;
     bool            verify;
 
@@ -104,7 +104,7 @@ struct Options : BaseOptions
     Options() :
         BaseOptions(),
         algorithmType(ALGO_SEEDS),
-        errorRate(0),
+        errorRate(0.0),
         editDistance(false),
         verify(false),
         seedsErrors(0),
@@ -219,7 +219,11 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 
     getAlgorithmType(options, parser);
     getOptionValue(options.editDistance, parser, "edit-distance");
-    getOptionValue(options.errorRate, parser, "error-rate");
+
+    unsigned errorRate;
+    if (getOptionValue(errorRate, parser, "error-rate"))
+        options.errorRate = errorRate / 100.0;
+
     getOptionValue(options.verify, parser, "verify");
 
     getOptionValue(options.seedsErrors, parser, "seeds-errors");
@@ -311,15 +315,14 @@ inline unsigned long filterOnline(Options const & options, TText & text, TQuerie
 
     TPatternIndex patternIndex(queries, shape);
     TPattern pattern(patternIndex);
-
     pattern.params.minThreshold = options.qgramsThreshold;
 //    setStepSize(patternIndex, 0);
-//    _patternInit(pattern, options.errorRate / 100.0, 0);
+    _patternInit(pattern, options.errorRate, 0);
 
     for (THaystackSize i = 0; i < length(text); ++i)
     {
         TFinder finder(text[i]);
-        while (find(finder, pattern, (double)(length(front(queries)) * options.errorRate)))
+        while (find(finder, pattern, options.errorRate))
         {
             count++;
 
@@ -327,7 +330,7 @@ inline unsigned long filterOnline(Options const & options, TText & text, TQuerie
 //            setPosition(verifyFinder, beginPosition(finder));
 //            Pattern<TReadSeq, HammingSimple> verifyPattern(fragStore.readSeqStore[position(pattern).i1]);
 //            unsigned readLength = length(fragStore.readSeqStore[position(pattern).i1]);
-//            int minScore = -static_cast<int>(EPSILON * readLength);
+//            int minScore = -static_cast<int>(options.errorRate * readLength);
 //            while (find(verifyFinder, verifyPattern, minScore) && position(verifyFinder) < endPosition(infix(finder))) {
 //                TAlignedRead match(length(fragStore.alignedReadStore), position(pattern).i1, i,
 //                                   beginPosition(verifyFinder), endPosition(verifyFinder));
@@ -348,7 +351,7 @@ inline unsigned long filterOnline(Options const & options, TText & text, TQuerie
 template <typename TText, typename TQueries, typename TAlgorithm>
 inline unsigned long filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
 {
-//    Shape<Dna, UngappedShape<9> > contiguous_w9;
+//    Shape<Dna, UngappedShape<9> > contiguous;
     Shape<Dna, SimpleShape>     contiguous;
     Shape<Dna, GenericShape>    gapped;
 

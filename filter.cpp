@@ -110,7 +110,7 @@ struct Options : BaseOptions
         editDistance(false),
         verify(false),
         seedsErrors(0),
-        seedsOnline(true),
+        seedsOnline(false),
         qgramsWeight(10),
         qgramsThreshold(1),
         qgramsShape()
@@ -155,15 +155,14 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     addOption(parser, ArgParseOption("ed", "edit-distance", "Edit distance. Default: Hamming distance."));
     addOption(parser, ArgParseOption("vf", "verify", "Verify candidate locations. Default: filter only."));
 
-    addSection(parser, "Seed Filtering Options");
-    addOption(parser, ArgParseOption("se", "seeds-errors", "Set maximum seed errors.", ArgParseOption::INTEGER));
+    addSection(parser, "Seeds Filtering Options");
+    addOption(parser, ArgParseOption("se", "seeds-errors", "Set maximum errors per seed.", ArgParseOption::INTEGER));
     setMinValue(parser, "seeds-errors", "0");
     setMaxValue(parser, "seeds-errors", "3");
     setDefaultValue(parser, "seeds-errors", options.seedsErrors);
-//    addOption(parser, ArgParseOption("si", "seeds-index", "Text index file.", ArgParseOption::INPUTFILE));
-    addOption(parser, ArgParseOption("so", "seeds-online", "Online filter - for exact seeds only. Default: indexed.", ArgParseOption::INTEGER));
+    addOption(parser, ArgParseOption("so", "seeds-online", "Online filter - for exact seeds only. Default: indexed filter."));
 
-    addSection(parser, "q-Gram Filtering Options");
+    addSection(parser, "q-Grams Filtering Options");
     addOption(parser, ArgParseOption("qw", "qgrams-weight", "Set q-gram weight.", ArgParseOption::INTEGER));
     setMinValue(parser, "qgrams-weight", "4");
     setMaxValue(parser, "qgrams-weight", "31");
@@ -176,7 +175,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
 }
 
 // ----------------------------------------------------------------------------
-// Function parseShape()
+// Function shapeWeight()
 // ----------------------------------------------------------------------------
 
 template <typename TString>
@@ -204,7 +203,7 @@ inline unsigned shapeWeight(TString const & shape)
 template <typename TOptions>
 inline bool runOnline(TOptions const & options)
 {
-    return options.algorithmType == Options::ALGO_QGRAMS;
+    return options.algorithmType == Options::ALGO_QGRAMS || (options.seedsOnline && !options.seedsErrors);
 }
 
 // ----------------------------------------------------------------------------
@@ -230,16 +229,10 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     if (res != ArgumentParser::PARSE_OK)
         return res;
 
-    getAlgorithmType(options, parser);
-
-    if (runOnline(options))
-        getArgumentValue(options.textFile, parser, 0);
-    else
-        getArgumentValue(options.textIndexFile, parser, 0);
-
     getArgumentValue(options.queryFile, parser, 1);
     getOptionValue(options.tsv, parser, "tsv");
 
+    getAlgorithmType(options, parser);
     getAlphabetType(options, parser);
     getIndexType(options, parser);
     getTextLimits(options, parser);
@@ -266,6 +259,11 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
         options.qgramsShape.assign(options.qgramsWeight, '1');
     }
     getOptionValue(options.qgramsThreshold, parser, "qgrams-threshold");
+
+    if (runOnline(options))
+        getArgumentValue(options.textFile, parser, 0);
+    else
+        getArgumentValue(options.textIndexFile, parser, 0);
 
     return ArgumentParser::PARSE_OK;
 }
@@ -446,26 +444,18 @@ filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorit
     throw RuntimeError("Unsupported q-gram shape");
 }
 
-// ----------------------------------------------------------------------------
-// Function filter()
-// ----------------------------------------------------------------------------
+template <typename TText, typename TQueries>
+inline unsigned long filterOnline(Options const & options, TText & text, TQueries & queries)
+{
+    switch (options.algorithmType)
+    {
+    case Options::ALGO_SEEDS:
+        return filterOnline(options, text, queries, Pigeonhole<void>()); //Pigeonhole<Hamming_>
 
-//template <typename TText, typename TQueries>
-//inline unsigned long filter(Options const & options, TText & text, TQueries & queries)
-//{
-//    switch (options.algorithmType)
-//    {
-//    case Options::ALGO_SEEDS:
-//        return filterOffline(options, index, queries);
-////        return filterOnline(options, text, queries, Pigeonhole<void>());//Hamming_
-//
-//    case Options::ALGO_QGRAMS:
-//        return filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
-//
-//    default:
-//        throw RuntimeError("Unsupported filter");
-//    }
-//}
+    case Options::ALGO_QGRAMS:
+        return filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
+    }
+}
 
 // ----------------------------------------------------------------------------
 // Function run()
@@ -499,7 +489,7 @@ inline void run(Options const & options)
         if (!open(text, toCString(options.textFile)))
             throw RuntimeError("Error while loading text");
 
-        verificationsCount = filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
+        verificationsCount = filterOnline(options, text, queries);
     }
 
     if (options.tsv)

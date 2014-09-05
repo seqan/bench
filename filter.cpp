@@ -63,15 +63,15 @@ using namespace seqan;
 // ----------------------------------------------------------------------------
 // Class Stats
 // ----------------------------------------------------------------------------
-//
-//struct Stats
-//{
-//    double          filterTime;
-//
-//    Stats() :
-//        filterTime()
-//    {}
-//};
+
+struct Stats
+{
+    static double   preprocessingTime;
+    static double   filteringTime;
+};
+
+double Stats::preprocessingTime = 0;
+double Stats::filteringTime = 0;
 
 // ----------------------------------------------------------------------------
 // Class Options
@@ -321,7 +321,7 @@ filterOffline(Options const & options, TIndex & index, TQueries & queries, TAlgo
     typedef typename StringSetPosition<TSeeds>::Type        TSeedPos;
     typedef unsigned                                        TSize;
 
-//    double timer = sysTime();
+    double timer = sysTime();
 
     TSeeds seeds(queries);
 
@@ -337,6 +337,10 @@ filterOffline(Options const & options, TIndex & index, TQueries & queries, TAlgo
     },
     Rooted(), Serial());
 
+    Stats::preprocessingTime = sysTime() - timer;
+
+    timer = sysTime();
+
     unsigned long count = 0;
 
     find(index, seeds, options.seedsErrors, [&](TIndexIt const & indexIt, TSeedsIt const &, unsigned)
@@ -345,7 +349,7 @@ filterOffline(Options const & options, TIndex & index, TQueries & queries, TAlgo
     },
     algo);
 
-//    stats.countTime = sysTime() - timer;
+    Stats::filteringTime = sysTime() - timer;
 
     return count;
 }
@@ -400,13 +404,17 @@ filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorit
     typedef typename Size<TText>::Type                      THaystackSize;
     typedef Finder<THaystack, TAlgorithm>                   TFinder;
 
-    unsigned long count = 0;
-
-//    double timer = sysTime();
+    double timer = sysTime();
 
     TPatternIndex patternIndex(queries, shape);
     TPattern pattern(patternIndex);
     filterOnlineInit(pattern, options, algo);
+
+    Stats::preprocessingTime = sysTime() - timer;
+
+    timer = sysTime();
+
+    unsigned long count = 0;
 
     for (THaystackSize i = 0; i < length(text); ++i)
     {
@@ -417,7 +425,7 @@ filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorit
         }
     }
 
-//    stats.filterTime = sysTime() - timer;
+    Stats::filteringTime = sysTime() - timer;
 
     return count;
 }
@@ -428,8 +436,7 @@ filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorit
 // q-Grams or exact seeds.
 
 template <typename TText, typename TQueries, typename TAlgorithm>
-inline unsigned long
-filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
+inline unsigned long filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
 {
 //    Shape<Dna, UngappedShape<9> > contiguous;
     Shape<Dna, SimpleShape>     contiguous;
@@ -454,6 +461,9 @@ inline unsigned long filterOnline(Options const & options, TText & text, TQuerie
 
     case Options::ALGO_QGRAMS:
         return filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
+
+    default:
+        throw RuntimeError("Unsupported filter");
     }
 }
 
@@ -494,14 +504,14 @@ inline void run(Options const & options)
 
     if (options.tsv)
     {
-//        std::cout << hitsCount << '\t' << std::fixed << stats.time << std::endl;
+        std::cout << verificationsCount << '\t' << std::fixed << Stats::filteringTime << std::endl;
     }
     else
     {
         std::cout << length(queries) << " queries" << std::endl;
         std::cout << lengthSum(queries) << " symbols" << std::endl;
         std::cout << verificationsCount << " verifications" << std::endl;
-//        std::cout << std::fixed << stats.time << " sec" << std::endl;
+        std::cout << std::fixed << Stats::filteringTime << " sec" << std::endl;
     }
 }
 

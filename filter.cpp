@@ -46,7 +46,6 @@
 #include <seqan/sequence.h>
 #include <seqan/find.h>
 #include <seqan/index.h>
-#include <seqan/index/find_pigeonhole.h>
 #include <seqan/arg_parse.h>
 
 #include "options.h"

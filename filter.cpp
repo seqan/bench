@@ -395,8 +395,7 @@ template <typename TText, typename TQueries, typename TAlgorithm, typename TShap
 inline unsigned long
 filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo, TShape const & shape)
 {
-//    typedef IndexQGram<TShape, OpenAddressing>              TIndexSpec;
-    typedef IndexQGram<TShape>                              TIndexSpec;
+    typedef IndexQGram<TShape, OpenAddressing>              TIndexSpec;
     typedef Index<TQueries, TIndexSpec>                     TPatternIndex;
     typedef Pattern<TPatternIndex, TAlgorithm>              TPattern;
 
@@ -504,14 +503,14 @@ inline void run(Options const & options)
 
     if (options.tsv)
     {
-        std::cout << verificationsCount << '\t' << std::fixed << Stats::filteringTime << std::endl;
+        std::cout << verificationsCount << '\t' << std::fixed << Stats::filteringTime + Stats::preprocessingTime << std::endl;
     }
     else
     {
         std::cout << length(queries) << " queries" << std::endl;
         std::cout << lengthSum(queries) << " symbols" << std::endl;
         std::cout << verificationsCount << " verifications" << std::endl;
-        std::cout << std::fixed << Stats::filteringTime << " sec" << std::endl;
+        std::cout << std::fixed << Stats::filteringTime << " + " << Stats::preprocessingTime << " sec" << std::endl;
     }
 }
 

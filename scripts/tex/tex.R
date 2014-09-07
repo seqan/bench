@@ -3,20 +3,6 @@ library("xtable")
 library("ggplot2")
 library("scales")
 library("Cairo")
-#library("extrafont")
-
-# To be run once after installing package extrafont
-#font_import()
-#loadfonts()
-
-#library("Cairo")
-#mainfont <- 'Cambria'
-#CairoFonts(regular=paste(mainfont,"style=Regular",sep=":"),
-#           bold=paste(mainfont,"style=Bold",sep=":"),
-#           italic=paste(mainfont,"style=Italic",sep=":"),
-#           bolditalic=paste(mainfont,"style=Bold Italic,BoldItalic",sep=":"))
-#pdf <- CairoPDF
-#png <- CairoPNG
 
 INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
 OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"

@@ -52,6 +52,7 @@
 #include "types.h"
 #include "run.h"
 #include "misc.h"
+#include "../yara/find_extender.h"
 
 using namespace seqan;
 
@@ -65,12 +66,16 @@ using namespace seqan;
 
 struct Stats
 {
-    static double   preprocessingTime;
-    static double   filteringTime;
+    static double           preprocessingTime;
+    static double           filteringTime;
+    static String<unsigned> verifications;
+    static String<unsigned> matches;
 };
 
 double Stats::preprocessingTime = 0;
 double Stats::filteringTime = 0;
+String<unsigned> Stats::verifications;
+String<unsigned> Stats::matches;
 
 // ----------------------------------------------------------------------------
 // Class Options
@@ -274,23 +279,6 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 //template <typename TIndex, typename TSpec>
 //inline void verify(Iter<TIndex, TSpec> const & it, True)
 //{
-//    typedef typename Fibre<TIndex, FibreSA>::Type   TSA;
-//    typedef typename Infix<TSA const>::Type         TOccurrences;
-//    typedef typename Value<TOccurrences>::Type      TOccurrence;
-//    typedef typename Size<TIndex>::Type             TSize;
-//
-//    TOccurrences const & occs = getOccurrences(it);
-//
-//    forEach(occs, [&](TOccurrence const & occ)
-//    {
-//        TSize volatile offset = getSeqOffset(occ);
-//        ignoreUnusedVariableWarning(offset);
-//    });
-//}
-
-//template <typename TIndex, typename TSpec>
-//inline void verify(Iter<TIndex, TSpec> const & it, True)
-//{
 //    Finder<TContigSeq> verifyFinder(fragStore.contigStore[i].seq);
 //    setPosition(verifyFinder, beginPosition(finder));
 //    Pattern<TReadSeq, HammingSimple> verifyPattern(fragStore.readSeqStore[position(pattern).i1]);
@@ -324,13 +312,13 @@ filterOffline(Options const & options, TIndex & index, TQueries & queries, TAlgo
 
     TSeeds seeds(queries);
 
+    TSize needleLength = length(front(queries));
+    TSize needleErrors = needleLength * options.errorRate;
+    TSize seedsCount = static_cast<TSize>(std::ceil((needleErrors + 1) / (options.seedsErrors + 1.0)));
+    TSize seedsLength = needleLength / seedsCount;
+
     iterate(queries, [&](TQueriesIt const & it)
     {
-        TSize needleLength = length(value(it));
-        TSize needleErrors = needleLength * options.errorRate;
-        TSize seedsCount = static_cast<TSize>(std::ceil((needleErrors + 1) / (options.seedsErrors + 1.0)));
-        TSize seedsLength = needleLength / seedsCount;
-
         for (TSize seedId = 0; seedId < seedsCount; ++seedId)
             appendInfixWithLength(seeds, TSeedPos(position(it), seedId * seedsLength), seedsLength, Generous());
     },
@@ -340,33 +328,41 @@ filterOffline(Options const & options, TIndex & index, TQueries & queries, TAlgo
 
     timer = sysTime();
 
-    unsigned long count = 0;
+    TExtender extender(indexText(index));
 
-    find(index, seeds, options.seedsErrors, [&](TIndexIt const & indexIt, TSeedsIt const &, unsigned)
+    find(index, seeds, options.seedsErrors, [&](TIndexIt const & indexIt, TSeedsIt const & seedsIt, unsigned seedErrors)
     {
-        count += countOccurrences(indexIt);
+        TOccurrences const & occs = getOccurrences(indexIt);
+
+        forEach(occs, [&](TOccurrence const & occ)
+        {
+            TSize queryId = position(seedsIt) / seedsCount;
+            TSize seedBegin = (position(seedsIt) % seedsCount) * seedsLength;
+            Stats::verifications[queryId]++;
+
+            extend(extender,
+               queries[queryId],
+               occ, posAdd(occ, seedsLength),
+               seedBegin, seedBegin + seedsLength,
+               seedErrors, needleErrors,
+               [&](TOccurrence, TOccurrence, unsigned char) { Stats::matches[queryId]++; });
+        });
     },
     algo);
 
     Stats::filteringTime = sysTime() - timer;
-
-    return count;
 }
 
 template <typename TText, typename TQueries, typename TAlgorithm>
-inline unsigned long
-filterOffline(Options const &, Index<TText, IndexEsa<void> > &, TQueries &, TAlgorithm const &)
+inline void filterOffline(Options const &, Index<TText, IndexEsa<void> > &, TQueries &, TAlgorithm const &)
 {
     throw RuntimeError("Unsupported index");
-    return 0;
 }
 
 template <typename TText, typename TQueries, typename TIndexSpec, typename TAlgorithm>
-inline unsigned long
-filterOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TAlgorithm const &)
+inline void filterOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TAlgorithm const &)
 {
     throw RuntimeError("Unsupported index");
-    return 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -391,7 +387,7 @@ inline void filterOnlineInit(TPattern & pattern, Options const & options, Swift<
 // ----------------------------------------------------------------------------
 
 template <typename TText, typename TQueries, typename TAlgorithm, typename TShape>
-inline unsigned long
+inline void
 filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo, TShape const & shape)
 {
     typedef IndexQGram<TShape, OpenAddressing>              TIndexSpec;
@@ -412,20 +408,16 @@ filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorit
 
     timer = sysTime();
 
-    unsigned long count = 0;
-
     for (THaystackSize i = 0; i < length(text); ++i)
     {
         TFinder finder(text[i]);
         while (find(finder, pattern, options.errorRate))
         {
-            count++;
+            Stats::verifications[getSeqNo(position(pattern))]++;
         }
     }
 
     Stats::filteringTime = sysTime() - timer;
-
-    return count;
 }
 
 // ----------------------------------------------------------------------------
@@ -434,31 +426,32 @@ filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorit
 // q-Grams or exact seeds.
 
 template <typename TText, typename TQueries, typename TAlgorithm>
-inline unsigned long filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
+inline void filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
 {
 //    Shape<Dna, UngappedShape<9> > contiguous;
     Shape<Dna, SimpleShape>     contiguous;
     Shape<Dna, GenericShape>    gapped;
 
     if (stringToShape(contiguous, options.qgramsShape))
-        return filterOnline(options, text, queries, algo, contiguous);
-
-    if (stringToShape(gapped, options.qgramsShape))
-        return filterOnline(options, text, queries, algo, gapped);
-
-    throw RuntimeError("Unsupported q-gram shape");
+        filterOnline(options, text, queries, algo, contiguous);
+    else if (stringToShape(gapped, options.qgramsShape))
+        filterOnline(options, text, queries, algo, gapped);
+    else
+        throw RuntimeError("Unsupported q-gram shape");
 }
 
 template <typename TText, typename TQueries>
-inline unsigned long filterOnline(Options const & options, TText & text, TQueries & queries)
+inline void filterOnline(Options const & options, TText & text, TQueries & queries)
 {
     switch (options.algorithmType)
     {
     case Options::ALGO_SEEDS:
-        return filterOnline(options, text, queries, Pigeonhole<void>()); //Pigeonhole<Hamming_>
+        filterOnline(options, text, queries, Pigeonhole<void>()); //Pigeonhole<Hamming_>
+        return;
 
     case Options::ALGO_QGRAMS:
-        return filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
+        filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
+        return;
 
     default:
         throw RuntimeError("Unsupported filter");
@@ -483,32 +476,43 @@ inline void run(Options const & options)
 
     TIndex index;
     TText text;
-    unsigned long verificationsCount = 0;
+
+    resize(Stats::verifications, length(queries), 0u, Exact());
+    resize(Stats::matches, length(queries), 0u, Exact());
 
     if (runOffline(options))
     {
         if (!open(index, toCString(options.textIndexFile)))
             throw RuntimeError("Error while loading full-text index");
 
-        verificationsCount = filterOffline(options, index, queries, Backtracking<HammingDistance>());
+        filterOffline(options, index, queries, Backtracking<HammingDistance>());
     }
     else
     {
         if (!open(text, toCString(options.textFile)))
             throw RuntimeError("Error while loading text");
 
-        verificationsCount = filterOnline(options, text, queries);
+        filterOnline(options, text, queries);
     }
+
+    unsigned long verificationsCount = sum(Stats::verifications);
+    unsigned long matchesCount = sum(Stats::matches);
 
     if (options.tsv)
     {
-        std::cout << verificationsCount << '\t' << std::fixed << Stats::filteringTime + Stats::preprocessingTime << std::endl;
+        std::cout << verificationsCount << '\t' << matchesCount << '\t' <<
+                     std::fixed << Stats::filteringTime + Stats::preprocessingTime << std::endl;
+
+//        forEach(Stats::verifications, [&](unsigned verificationsCount) { std::cout << verificationsCount << '\n'; });
     }
     else
     {
         std::cout << length(queries) << " queries" << std::endl;
         std::cout << lengthSum(queries) << " symbols" << std::endl;
         std::cout << verificationsCount << " verifications" << std::endl;
+        std::cout << matchesCount << " matches" << std::endl;
+        std::cout <<  100.0 * matchesCount / verificationsCount << " % efficiency" << std::endl;
+
         std::cout << std::fixed << Stats::filteringTime << " + " << Stats::preprocessingTime << " sec" << std::endl;
     }
 }

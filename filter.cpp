@@ -293,62 +293,112 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 //}
 
 // ----------------------------------------------------------------------------
-// Function filterOffline()
+// Function filter(index, needles, errors, [](...){}, Seeds<TDistane>());
 // ----------------------------------------------------------------------------
-// Exact or approximate seeds.
 
-template <typename TIndex, typename TQueries, typename TAlgorithm>
-inline unsigned long
-filterOffline(Options const & options, TIndex & index, TQueries & queries, TAlgorithm const & algo)
+template <typename TDistance = Exact>
+struct Seeds
+{
+    unsigned char threshold;
+
+    Seeds(unsigned char threshold = 0) :
+        threshold(threshold)
+    {}
+};
+
+template <typename TIndex, typename TNeedles, typename TThreshold, typename TDelegate, typename TDistance>
+inline void filter(TIndex & index, TNeedles & needles, TThreshold threshold, TDelegate && delegate, Seeds<TDistance> const & config)
 {
     typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
-    typedef typename Iterator<TQueries const, Rooted>::Type TQueriesIt;
-    typedef StringSet<TQueries, Segment<TQueries> >         TSeeds;
+    typedef typename Fibre<TIndex, FibreSA>::Type           TSA;
+    typedef typename Infix<TSA const>::Type                 TOccurrences;
+    typedef typename Value<TOccurrences>::Type              TOccurrence;
+
+    typedef typename Iterator<TNeedles const, Rooted>::Type TNeedlesIt;
+    typedef typename Size<TNeedles>::Type                   TNeedleId;
+    typedef typename Value<TNeedles>::Type                  TNeedle;
+    typedef typename Size<TNeedle>::Type                    TNeedleSize;
+
+    typedef StringSet<TNeedles, Segment<TNeedles> >         TSeeds;
     typedef typename Iterator<TSeeds const, Rooted>::Type   TSeedsIt;
     typedef typename StringSetPosition<TSeeds>::Type        TSeedPos;
-    typedef unsigned                                        TSize;
 
-    double timer = sysTime();
+    if (empty(needles)) return;
 
-    TSeeds seeds(queries);
+    TNeedleId needlesCount = length(needles);
+    TNeedleSize needleLength = length(front(needles));
+    TNeedleSize seedsCount = static_cast<TNeedleSize>(std::ceil((threshold + 1) / (config.threshold + 1.0)));
+    TNeedleSize seedsLength = needleLength / seedsCount;
 
-    TSize needleLength = length(front(queries));
-    TSize needleErrors = needleLength * options.errorRate;
-    TSize seedsCount = static_cast<TSize>(std::ceil((needleErrors + 1) / (options.seedsErrors + 1.0)));
-    TSize seedsLength = needleLength / seedsCount;
+    TSeeds seeds(needles);
 
-    iterate(queries, [&](TQueriesIt const & it)
-    {
-        for (TSize seedId = 0; seedId < seedsCount; ++seedId)
-            appendInfixWithLength(seeds, TSeedPos(position(it), seedId * seedsLength), seedsLength, Generous());
-    },
-    Rooted(), Serial());
+    reserve(seeds, needlesCount * seedsCount, Exact());
 
-    Stats::preprocessingTime = sysTime() - timer;
+    for (TNeedleId needleId = 0; needleId < needlesCount; ++needleId)
+        for (TNeedleSize seedId = 0; seedId < seedsCount; ++seedId)
+            appendInfixWithLength(seeds, TSeedPos(needleId, seedId * seedsLength), seedsLength, Exact());
 
-    timer = sysTime();
-
-    TExtender extender(indexText(index));
-
-    find(index, seeds, options.seedsErrors, [&](TIndexIt const & indexIt, TSeedsIt const & seedsIt, unsigned seedErrors)
+    find(index, seeds, config.threshold, [&](TIndexIt const & indexIt, TSeedsIt const & seedsIt, unsigned char seedErrors)
     {
         TOccurrences const & occs = getOccurrences(indexIt);
 
         forEach(occs, [&](TOccurrence const & occ)
         {
-            TSize queryId = position(seedsIt) / seedsCount;
-            TSize seedBegin = (position(seedsIt) % seedsCount) * seedsLength;
-            Stats::verifications[queryId]++;
+            TNeedleId needleId = position(seedsIt) / seedsCount;
+            TNeedleSize seedBegin = (position(seedsIt) % seedsCount) * seedsLength;
 
-            extend(extender,
-               queries[queryId],
-               occ, posAdd(occ, seedsLength),
-               seedBegin, seedBegin + seedsLength,
-               seedErrors, needleErrors,
-               [&](TOccurrence, TOccurrence, unsigned char) { Stats::matches[queryId]++; });
+            delegate(needleId, occ, posAdd(occ, seedsLength), seedBegin, seedBegin + seedsLength, seedErrors);
         });
     },
-    algo);
+    Backtracking<TDistance>());
+}
+
+// ----------------------------------------------------------------------------
+// Function filterOffline()
+// ----------------------------------------------------------------------------
+// Exact or approximate seeds.
+
+template <typename TIndex, typename TQueries, typename TDistance>
+inline void filterOffline(Options const & options, TIndex & index, TQueries & queries, TDistance const &)
+{
+    typedef typename Fibre<TIndex, FibreText>::Type         TText;
+    typedef typename Fibre<TIndex, FibreSA>::Type           TSA;
+    typedef typename Infix<TSA const>::Type                 TOccurrences;
+    typedef typename Value<TOccurrences>::Type              TOccurrence;
+
+    typedef typename Size<TQueries>::Type                   TQueryId;
+    typedef typename Value<TQueries>::Type                  TQuery;
+    typedef typename Size<TQuery>::Type                     TQuerySize;
+
+    typedef AlignTextBanded<FindPrefix, NMatchesNone_, NMatchesNone_> TMyersSpec;
+    typedef Myers<TMyersSpec, True, void>                   TExtenderAlgo;
+    typedef Extender<TText, TQuery, TExtenderAlgo>          TExtender;
+
+    double timer = sysTime();
+
+    TExtender extender(indexText(index));
+
+    unsigned char queryErrors = options.errorRate * length(front(queries));
+
+    filter(index, queries, queryErrors,
+           [&](TQueryId queryId,
+               TOccurrence textBegin, TOccurrence textEnd,
+               TQuerySize queryBegin, TQuerySize queryEnd,
+               unsigned char seedErrors)
+            {
+                Stats::verifications[queryId]++;
+
+                extend(extender,
+                       queries[queryId],
+                       textBegin, textEnd,
+                       queryBegin, queryEnd,
+                       seedErrors, queryErrors,
+                       [&](TOccurrence, TOccurrence, unsigned char)
+                       {
+                            Stats::matches[queryId]++;
+                       });
+            },
+    Seeds<TDistance>(options.seedsErrors));
 
     Stats::filteringTime = sysTime() - timer;
 }
@@ -485,7 +535,7 @@ inline void run(Options const & options)
         if (!open(index, toCString(options.textIndexFile)))
             throw RuntimeError("Error while loading full-text index");
 
-        filterOffline(options, index, queries, Backtracking<HammingDistance>());
+        filterOffline(options, index, queries, HammingDistance());
     }
     else
     {
@@ -511,7 +561,7 @@ inline void run(Options const & options)
         std::cout << lengthSum(queries) << " symbols" << std::endl;
         std::cout << verificationsCount << " verifications" << std::endl;
         std::cout << matchesCount << " matches" << std::endl;
-        std::cout <<  100.0 * matchesCount / verificationsCount << " % efficiency" << std::endl;
+        std::cout << 100.0 * matchesCount / verificationsCount << " % PPV" << std::endl;
 
         std::cout << std::fixed << Stats::filteringTime << " + " << Stats::preprocessingTime << " sec" << std::endl;
     }

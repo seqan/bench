@@ -433,9 +433,12 @@ runOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm 
 template <typename TText, typename TQueries, typename TAlgorithm>
 inline void runOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
 {
-//    Shape<Dna, UngappedShape<9> > contiguous;
-    Shape<Dna, SimpleShape>     contiguous;
-    Shape<Dna, GenericShape>    gapped;
+    typedef typename Value<TText>::Type     THaystack;
+    typedef typename Value<THaystack>::Type TAlphabet;
+
+//    Shape<TAlphabet, UngappedShape<9> > contiguous;
+    Shape<TAlphabet, SimpleShape>     contiguous;
+    Shape<TAlphabet, GenericShape>    gapped;
 
     if (stringToShape(contiguous, options.qgramsShape))
         runOnline(options, text, queries, algo, contiguous);

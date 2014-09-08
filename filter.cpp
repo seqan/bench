@@ -123,6 +123,36 @@ struct Options : BaseOptions
 };
 
 // ============================================================================
+// Tags and Metafunctions
+// ============================================================================
+
+template <>
+struct Pigeonhole<EditDistance>
+{
+    enum { ONE_PER_DIAGONAL = 0 };  // 1 turns on heuristic duplicate masking.
+    enum { HAMMING_ONLY = 0 };
+};
+
+template <>
+struct Pigeonhole<HammingDistance>
+{
+    enum { ONE_PER_DIAGONAL = 0 };
+    enum { HAMMING_ONLY = 1 };
+};
+
+template <typename TDistance>
+struct SwiftSpec
+{
+    typedef SwiftSemiGlobal Type;
+};
+
+template <>
+struct SwiftSpec<HammingDistance>
+{
+    typedef SwiftSemiGlobalHamming Type;
+};
+
+// ============================================================================
 // Functions
 // ============================================================================
 
@@ -271,26 +301,6 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 }
 
 // ----------------------------------------------------------------------------
-// Function verify()
-// ----------------------------------------------------------------------------
-
-//template <typename TIndex, typename TSpec>
-//inline void verify(Iter<TIndex, TSpec> const & it, True)
-//{
-//    Finder<TContigSeq> verifyFinder(fragStore.contigStore[i].seq);
-//    setPosition(verifyFinder, beginPosition(finder));
-//    Pattern<TReadSeq, HammingSimple> verifyPattern(fragStore.readSeqStore[position(pattern).i1]);
-//    unsigned readLength = length(fragStore.readSeqStore[position(pattern).i1]);
-//    int minScore = -static_cast<int>(options.errorRate * readLength);
-//    while (find(verifyFinder, verifyPattern, minScore) && position(verifyFinder) < endPosition(infix(finder)))
-//    {
-//        TAlignedRead match(length(fragStore.alignedReadStore), position(pattern).i1, i,
-//                           beginPosition(verifyFinder), endPosition(verifyFinder));
-//        appendValue(fragStore.alignedReadStore, match);
-//    }
-//}
-
-// ----------------------------------------------------------------------------
 // Function runOffline()
 // ----------------------------------------------------------------------------
 // Exact or approximate seeds.
@@ -333,7 +343,7 @@ inline void runOffline(Options const & options, TIndex & index, TQueries & queri
                             Stats::matches[queryId]++;
                        });
             },
-    Seeds<TSeeding>(options.seedsErrors));
+            Seeds<TSeeding>(options.seedsErrors));
 
     Stats::totalTime = sysTime() - timer;
 }
@@ -379,30 +389,25 @@ inline void runOffline(Options const & options, TText & text, TQueries & queries
 }
 
 // ----------------------------------------------------------------------------
-// Function runOnlineInit()
+// Function runOnline()
 // ----------------------------------------------------------------------------
+// q-Grams or exact seeds.
 
 template <typename TPattern, typename TSpec>
-inline void runOnlineInit(TPattern & pattern, Options const & options, Pigeonhole<TSpec>)
+inline void _runOnlineInit(TPattern & pattern, Options const & options, Pigeonhole<TSpec>)
 {
     _patternInit(pattern, options.errorRate);
 }
 
-template <typename TPattern>
-inline void runOnlineInit(TPattern & pattern, Options const & options, Swift<SwiftSemiGlobal>)
+template <typename TPattern, typename TSpec>
+inline void _runOnlineInit(TPattern & pattern, Options const & options, Swift<TSpec>)
 {
     pattern.params.minThreshold = options.qgramsThreshold;
     _patternInit(pattern, options.errorRate, 0);
 }
 
-// ----------------------------------------------------------------------------
-// Function runOnline()
-// ----------------------------------------------------------------------------
-// q-Grams or exact seeds.
-
-template <typename TText, typename TQueries, typename TAlgorithm, typename TShape>
-inline void
-runOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo, TShape const & shape)
+template <typename TText, typename TQueries, typename TDistance, typename TAlgorithm, typename TShape>
+inline void runOnline(Options const & options, TText & text, TQueries & queries, TDistance const &, TAlgorithm const & algo, TShape const & shape)
 {
     typedef IndexQGram<TShape, OpenAddressing>              TIndexSpec;
     typedef Index<TQueries, TIndexSpec>                     TPatternIndex;
@@ -412,26 +417,43 @@ runOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm 
     typedef typename Size<TText>::Type                      THaystackSize;
     typedef Finder<THaystack, TAlgorithm>                   TFinder;
 
+    typedef typename Size<TQueries>::Type                   TQueryId;
+    typedef typename Value<TQueries>::Type                  TNeedle;
+    typedef Verifier<THaystack, TNeedle, TDistance>         TVerifier;
+
     double timer = sysTime();
 
     TPatternIndex patternIndex(queries, shape);
     TPattern pattern(patternIndex);
-    runOnlineInit(pattern, options, algo);
+    _runOnlineInit(pattern, options, algo);
+
+    TVerifier verifier;
 
     for (THaystackSize i = 0; i < length(text); ++i)
     {
         TFinder finder(text[i]);
         while (find(finder, pattern, options.errorRate))
         {
-            Stats::verifications[getSeqNo(position(pattern))]++;
+            TQueryId queryId = getSeqNo(position(pattern));
+
+            Stats::verifications[queryId]++;
+
+            unsigned char queryErrors = options.errorRate * length(queries[queryId]);
+
+            verify(verifier,
+                   infix(finder), infix(pattern), queryErrors,
+                   [&](typename Infix<THaystack>::Type const &, unsigned char)
+                   {
+                        Stats::matches[queryId]++;
+                   });
         }
     }
 
     Stats::totalTime = sysTime() - timer;
 }
 
-template <typename TText, typename TQueries, typename TAlgorithm>
-inline void runOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
+template <typename TText, typename TQueries, typename TDistance, typename TAlgorithm>
+inline void _runOnline(Options const & options, TText & text, TQueries & queries, TDistance const & dist, TAlgorithm const & algo)
 {
     typedef typename Value<TText>::Type     THaystack;
     typedef typename Value<THaystack>::Type TAlphabet;
@@ -441,29 +463,47 @@ inline void runOnline(Options const & options, TText & text, TQueries & queries,
     Shape<TAlphabet, GenericShape>    gapped;
 
     if (stringToShape(contiguous, options.qgramsShape))
-        runOnline(options, text, queries, algo, contiguous);
+        runOnline(options, text, queries, dist, algo, contiguous);
     else if (stringToShape(gapped, options.qgramsShape))
-        runOnline(options, text, queries, algo, gapped);
+        runOnline(options, text, queries, dist, algo, gapped);
     else
         throw RuntimeError("Unsupported q-gram shape");
 }
 
-template <typename TText, typename TQueries>
-inline void runOnline(Options const & options, TText & text, TQueries & queries)
+template <typename TText, typename TQueries, typename TDistance, typename TSeeding>
+inline void runOnline(Options const & options, TText & text, TQueries & queries, TDistance const & dist, TSeeding const &)
 {
     switch (options.algorithmType)
     {
     case Options::ALGO_SEEDS:
-        runOnline(options, text, queries, Pigeonhole<void>()); //Pigeonhole<Hamming_>
+        _runOnline(options, text, queries, dist, Pigeonhole<TSeeding>());
         return;
 
     case Options::ALGO_QGRAMS:
-        runOnline(options, text, queries, Swift<SwiftSemiGlobal>());
+        _runOnline(options, text, queries, dist, Swift<typename SwiftSpec<TSeeding>::Type>());
         return;
 
     default:
         throw RuntimeError("Unsupported filter");
     }
+}
+
+template <typename TText, typename TQueries, typename TDistance>
+inline void runOnline(Options const & options, TText & text, TQueries & queries, TDistance const & dist)
+{
+    if (options.verify)
+        runOnline(options, text, queries, dist, dist);
+    else
+        runOnline(options, text, queries, Nothing(), dist);
+}
+
+template <typename TText, typename TQueries>
+inline void runOnline(Options const & options, TText & text, TQueries & queries)
+{
+    if (options.editDistance)
+        runOnline(options, text, queries, EditDistance());
+    else
+        runOnline(options, text, queries, HammingDistance());
 }
 
 // ----------------------------------------------------------------------------

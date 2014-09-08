@@ -331,7 +331,68 @@ find(Index<THaystack, THaystackSpec> & text,
             });
         }
     }
+}
 
+// ----------------------------------------------------------------------------
+// Function filter(index, needles, errors, [](...){}, Seeds<TDistance>());
+// ----------------------------------------------------------------------------
+// NOTE(esiragusa): All needles must have the same length.
+
+template <typename TDistance = Exact>
+struct Seeds
+{
+    unsigned char threshold;
+
+    Seeds(unsigned char threshold = 0) :
+        threshold(threshold)
+    {}
+};
+
+template <typename TIndex, typename TNeedles, typename TThreshold, typename TDelegate, typename TDistance>
+inline void filter(TIndex & index, TNeedles & needles, TThreshold threshold, TDelegate && delegate, Seeds<TDistance> const & config)
+{
+    typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
+    typedef typename Fibre<TIndex, FibreSA>::Type           TSA;
+    typedef typename Infix<TSA const>::Type                 TOccurrences;
+    typedef typename Value<TOccurrences>::Type              TOccurrence;
+
+    typedef typename Iterator<TNeedles const, Rooted>::Type TNeedlesIt;
+    typedef typename Size<TNeedles>::Type                   TNeedleId;
+    typedef typename Value<TNeedles>::Type                  TNeedle;
+    typedef typename Size<TNeedle>::Type                    TNeedleSize;
+
+    typedef StringSet<TNeedles, Segment<TNeedles> >         TSeeds;
+    typedef typename Iterator<TSeeds const, Rooted>::Type   TSeedsIt;
+    typedef typename StringSetPosition<TSeeds>::Type        TSeedPos;
+
+    if (empty(needles)) return;
+
+    TNeedleId needlesCount = length(needles);
+    TNeedleSize needleLength = length(front(needles));
+    TNeedleSize seedsCount = static_cast<TNeedleSize>(std::ceil((threshold + 1) / (config.threshold + 1.0)));
+    TNeedleSize seedsLength = needleLength / seedsCount;
+
+    TSeeds seeds(needles);
+
+    reserve(seeds, needlesCount * seedsCount, Exact());
+
+    for (TNeedleId needleId = 0; needleId < needlesCount; ++needleId)
+        for (TNeedleSize seedId = 0; seedId < seedsCount; ++seedId)
+            appendInfixWithLength(seeds, TSeedPos(needleId, seedId * seedsLength), seedsLength, Exact());
+
+    find(index, seeds, config.threshold, [&](TIndexIt const & indexIt, TSeedsIt const & seedsIt, unsigned char seedErrors)
+    {
+        TOccurrences const & occs = getOccurrences(indexIt);
+
+        forEach(occs, [&](TOccurrence const & occ)
+        {
+            TNeedleId needleId = position(seedsIt) / seedsCount;
+            TNeedleSize seedBegin = (position(seedsIt) % seedsCount) * seedsLength;
+
+            delegate(needleId, occ, posAdd(occ, seedsLength), seedBegin, seedBegin + seedsLength, seedErrors);
+        });
+    },
+    Backtracking<TDistance>());
 }
 
 #endif  // #ifndef APP_IBENCH_MISC_H_

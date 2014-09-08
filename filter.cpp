@@ -66,14 +66,12 @@ using namespace seqan;
 
 struct Stats
 {
-    static double           preprocessingTime;
-    static double           filteringTime;
+    static double           totalTime;
     static String<unsigned> verifications;
     static String<unsigned> matches;
 };
 
-double Stats::preprocessingTime = 0;
-double Stats::filteringTime = 0;
+double Stats::totalTime = 0;
 String<unsigned> Stats::verifications;
 String<unsigned> Stats::matches;
 
@@ -293,73 +291,12 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 //}
 
 // ----------------------------------------------------------------------------
-// Function filter(index, needles, errors, [](...){}, Seeds<TDistane>());
-// ----------------------------------------------------------------------------
-
-template <typename TDistance = Exact>
-struct Seeds
-{
-    unsigned char threshold;
-
-    Seeds(unsigned char threshold = 0) :
-        threshold(threshold)
-    {}
-};
-
-template <typename TIndex, typename TNeedles, typename TThreshold, typename TDelegate, typename TDistance>
-inline void filter(TIndex & index, TNeedles & needles, TThreshold threshold, TDelegate && delegate, Seeds<TDistance> const & config)
-{
-    typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
-    typedef typename Fibre<TIndex, FibreSA>::Type           TSA;
-    typedef typename Infix<TSA const>::Type                 TOccurrences;
-    typedef typename Value<TOccurrences>::Type              TOccurrence;
-
-    typedef typename Iterator<TNeedles const, Rooted>::Type TNeedlesIt;
-    typedef typename Size<TNeedles>::Type                   TNeedleId;
-    typedef typename Value<TNeedles>::Type                  TNeedle;
-    typedef typename Size<TNeedle>::Type                    TNeedleSize;
-
-    typedef StringSet<TNeedles, Segment<TNeedles> >         TSeeds;
-    typedef typename Iterator<TSeeds const, Rooted>::Type   TSeedsIt;
-    typedef typename StringSetPosition<TSeeds>::Type        TSeedPos;
-
-    if (empty(needles)) return;
-
-    TNeedleId needlesCount = length(needles);
-    TNeedleSize needleLength = length(front(needles));
-    TNeedleSize seedsCount = static_cast<TNeedleSize>(std::ceil((threshold + 1) / (config.threshold + 1.0)));
-    TNeedleSize seedsLength = needleLength / seedsCount;
-
-    TSeeds seeds(needles);
-
-    reserve(seeds, needlesCount * seedsCount, Exact());
-
-    for (TNeedleId needleId = 0; needleId < needlesCount; ++needleId)
-        for (TNeedleSize seedId = 0; seedId < seedsCount; ++seedId)
-            appendInfixWithLength(seeds, TSeedPos(needleId, seedId * seedsLength), seedsLength, Exact());
-
-    find(index, seeds, config.threshold, [&](TIndexIt const & indexIt, TSeedsIt const & seedsIt, unsigned char seedErrors)
-    {
-        TOccurrences const & occs = getOccurrences(indexIt);
-
-        forEach(occs, [&](TOccurrence const & occ)
-        {
-            TNeedleId needleId = position(seedsIt) / seedsCount;
-            TNeedleSize seedBegin = (position(seedsIt) % seedsCount) * seedsLength;
-
-            delegate(needleId, occ, posAdd(occ, seedsLength), seedBegin, seedBegin + seedsLength, seedErrors);
-        });
-    },
-    Backtracking<TDistance>());
-}
-
-// ----------------------------------------------------------------------------
 // Function runOffline()
 // ----------------------------------------------------------------------------
 // Exact or approximate seeds.
 
-template <typename TIndex, typename TQueries, typename TDistance>
-inline void runOffline(Options const & options, TIndex & index, TQueries & queries, TDistance const &)
+template <typename TIndex, typename TQueries, typename TDistance, typename TSeeding>
+inline void runOffline(Options const & options, TIndex & index, TQueries & queries, TDistance const &, TSeeding const &)
 {
     typedef typename Fibre<TIndex, FibreText>::Type         TText;
     typedef typename Fibre<TIndex, FibreSA>::Type           TSA;
@@ -370,9 +307,7 @@ inline void runOffline(Options const & options, TIndex & index, TQueries & queri
     typedef typename Value<TQueries>::Type                  TQuery;
     typedef typename Size<TQuery>::Type                     TQuerySize;
 
-    typedef AlignTextBanded<FindPrefix, NMatchesNone_, NMatchesNone_> TMyersSpec;
-    typedef Myers<TMyersSpec, True, void>                   TExtenderAlgo;
-    typedef Extender<TText, TQuery, TExtenderAlgo>          TExtender;
+    typedef Extender<TText, TQuery, TDistance>              TExtender;
 
     double timer = sysTime();
 
@@ -398,21 +333,49 @@ inline void runOffline(Options const & options, TIndex & index, TQueries & queri
                             Stats::matches[queryId]++;
                        });
             },
-    Seeds<TDistance>(options.seedsErrors));
+    Seeds<TSeeding>(options.seedsErrors));
 
-    Stats::filteringTime = sysTime() - timer;
+    Stats::totalTime = sysTime() - timer;
 }
 
-template <typename TText, typename TQueries, typename TAlgorithm>
-inline void runOffline(Options const &, Index<TText, IndexEsa<void> > &, TQueries &, TAlgorithm const &)
+template <typename TText, typename TQueries, typename TDistance, typename TSeeding>
+inline void runOffline(Options const &, Index<TText, IndexEsa<void> > &, TQueries &, TDistance const &, TSeeding const &)
 {
     throw RuntimeError("Unsupported index");
 }
 
-template <typename TText, typename TQueries, typename TIndexSpec, typename TAlgorithm>
-inline void runOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TAlgorithm const &)
+template <typename TText, typename TQueries, typename TIndexSpec, typename TDistance, typename TSeeding>
+inline void runOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TDistance const &, TSeeding const &)
 {
     throw RuntimeError("Unsupported index");
+}
+
+template <typename TText, typename TQueries, typename TDistance>
+inline void runOffline(Options const & options, TText & text, TQueries & queries, TDistance const & dist)
+{
+    if (options.verify)
+    {
+        if (options.seedsErrors)
+            runOffline(options, text, queries, dist, dist);
+        else
+            runOffline(options, text, queries, dist, Exact());
+    }
+    else
+    {
+        if (options.seedsErrors)
+            runOffline(options, text, queries, Nothing(), dist);
+        else
+            runOffline(options, text, queries, Nothing(), Exact());
+    }
+}
+
+template <typename TText, typename TQueries>
+inline void runOffline(Options const & options, TText & text, TQueries & queries)
+{
+    if (options.editDistance)
+        runOffline(options, text, queries, EditDistance());
+    else
+        runOffline(options, text, queries, HammingDistance());
 }
 
 // ----------------------------------------------------------------------------
@@ -455,10 +418,6 @@ runOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm 
     TPattern pattern(patternIndex);
     runOnlineInit(pattern, options, algo);
 
-    Stats::preprocessingTime = sysTime() - timer;
-
-    timer = sysTime();
-
     for (THaystackSize i = 0; i < length(text); ++i)
     {
         TFinder finder(text[i]);
@@ -468,7 +427,7 @@ runOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm 
         }
     }
 
-    Stats::filteringTime = sysTime() - timer;
+    Stats::totalTime = sysTime() - timer;
 }
 
 template <typename TText, typename TQueries, typename TAlgorithm>
@@ -531,7 +490,7 @@ inline void run(Options const & options)
         if (!open(index, toCString(options.textIndexFile)))
             throw RuntimeError("Error while loading full-text index");
 
-        runOffline(options, index, queries, HammingDistance());
+        runOffline(options, index, queries);
     }
     else
     {
@@ -547,7 +506,7 @@ inline void run(Options const & options)
     if (options.tsv)
     {
         std::cout << verificationsCount << '\t' << matchesCount << '\t' <<
-                     std::fixed << Stats::filteringTime + Stats::preprocessingTime << std::endl;
+                     std::fixed << Stats::totalTime << std::endl;
 
 //        forEach(Stats::verifications, [&](unsigned verificationsCount) { std::cout << verificationsCount << '\n'; });
     }
@@ -558,8 +517,7 @@ inline void run(Options const & options)
         std::cout << verificationsCount << " verifications" << std::endl;
         std::cout << matchesCount << " matches" << std::endl;
         std::cout << 100.0 * matchesCount / verificationsCount << " % PPV" << std::endl;
-
-        std::cout << std::fixed << Stats::filteringTime << " + " << Stats::preprocessingTime << " sec" << std::endl;
+        std::cout << std::fixed << Stats::totalTime << " sec" << std::endl;
     }
 }
 

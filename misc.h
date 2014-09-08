@@ -348,9 +348,10 @@ struct Seeds
     {}
 };
 
-template <typename TIndex, typename TNeedles, typename TThreshold, typename TDelegate, typename TDistance>
-inline void filter(TIndex & index, TNeedles & needles, TThreshold threshold, TDelegate && delegate, Seeds<TDistance> const & config)
+template <typename TText, typename TSpec, typename TNeedles, typename TThreshold, typename TDelegate, typename TDistance>
+inline void filter(Index<TText, TSpec> & index, TNeedles & needles, TThreshold threshold, TDelegate && delegate, Seeds<TDistance> const & config)
 {
+    typedef Index<TText, TSpec>                             TIndex;
     typedef typename Iterator<TIndex, TopDown<> >::Type     TIndexIt;
     typedef typename Fibre<TIndex, FibreSA>::Type           TSA;
     typedef typename Infix<TSA const>::Type                 TOccurrences;
@@ -393,6 +394,145 @@ inline void filter(TIndex & index, TNeedles & needles, TThreshold threshold, TDe
         });
     },
     Backtracking<TDistance>());
+}
+
+
+// ============================================================================
+// Classes
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Class Verifier
+// ----------------------------------------------------------------------------
+
+template <typename THaystack, typename TNeedle, typename TSpec = Nothing>
+struct Verifier {};
+
+// ----------------------------------------------------------------------------
+// Class Verifier<EditDistance>
+// ----------------------------------------------------------------------------
+
+template <typename THaystack, typename TNeedle>
+struct Verifier<THaystack, TNeedle, EditDistance>
+{
+    typedef typename Infix<THaystack const>::Type       THaystackInfix;
+    typedef ModifiedString<THaystackInfix, ModReverse>  THaystackInfixRev;
+    typedef typename Infix<TNeedle const>::Type         TNeedleInfix;
+    typedef ModifiedString<TNeedleInfix, ModReverse>    TNeedleInfixRev;
+
+    typedef AlignTextBanded<FindInfix,
+                            NMatchesNone_,
+                            NMatchesNone_>              TMyersInfix;
+    typedef AlignTextBanded<FindPrefix,
+                            NMatchesNone_,
+                            NMatchesNone_>              TMyersPrefix;
+    typedef Myers<TMyersInfix, True, void>              TAlgoEnd;
+    typedef Myers<TMyersPrefix, True, void>             TAlgoBegin;
+
+    typedef Finder<THaystackInfix const>                TFinderEnd;
+    typedef Finder<THaystackInfixRev>                   TFinderBegin;
+    typedef PatternState_<TNeedleInfix const, TAlgoEnd> TPatternEnd;
+    typedef PatternState_<TNeedleInfixRev, TAlgoBegin>  TPatternBegin;
+
+    TPatternEnd         patternEnd;
+    TPatternBegin       patternBegin;
+};
+
+// ----------------------------------------------------------------------------
+// Function verify<Nothing>()
+// ----------------------------------------------------------------------------
+
+template <typename THaystack, typename TNeedle, typename THaystackInfix, typename TNeedleInfix, typename TErrors, typename TDelegate>
+inline void
+verify(Verifier<THaystack, TNeedle, Nothing> & /* verifier */,
+       THaystackInfix const & /* haystackInfix */,
+       TNeedleInfix const & /* needle */,
+       TErrors /* threshold */,
+       TDelegate && /* delegate */)
+{}
+
+// ----------------------------------------------------------------------------
+// Function verify<HammingDistance>()
+// ----------------------------------------------------------------------------
+
+template <typename THaystack, typename TNeedle, typename THaystackInfix, typename TNeedleInfix, typename TErrors, typename TDelegate>
+inline void
+verify(Verifier<THaystack, TNeedle, HammingDistance> & /* verifier */,
+       THaystackInfix const & haystackInfix,
+       TNeedleInfix const & needleInfix,
+       TErrors threshold,
+       TDelegate && delegate)
+{
+    typedef typename Position<THaystackInfix>::Type             THaystackPos;
+    typedef typename Iterator<THaystackInfix, Standard>::Type   THaystackIt;
+    typedef typename Iterator<TNeedleInfix, Standard>::Type     TNeedleIt;
+    typedef typename Size<TNeedleInfix>::Type                   TNeedleSize;
+
+    SEQAN_ASSERT_GEQ(length(haystackInfix), length(needleInfix));
+
+//    THaystackPos endPos = length(haystackInfix);
+//    TErrors minErrors = threshold + 1;
+
+    TNeedleSize nLength = length(needleInfix);
+    THaystackIt iIt = begin(haystackInfix, Standard());
+    THaystackIt iEnd = end(haystackInfix, Standard()) - nLength;
+
+    for (; iIt != iEnd; ++iIt)
+    {
+        THaystackIt hIt = iIt;
+        THaystackIt hEnd = iIt + nLength;
+        TNeedleIt nIt = begin(needleInfix, Standard());
+        TErrors currentErrors = 0;
+
+        for (; hIt != hEnd && currentErrors <= threshold; ++hIt, ++nIt)
+            currentErrors += !ordEqual(value(hIt), value(nIt));
+
+        THaystackPos endPos = position(hEnd);
+
+        if (currentErrors <= threshold)
+        {
+            delegate(infix(haystackInfix, endPos - length(needleInfix), endPos), currentErrors);
+            break;
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Function verify<EditDistance>()
+// ----------------------------------------------------------------------------
+
+template <typename THaystack, typename TNeedle, typename THaystackInfix, typename TNeedleInfix, typename TErrors, typename TDelegate>
+inline void
+verify(Verifier<THaystack, TNeedle, EditDistance> & verifier,
+       THaystackInfix const & haystackInfix,
+       TNeedleInfix const & needleInfix,
+       TErrors threshold,
+       TDelegate && delegate)
+{
+    typedef Verifier<THaystack, TNeedle, EditDistance>  TVerifier;
+    typedef typename TVerifier::TFinderEnd              TFinderEnd;
+    typedef typename Position<THaystackInfix>::Type     THaystackPos;
+
+    TFinderEnd finderEnd;
+    setHost(finderEnd, haystackInfix);
+
+    THaystackPos beginPos = 0;
+    THaystackPos endPos = length(haystackInfix);
+    TErrors minErrors = threshold + 1;
+
+    while (find(finderEnd, needleInfix, verifier.patternEnd, -static_cast<int>(threshold)))
+    {
+        TErrors currentErrors = -getScore(verifier.patternEnd);
+
+        if (currentErrors <= minErrors)
+        {
+            minErrors = currentErrors;
+            endPos = position(finderEnd) + 1;
+        }
+    }
+
+    if (minErrors <= threshold)
+        delegate(infix(haystackInfix, beginPos, endPos), minErrors);
 }
 
 #endif  // #ifndef APP_IBENCH_MISC_H_

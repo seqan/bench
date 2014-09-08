@@ -201,23 +201,23 @@ inline unsigned shapeWeight(TString const & shape)
 }
 
 // ----------------------------------------------------------------------------
-// Function runOnline()
+// Function isOnline()
 // ----------------------------------------------------------------------------
 
 template <typename TOptions>
-inline bool runOnline(TOptions const & options)
+inline bool isOnline(TOptions const & options)
 {
     return options.algorithmType == Options::ALGO_QGRAMS || (options.seedsOnline && !options.seedsErrors);
 }
 
 // ----------------------------------------------------------------------------
-// Function runOffline()
+// Function isOffline()
 // ----------------------------------------------------------------------------
 
 template <typename TOptions>
-inline bool runOffline(TOptions const & options)
+inline bool isOffline(TOptions const & options)
 {
-    return !runOnline(options);
+    return !isOnline(options);
 }
 
 // ----------------------------------------------------------------------------
@@ -264,7 +264,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     }
     getOptionValue(options.qgramsThreshold, parser, "qgrams-threshold");
 
-    if (runOnline(options))
+    if (isOnline(options))
         getArgumentValue(options.textFile, parser, 0);
     else
         getArgumentValue(options.textIndexFile, parser, 0);
@@ -354,12 +354,12 @@ inline void filter(TIndex & index, TNeedles & needles, TThreshold threshold, TDe
 }
 
 // ----------------------------------------------------------------------------
-// Function filterOffline()
+// Function runOffline()
 // ----------------------------------------------------------------------------
 // Exact or approximate seeds.
 
 template <typename TIndex, typename TQueries, typename TDistance>
-inline void filterOffline(Options const & options, TIndex & index, TQueries & queries, TDistance const &)
+inline void runOffline(Options const & options, TIndex & index, TQueries & queries, TDistance const &)
 {
     typedef typename Fibre<TIndex, FibreText>::Type         TText;
     typedef typename Fibre<TIndex, FibreSA>::Type           TSA;
@@ -404,41 +404,42 @@ inline void filterOffline(Options const & options, TIndex & index, TQueries & qu
 }
 
 template <typename TText, typename TQueries, typename TAlgorithm>
-inline void filterOffline(Options const &, Index<TText, IndexEsa<void> > &, TQueries &, TAlgorithm const &)
+inline void runOffline(Options const &, Index<TText, IndexEsa<void> > &, TQueries &, TAlgorithm const &)
 {
     throw RuntimeError("Unsupported index");
 }
 
 template <typename TText, typename TQueries, typename TIndexSpec, typename TAlgorithm>
-inline void filterOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TAlgorithm const &)
+inline void runOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TAlgorithm const &)
 {
     throw RuntimeError("Unsupported index");
 }
 
 // ----------------------------------------------------------------------------
-// Function filterOnlineInit()
+// Function runOnlineInit()
 // ----------------------------------------------------------------------------
 
 template <typename TPattern, typename TSpec>
-inline void filterOnlineInit(TPattern & pattern, Options const & options, Pigeonhole<TSpec>)
+inline void runOnlineInit(TPattern & pattern, Options const & options, Pigeonhole<TSpec>)
 {
     _patternInit(pattern, options.errorRate);
 }
 
 template <typename TPattern>
-inline void filterOnlineInit(TPattern & pattern, Options const & options, Swift<SwiftSemiGlobal>)
+inline void runOnlineInit(TPattern & pattern, Options const & options, Swift<SwiftSemiGlobal>)
 {
     pattern.params.minThreshold = options.qgramsThreshold;
     _patternInit(pattern, options.errorRate, 0);
 }
 
 // ----------------------------------------------------------------------------
-// Function filterOnline()
+// Function runOnline()
 // ----------------------------------------------------------------------------
+// q-Grams or exact seeds.
 
 template <typename TText, typename TQueries, typename TAlgorithm, typename TShape>
 inline void
-filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo, TShape const & shape)
+runOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo, TShape const & shape)
 {
     typedef IndexQGram<TShape, OpenAddressing>              TIndexSpec;
     typedef Index<TQueries, TIndexSpec>                     TPatternIndex;
@@ -452,7 +453,7 @@ filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorit
 
     TPatternIndex patternIndex(queries, shape);
     TPattern pattern(patternIndex);
-    filterOnlineInit(pattern, options, algo);
+    runOnlineInit(pattern, options, algo);
 
     Stats::preprocessingTime = sysTime() - timer;
 
@@ -470,37 +471,32 @@ filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorit
     Stats::filteringTime = sysTime() - timer;
 }
 
-// ----------------------------------------------------------------------------
-// Function filterOnline()
-// ----------------------------------------------------------------------------
-// q-Grams or exact seeds.
-
 template <typename TText, typename TQueries, typename TAlgorithm>
-inline void filterOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
+inline void runOnline(Options const & options, TText & text, TQueries & queries, TAlgorithm const & algo)
 {
 //    Shape<Dna, UngappedShape<9> > contiguous;
     Shape<Dna, SimpleShape>     contiguous;
     Shape<Dna, GenericShape>    gapped;
 
     if (stringToShape(contiguous, options.qgramsShape))
-        filterOnline(options, text, queries, algo, contiguous);
+        runOnline(options, text, queries, algo, contiguous);
     else if (stringToShape(gapped, options.qgramsShape))
-        filterOnline(options, text, queries, algo, gapped);
+        runOnline(options, text, queries, algo, gapped);
     else
         throw RuntimeError("Unsupported q-gram shape");
 }
 
 template <typename TText, typename TQueries>
-inline void filterOnline(Options const & options, TText & text, TQueries & queries)
+inline void runOnline(Options const & options, TText & text, TQueries & queries)
 {
     switch (options.algorithmType)
     {
     case Options::ALGO_SEEDS:
-        filterOnline(options, text, queries, Pigeonhole<void>()); //Pigeonhole<Hamming_>
+        runOnline(options, text, queries, Pigeonhole<void>()); //Pigeonhole<Hamming_>
         return;
 
     case Options::ALGO_QGRAMS:
-        filterOnline(options, text, queries, Swift<SwiftSemiGlobal>());
+        runOnline(options, text, queries, Swift<SwiftSemiGlobal>());
         return;
 
     default:
@@ -530,19 +526,19 @@ inline void run(Options const & options)
     resize(Stats::verifications, length(queries), 0u, Exact());
     resize(Stats::matches, length(queries), 0u, Exact());
 
-    if (runOffline(options))
+    if (isOffline(options))
     {
         if (!open(index, toCString(options.textIndexFile)))
             throw RuntimeError("Error while loading full-text index");
 
-        filterOffline(options, index, queries, HammingDistance());
+        runOffline(options, index, queries, HammingDistance());
     }
     else
     {
         if (!open(text, toCString(options.textFile)))
             throw RuntimeError("Error while loading text");
 
-        filterOnline(options, text, queries);
+        runOnline(options, text, queries);
     }
 
     unsigned long verificationsCount = sum(Stats::verifications);

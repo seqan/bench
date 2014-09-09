@@ -1,0 +1,9 @@
+alphabet	dataset	pcount	plength	errors	filter	time
+dna	celegans	1000	100	4	online	99.2
+dna	celegans	10000	100	4	online	100.2
+dna	celegans	100000	100	4	online	120.2
+dna	celegans	1000000	100	4	online	1010.2
+dna	celegans	1000	100	4	offline	1.2
+dna	celegans	10000	100	4	offline	10.2
+dna	celegans	100000	100	4	offline	100.2
+dna	celegans	1000000	100	4	offline	1000.2

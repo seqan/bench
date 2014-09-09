@@ -1,0 +1,4 @@
+alphabet	dataset	pcount	plength	errors	distance	matches
+dna	celegans	100000	100	1	hamming	500000
+dna	celegans	100000	100	2	hamming	1500000
+dna	celegans	100000	100	3	hamming	2000000

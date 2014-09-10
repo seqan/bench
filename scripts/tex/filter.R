@@ -2,7 +2,7 @@ library("reshape")
 library("xtable")
 library("ggplot2")
 library("scales")
-library("Cairo")
+#library("Cairo")
 
 INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
 OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"
@@ -93,7 +93,7 @@ ggsave(file=PLOT_ONOFF, scale=SCALE, device=cairo_pdf)
 
 
 
-### PLOT MATCHES ###
+### LOAD MATCHES ###
 
 FILENAME_MATCHES=paste(paste(INPUT, 'matches', sep='/'), "tsv", sep='.')
 
@@ -129,7 +129,7 @@ ggplot() +
   ylab("PPV (matches/verifications)") +
   theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 
-ggsave(file=PLOT_MULTI_IDX, scale=SCALE, device=cairo_pdf) 
+ggsave(file=PLOT_PPV, scale=SCALE, device=cairo_pdf) 
 
 
 ### PLOT RUNTIME ###
@@ -138,7 +138,7 @@ for (DISTANCE in c('hamming','edit'))
 {
   table_times = subset(TABLE_FILTERS, alphabet==ALPHABET & dataset==DATASET & distance==DISTANCE & plength==PLENGTH, select=c(filter, errors, ftime, time))
   
-  PLOT_MULTI_IDX=paste(paste(OUTPUT, "fspeed", sep='/'), ALPHABET, DATASET, DISTANCE, PLENGTH, "pdf", sep='.')
+  PLOT_RUNTIME=paste(paste(OUTPUT, "fspeed", sep='/'), ALPHABET, DATASET, DISTANCE, PLENGTH, "pdf", sep='.')
   
   ggplot() +
     geom_line(data=table_times, aes(x=errors, y=time, group=filter, shape=filter, color=filter), linetype='solid') +
@@ -152,7 +152,7 @@ for (DISTANCE in c('hamming','edit'))
     scale_y_log10() +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
-  ggsave(file=PLOT_MULTI_IDX, scale=SCALE, device=cairo_pdf) 
+  ggsave(file=PLOT_RUNTIME, scale=SCALE, device=cairo_pdf) 
 }
 
 

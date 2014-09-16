@@ -468,14 +468,14 @@ verify(Verifier<THaystack, TNeedle, HammingDistance> & /* verifier */,
     typedef typename Iterator<TNeedleInfix, Standard>::Type     TNeedleIt;
     typedef typename Size<TNeedleInfix>::Type                   TNeedleSize;
 
-    SEQAN_ASSERT_GEQ(length(haystackInfix), length(needleInfix));
+    if (length(haystackInfix) < length(needleInfix)) return;
 
 //    THaystackPos endPos = length(haystackInfix);
 //    TErrors minErrors = threshold + 1;
 
     TNeedleSize nLength = length(needleInfix);
     THaystackIt iIt = begin(haystackInfix, Standard());
-    THaystackIt iEnd = end(haystackInfix, Standard()) - nLength;
+    THaystackIt iEnd = end(haystackInfix, Standard()) - nLength + 1;
 
     for (; iIt != iEnd; ++iIt)
     {
@@ -487,11 +487,11 @@ verify(Verifier<THaystack, TNeedle, HammingDistance> & /* verifier */,
         for (; hIt != hEnd && currentErrors <= threshold; ++hIt, ++nIt)
             currentErrors += !ordEqual(value(hIt), value(nIt));
 
-        THaystackPos endPos = position(hEnd);
+        THaystackPos endPos = position(hEnd, haystackInfix);
 
         if (currentErrors <= threshold)
         {
-            delegate(infix(haystackInfix, endPos - length(needleInfix), endPos), currentErrors);
+            delegate(infix(haystackInfix, endPos - nLength, endPos), currentErrors);
             break;
         }
     }

@@ -52,6 +52,9 @@
 #include "types.h"
 #include "run.h"
 #include "misc.h"
+#include "../yara/misc_tags.h"
+#include "../yara/bits_bucket.h"
+#include "../yara/bits_matches.h"
 #include "../yara/find_extender.h"
 
 using namespace seqan;
@@ -61,19 +64,31 @@ using namespace seqan;
 // ============================================================================
 
 // ----------------------------------------------------------------------------
+// Class Match
+// ----------------------------------------------------------------------------
+
+typedef Match<Nothing>                                          TMatch;
+typedef String<TMatch>                                          TMatches;
+typedef StringSet<TMatches, Segment<TMatches> >                 TMatchesSet;
+
+// ----------------------------------------------------------------------------
 // Class Stats
 // ----------------------------------------------------------------------------
 
 struct Stats
 {
     static double           totalTime;
-    static String<unsigned> verifications;
-    static String<unsigned> matches;
+    static String<unsigned> verificationsCount;
+    static String<unsigned> matchesCount;
+    static TMatches         matches;
+    static TMatchesSet      matchesSet;
 };
 
 double Stats::totalTime = 0;
-String<unsigned> Stats::verifications;
-String<unsigned> Stats::matches;
+String<unsigned> Stats::verificationsCount;
+String<unsigned> Stats::matchesCount;
+TMatches Stats::matches;
+TMatchesSet Stats::matchesSet(matches);
 
 // ----------------------------------------------------------------------------
 // Class Options
@@ -129,7 +144,7 @@ struct Options : BaseOptions
 template <>
 struct Pigeonhole<EditDistance>
 {
-    enum { ONE_PER_DIAGONAL = 0 };  // 1 turns on heuristic duplicate masking.
+    enum { ONE_PER_DIAGONAL = 0 };
     enum { HAMMING_ONLY = 0 };
 };
 
@@ -185,7 +200,8 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setMaxValue(parser, "error-rate", "10");
     setDefaultValue(parser, "error-rate", options.errorRate);
     addOption(parser, ArgParseOption("ed", "edit-distance", "Edit distance. Default: Hamming distance."));
-    addOption(parser, ArgParseOption("vf", "verify", "Verify candidate locations. Default: filter only."));
+    addOption(parser, ArgParseOption("vy", "verify-candidates", "Verify candidate locations. Default: filter only."));
+    addOption(parser, ArgParseOption("rd", "remove-duplicates", "Remove duplicate locations. Default: count duplicates."));
 
     addSection(parser, "Seeds Filtering Options");
     addOption(parser, ArgParseOption("se", "seeds-errors", "Set maximum errors per seed.", ArgParseOption::INTEGER));
@@ -275,7 +291,8 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     if (getOptionValue(errorRate, parser, "error-rate"))
         options.errorRate = errorRate / 100.0;
 
-    getOptionValue(options.verify, parser, "verify");
+    getOptionValue(options.verify, parser, "verify-candidates");
+//    getOptionValue(options.removeDuplicates, parser, "remove-duplicates");
 
     getOptionValue(options.seedsErrors, parser, "seeds-errors");
     getOptionValue(options.seedsOnline, parser, "seeds-online");
@@ -331,16 +348,22 @@ inline void runOffline(Options const & options, TIndex & index, TQueries & queri
                TQuerySize queryBegin, TQuerySize queryEnd,
                unsigned char seedErrors)
             {
-                Stats::verifications[queryId]++;
+                Stats::verificationsCount[queryId]++;
 
                 extend(extender,
                        queries[queryId],
                        textBegin, textEnd,
                        queryBegin, queryEnd,
                        seedErrors, queryErrors,
-                       [&](TOccurrence, TOccurrence, unsigned char)
+                       [&](TOccurrence matchBegin, TOccurrence matchEnd, unsigned char matchErrors)
                        {
-                            Stats::matches[queryId]++;
+                            TMatch match;
+                            setContigPosition(match, matchBegin, matchEnd);
+                            match.readId = queryId;
+                            match.errors = matchErrors;
+                            appendValue(Stats::matches, match, Generous());
+
+                            Stats::matchesCount[queryId]++;
                        });
             },
             Seeds<TSeeding>(options.seedsErrors));
@@ -414,6 +437,7 @@ inline void runOnline(Options const & options, TText & text, TQueries & queries,
     typedef Pattern<TPatternIndex, TAlgorithm>              TPattern;
 
     typedef typename Value<TText>::Type const               THaystack;
+    typedef typename StringSetPosition<TText>::Type         THaystackPos;
     typedef typename Size<TText>::Type                      THaystackSize;
     typedef Finder<THaystack, TAlgorithm>                   TFinder;
 
@@ -436,15 +460,21 @@ inline void runOnline(Options const & options, TText & text, TQueries & queries,
         {
             TQueryId queryId = getSeqNo(position(pattern));
 
-            Stats::verifications[queryId]++;
+            Stats::verificationsCount[queryId]++;
 
             unsigned char queryErrors = options.errorRate * length(queries[queryId]);
 
             verify(verifier,
                    infix(finder), infix(pattern), queryErrors,
-                   [&](typename Infix<THaystack>::Type const &, unsigned char)
+                   [&](typename Infix<THaystack>::Type const & matchInfix, unsigned char matchErrors)
                    {
-                        Stats::matches[queryId]++;
+                        TMatch match;
+                        setContigPosition(match, THaystackPos(i, beginPosition(matchInfix)), THaystackPos(i, endPosition(matchInfix)));
+                        match.readId = queryId;
+                        match.errors = matchErrors;
+                        appendValue(Stats::matches, match, Generous());
+
+                        Stats::matchesCount[queryId]++;
                    });
         }
     }
@@ -525,8 +555,8 @@ inline void run(Options const & options)
     TIndex index;
     TText text;
 
-    resize(Stats::verifications, length(queries), 0u, Exact());
-    resize(Stats::matches, length(queries), 0u, Exact());
+    resize(Stats::verificationsCount, length(queries), 0u, Exact());
+    resize(Stats::matchesCount, length(queries), 0u, Exact());
 
     if (isOffline(options))
     {
@@ -543,8 +573,18 @@ inline void run(Options const & options)
         runOnline(options, text, queries);
     }
 
-    unsigned long verificationsCount = sum(Stats::verifications);
-    unsigned long matchesCount = sum(Stats::matches);
+    unsigned long duplicatesCount = sum(Stats::matchesCount);
+    sort(Stats::matches, MatchSorter<TMatch, ReadId>());
+    bucket(Stats::matchesSet, Getter<TMatch, ReadId>(), length(queries), Serial());
+    removeDuplicates(Stats::matchesSet, Serial());
+    forEach(Stats::matchesSet, [&](typename Value<TMatchesSet>::Type const & matches)
+    {
+        if (!empty(matches))
+            Stats::matchesCount[front(matches).readId] = length(matches);
+    });
+
+    unsigned long verificationsCount = sum(Stats::verificationsCount);
+    unsigned long matchesCount = sum(Stats::matchesCount);
 
     if (options.tsv)
     {
@@ -558,8 +598,12 @@ inline void run(Options const & options)
         std::cout << length(queries) << " queries" << std::endl;
         std::cout << lengthSum(queries) << " symbols" << std::endl;
         std::cout << verificationsCount << " verifications" << std::endl;
-        std::cout << matchesCount << " matches" << std::endl;
-        std::cout << 100.0 * matchesCount / verificationsCount << " % PPV" << std::endl;
+        if (options.verify)
+        {
+            std::cout << duplicatesCount << " non-unique matches" << std::endl;
+            std::cout << matchesCount << " matches" << std::endl;
+            std::cout << 100.0 * matchesCount / verificationsCount << " % PPV" << std::endl;
+        }
         std::cout << std::fixed << Stats::totalTime << " sec" << std::endl;
     }
 }

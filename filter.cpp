@@ -459,7 +459,9 @@ inline void runOnline(Options const & options, TText & text, TQueries & queries,
                    [&](typename Infix<THaystack>::Type const & matchInfix, unsigned char matchErrors)
                    {
                         TMatch match;
-                        setContigPosition(match, THaystackPos(i, beginPosition(matchInfix)), THaystackPos(i, endPosition(matchInfix)));
+                        THaystackPos matchBegin;
+                        posLocalize(matchBegin, beginPosition(matchInfix), stringSetLimits(text));
+                        setContigPosition(match, matchBegin, posAdd(matchBegin, length(matchInfix)));
                         match.readId = queryId;
                         match.errors = matchErrors;
                         appendValue(Stats::matches, match, Generous());

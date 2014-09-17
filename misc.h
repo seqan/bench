@@ -490,10 +490,7 @@ verify(Verifier<THaystack, TNeedle, HammingDistance> & /* verifier */,
         THaystackPos endPos = position(hEnd, haystackInfix);
 
         if (currentErrors <= threshold)
-        {
             delegate(infix(haystackInfix, endPos - nLength, endPos), currentErrors);
-            break;
-        }
     }
 }
 

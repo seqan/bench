@@ -255,16 +255,6 @@ inline bool isOnline(TOptions const & options)
 }
 
 // ----------------------------------------------------------------------------
-// Function isOffline()
-// ----------------------------------------------------------------------------
-
-template <typename TOptions>
-inline bool isOffline(TOptions const & options)
-{
-    return !isOnline(options);
-}
-
-// ----------------------------------------------------------------------------
 // Function parseCommandLine()
 // ----------------------------------------------------------------------------
 
@@ -558,19 +548,19 @@ inline void run(Options const & options)
     resize(Stats::verificationsCount, length(queries), 0u, Exact());
     resize(Stats::matchesCount, length(queries), 0u, Exact());
 
-    if (isOffline(options))
-    {
-        if (!open(index, toCString(options.textIndexFile)))
-            throw RuntimeError("Error while loading full-text index");
-
-        runOffline(options, index, queries);
-    }
-    else
+    if (isOnline(options))
     {
         if (!open(text, toCString(options.textFile)))
             throw RuntimeError("Error while loading text");
 
         runOnline(options, text, queries);
+    }
+    else
+    {
+        if (!open(index, toCString(options.textIndexFile)))
+            throw RuntimeError("Error while loading full-text index");
+
+        runOffline(options, index, queries);
     }
 
     unsigned long duplicatesCount = sum(Stats::matchesCount);

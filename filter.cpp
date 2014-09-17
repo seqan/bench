@@ -112,6 +112,7 @@ struct Options : BaseOptions
     double          errorRate;
     bool            editDistance;
     bool            verify;
+    bool            removeDuplicates;
 
     unsigned        seedsErrors;
     bool            seedsOnline;
@@ -126,6 +127,7 @@ struct Options : BaseOptions
         errorRate(0.0),
         editDistance(false),
         verify(false),
+        removeDuplicates(false),
         seedsErrors(0),
         seedsOnline(false),
         qgramsWeight(10),
@@ -282,7 +284,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
         options.errorRate = errorRate / 100.0;
 
     getOptionValue(options.verify, parser, "verify-candidates");
-//    getOptionValue(options.removeDuplicates, parser, "remove-duplicates");
+    getOptionValue(options.removeDuplicates, parser, "remove-duplicates");
 
     getOptionValue(options.seedsErrors, parser, "seeds-errors");
     getOptionValue(options.seedsOnline, parser, "seeds-online");

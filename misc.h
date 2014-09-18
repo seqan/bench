@@ -532,4 +532,54 @@ verify(Verifier<THaystack, TNeedle, EditDistance> & verifier,
         delegate(infix(haystackInfix, beginPos, endPos), minErrors);
 }
 
+// ----------------------------------------------------------------------------
+// Function collectMatch()
+// ----------------------------------------------------------------------------
+
+template <typename TMatches, typename TNeedleId, typename THaystackPos, typename TErrors>
+inline void collectMatch(TMatches & matches,
+                         TNeedleId needleId,
+                         THaystackPos const & matchBegin,
+                         THaystackPos const & matchEnd,
+                         TErrors matchErrors,
+                         True)
+{
+    typedef typename Value<TMatches>::Type TMatch;
+
+    TMatch match;
+    setContigPosition(match, matchBegin, matchEnd);
+    match.readId = needleId;
+    match.errors = matchErrors;
+    appendValue(matches, match, Generous());
+}
+
+template <typename TMatches, typename TNeedleId, typename THaystackPos, typename TErrors>
+inline void collectMatch(TMatches & /* matches */,
+                         TNeedleId /* needleId */,
+                         THaystackPos const & /* matchBegin */,
+                         THaystackPos const & /* matchEnd */,
+                         TErrors /* matchErrors */,
+                         False)
+{}
+
+// ----------------------------------------------------------------------------
+// Function getLocalPos()
+// ----------------------------------------------------------------------------
+
+template <typename TText, typename TInfix>
+inline typename StringSetPosition<TText const>::Type
+getLocalPos(TText const & text, TInfix const & infix, True)
+{
+    typename StringSetPosition<TText const>::Type pos;
+    posLocalize(pos, beginPosition(infix), stringSetLimits(text));
+    return pos;
+}
+
+template <typename TText, typename TInfix>
+inline typename StringSetPosition<TText const>::Type
+getLocalPos(TText const & /* text */, TInfix const & /* infix */, False)
+{
+    return typename StringSetPosition<TText const>::Type();
+}
+
 #endif  // #ifndef APP_IBENCH_MISC_H_

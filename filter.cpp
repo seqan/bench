@@ -143,6 +143,7 @@ struct Options : BaseOptions
 // Tags and Metafunctions
 // ============================================================================
 
+namespace seqan {
 template <>
 struct Pigeonhole<EditDistance>
 {
@@ -156,6 +157,7 @@ struct Pigeonhole<HammingDistance>
     enum { ONE_PER_DIAGONAL = 0 };
     enum { HAMMING_ONLY = 1 };
 };
+}
 
 template <typename TDistance>
 struct SwiftSpec

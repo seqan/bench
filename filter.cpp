@@ -314,8 +314,9 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 // ----------------------------------------------------------------------------
 // Exact or approximate seeds.
 
-template <typename TIndex, typename TQueries, typename TDistance, typename TSeeding>
-inline void runOffline(Options const & options, TIndex & index, TQueries & queries, TDistance const &, TSeeding const &)
+template <typename TIndex, typename TQueries, typename TDistance, typename TSeeding, typename TCollect>
+inline void runOffline(Options const & options, TIndex & index, TQueries & queries, TDistance const &,
+                       TSeeding const &, TCollect const & collect)
 {
     typedef typename Fibre<TIndex, FibreText>::Type         TText;
     typedef typename Fibre<TIndex, FibreSA>::Type           TSA;
@@ -349,11 +350,7 @@ inline void runOffline(Options const & options, TIndex & index, TQueries & queri
                        seedErrors, queryErrors,
                        [&](TOccurrence matchBegin, TOccurrence matchEnd, unsigned char matchErrors)
                        {
-                            TMatch match;
-                            setContigPosition(match, matchBegin, matchEnd);
-                            match.readId = queryId;
-                            match.errors = matchErrors;
-                            appendValue(Stats::matches, match, Generous());
+                            collectMatch(Stats::matches, queryId, matchBegin, matchEnd, matchErrors, collect);
 
                             Stats::matchesCount[queryId]++;
                        });
@@ -363,16 +360,28 @@ inline void runOffline(Options const & options, TIndex & index, TQueries & queri
     Stats::totalTime = sysTime() - timer;
 }
 
-template <typename TText, typename TQueries, typename TDistance, typename TSeeding>
-inline void runOffline(Options const &, Index<TText, IndexEsa<void> > &, TQueries &, TDistance const &, TSeeding const &)
+template <typename TText, typename TQueries, typename TDistance, typename TSeeding, typename TCollect>
+inline void runOffline(Options const &, Index<TText, IndexEsa<void> > &, TQueries &, TDistance const &,
+                       TSeeding const &, TCollect const &)
 {
     throw RuntimeError("Unsupported index");
 }
 
-template <typename TText, typename TQueries, typename TIndexSpec, typename TDistance, typename TSeeding>
-inline void runOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TDistance const &, TSeeding const &)
+template <typename TText, typename TQueries, typename TIndexSpec, typename TDistance, typename TSeeding, typename TCollect>
+inline void runOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TDistance const &,
+                       TSeeding const &, TCollect const &)
 {
     throw RuntimeError("Unsupported index");
+}
+
+template <typename TText, typename TQueries, typename TDistance, typename TSeeding>
+inline void runOffline(Options const & options, TText & text, TQueries & queries, TDistance const & dist,
+                       TSeeding const & seed)
+{
+    if (options.removeDuplicates)
+        runOffline(options, text, queries, dist, seed, True());
+    else
+        runOffline(options, text, queries, dist, seed, False());
 }
 
 template <typename TText, typename TQueries, typename TDistance>
@@ -421,8 +430,10 @@ inline void _runOnlineInit(TPattern & pattern, Options const & options, Swift<TS
     _patternInit(pattern, options.errorRate, 0);
 }
 
-template <typename TText, typename TQueries, typename TDistance, typename TAlgorithm, typename TShape>
-inline void runOnline(Options const & options, TText & text, TQueries & queries, TDistance const &, TAlgorithm const & algo, TShape const & shape)
+template <typename TText, typename TQueries, typename TDistance,
+          typename TSeeding, typename TAlgorithm, typename TCollect, typename TShape>
+inline void runOnline(Options const & options, TText & text, TQueries & queries, TDistance const &,
+                      TSeeding const &, TAlgorithm const & algo, TCollect const &, TShape const & shape)
 {
     typedef IndexQGram<TShape, OpenAddressing>              TIndexSpec;
     typedef Index<TQueries, TIndexSpec>                     TPatternIndex;
@@ -460,13 +471,8 @@ inline void runOnline(Options const & options, TText & text, TQueries & queries,
                    infix(finder), infix(pattern), queryErrors,
                    [&](typename Infix<THaystack>::Type const & matchInfix, unsigned char matchErrors)
                    {
-                        TMatch match;
-                        THaystackPos matchBegin;
-                        posLocalize(matchBegin, beginPosition(matchInfix), stringSetLimits(text));
-                        setContigPosition(match, matchBegin, posAdd(matchBegin, length(matchInfix)));
-                        match.readId = queryId;
-                        match.errors = matchErrors;
-                        appendValue(Stats::matches, match, Generous());
+                        THaystackPos matchBegin = getLocalPos(text, matchInfix, TCollect());
+                        collectMatch(Stats::matches, queryId, matchBegin, posAdd(matchBegin, length(matchInfix)), matchErrors, TCollect());
 
                         Stats::matchesCount[queryId]++;
                    });
@@ -476,8 +482,10 @@ inline void runOnline(Options const & options, TText & text, TQueries & queries,
     Stats::totalTime = sysTime() - timer;
 }
 
-template <typename TText, typename TQueries, typename TDistance, typename TAlgorithm>
-inline void _runOnline(Options const & options, TText & text, TQueries & queries, TDistance const & dist, TAlgorithm const & algo)
+template <typename TText, typename TQueries, typename TDistance,
+          typename TSeeding, typename TAlgorithm, typename TCollect>
+inline void runOnline(Options const & options, TText & text, TQueries & queries, TDistance const & dist,
+                      TSeeding const & seed, TAlgorithm const & algo, TCollect const & collect)
 {
     typedef typename Value<TText>::Type     THaystack;
     typedef typename Value<THaystack>::Type TAlphabet;
@@ -487,24 +495,35 @@ inline void _runOnline(Options const & options, TText & text, TQueries & queries
     Shape<TAlphabet, GenericShape>    gapped;
 
     if (stringToShape(contiguous, options.qgramsShape))
-        runOnline(options, text, queries, dist, algo, contiguous);
+        runOnline(options, text, queries, dist, seed, algo, collect, contiguous);
     else if (stringToShape(gapped, options.qgramsShape))
-        runOnline(options, text, queries, dist, algo, gapped);
+        runOnline(options, text, queries, dist, seed, algo, collect, gapped);
     else
         throw RuntimeError("Unsupported q-gram shape");
 }
 
+template <typename TText, typename TQueries, typename TDistance, typename TSeeding, typename TAlgorithm>
+inline void runOnline(Options const & options, TText & text, TQueries & queries, TDistance const & dist,
+                      TSeeding const & seed, TAlgorithm const & algo)
+{
+    if (options.removeDuplicates)
+        runOnline(options, text, queries, dist, seed, algo, True());
+    else
+        runOnline(options, text, queries, dist, seed, algo, False());
+}
+
 template <typename TText, typename TQueries, typename TDistance, typename TSeeding>
-inline void runOnline(Options const & options, TText & text, TQueries & queries, TDistance const & dist, TSeeding const &)
+inline void runOnline(Options const & options, TText & text, TQueries & queries, TDistance const & dist,
+                      TSeeding const & seed)
 {
     switch (options.algorithmType)
     {
     case Options::ALGO_SEEDS:
-        _runOnline(options, text, queries, dist, Pigeonhole<TSeeding>());
+        runOnline(options, text, queries, dist, seed, Pigeonhole<TSeeding>());
         return;
 
     case Options::ALGO_QGRAMS:
-        _runOnline(options, text, queries, dist, Swift<typename SwiftSpec<TSeeding>::Type>());
+        runOnline(options, text, queries, dist, seed, Swift<typename SwiftSpec<TSeeding>::Type>());
         return;
 
     default:
@@ -568,14 +587,19 @@ inline void run(Options const & options)
     }
 
     unsigned long duplicatesCount = sum(Stats::matchesCount);
-    sort(Stats::matches, MatchSorter<TMatch, ReadId>());
-    bucket(Stats::matchesSet, Getter<TMatch, ReadId>(), length(queries), Serial());
-    removeDuplicates(Stats::matchesSet, Serial());
-    forEach(Stats::matchesSet, [&](typename Value<TMatchesSet>::Type const & matches)
+
+    if (options.removeDuplicates)
     {
-        if (!empty(matches))
-            Stats::matchesCount[front(matches).readId] = length(matches);
-    });
+        sort(Stats::matches, MatchSorter<TMatch, ReadId>());
+        bucket(Stats::matchesSet, Getter<TMatch, ReadId>(), length(queries), Serial());
+        removeDuplicates(Stats::matchesSet, Serial());
+
+        // Update matches counts.
+        forEach(Stats::matchesSet, [&](typename Value<TMatchesSet>::Type const & matches)
+        {
+            if (!empty(matches)) Stats::matchesCount[front(matches).readId] = length(matches);
+        });
+    }
 
     unsigned long verificationsCount = sum(Stats::verificationsCount);
     unsigned long matchesCount = sum(Stats::matchesCount);
@@ -584,8 +608,6 @@ inline void run(Options const & options)
     {
         std::cout << verificationsCount << '\t' << matchesCount << '\t' <<
                      std::fixed << Stats::totalTime << std::endl;
-
-//        forEach(Stats::verifications, [&](unsigned verificationsCount) { std::cout << verificationsCount << '\n'; });
     }
     else
     {
@@ -595,11 +617,27 @@ inline void run(Options const & options)
         if (options.verify)
         {
             std::cout << duplicatesCount << " non-unique matches" << std::endl;
-            std::cout << matchesCount << " matches" << std::endl;
-            std::cout << 100.0 * matchesCount / verificationsCount << " % PPV" << std::endl;
+            if (options.removeDuplicates)
+            {
+                std::cout << matchesCount << " matches" << std::endl;
+                std::cout << 100.0 * matchesCount / verificationsCount << " % PPV" << std::endl;
+            }
         }
         std::cout << std::fixed << Stats::totalTime << " sec" << std::endl;
     }
+
+        // DEBUG
+//    if (options.tsv)
+//    {
+//        forEach(concat(Stats::matchesSet), [&](Match<Nothing> const & match)
+//        {
+//            std::cout << getValue(match, ReadId()) << " - " << (unsigned)getValue(match, Errors()) << " @ " <<
+//                         (unsigned)getValue(match, ContigId()) << " - " <<
+//                         Pair<unsigned>(getValue(match, ContigBegin()), getValue(match, ContigEnd())) << '\n';
+//        });
+//
+//        forEach(Stats::verifications, [&](unsigned verificationsCount) { std::cout << verificationsCount << '\n'; });
+//    }
 }
 
 int main(int argc, char const ** argv)

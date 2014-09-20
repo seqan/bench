@@ -205,7 +205,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setDefaultValue(parser, "error-rate", options.errorRate);
     addOption(parser, ArgParseOption("ed", "edit-distance", "Edit distance. Default: Hamming distance."));
     addOption(parser, ArgParseOption("vy", "verify-candidates", "Verify candidate locations. Default: filter only."));
-    addOption(parser, ArgParseOption("rd", "remove-duplicates", "Remove duplicate locations. Default: count duplicates."));
+    addOption(parser, ArgParseOption("rd", "remove-duplicates", "Remove duplicate occurrences. Default: count duplicates."));
 
     addSection(parser, "Seeds Filtering Options");
     addOption(parser, ArgParseOption("se", "seeds-errors", "Set maximum errors per seed.", ArgParseOption::INTEGER));
@@ -588,7 +588,9 @@ inline void run(Options const & options)
         runOffline(options, index, queries);
     }
 
+    unsigned long verificationsCount = sum(Stats::verificationsCount);
     unsigned long duplicatesCount = sum(Stats::matchesCount);
+    unsigned long matchesCount =  0;
 
     if (options.removeDuplicates)
     {
@@ -601,14 +603,13 @@ inline void run(Options const & options)
         {
             if (!empty(matches)) Stats::matchesCount[front(matches).readId] = length(matches);
         });
-    }
 
-    unsigned long verificationsCount = sum(Stats::verificationsCount);
-    unsigned long matchesCount = sum(Stats::matchesCount);
+        matchesCount = sum(Stats::matchesCount);
+    }
 
     if (options.tsv)
     {
-        std::cout << verificationsCount << '\t' << matchesCount << '\t' <<
+        std::cout << verificationsCount << '\t' << duplicatesCount << '\t' << matchesCount << '\t' <<
                      std::fixed << Stats::totalTime << std::endl;
     }
     else
@@ -618,10 +619,10 @@ inline void run(Options const & options)
         std::cout << verificationsCount << " verifications" << std::endl;
         if (options.verify)
         {
-            std::cout << duplicatesCount << " non-unique matches" << std::endl;
+            std::cout << duplicatesCount << " non-unique occurrences" << std::endl;
             if (options.removeDuplicates)
             {
-                std::cout << matchesCount << " matches" << std::endl;
+                std::cout << matchesCount << " occurrences" << std::endl;
                 std::cout << 100.0 * matchesCount / verificationsCount << " % PPV" << std::endl;
             }
         }

@@ -48,14 +48,15 @@
 #include <seqan/index.h>
 #include <seqan/arg_parse.h>
 
-#include "options.h"
-#include "types.h"
-#include "run.h"
-#include "misc.h"
 #include "../yara/misc_tags.h"
 #include "../yara/bits_bucket.h"
 #include "../yara/bits_matches.h"
 #include "../yara/find_extender.h"
+
+#include "options.h"
+#include "types.h"
+#include "run.h"
+#include "misc.h"
 
 using namespace seqan;
 
@@ -329,7 +330,7 @@ inline void runOffline(Options const & options, TIndex & index, TQueries & queri
     typedef typename Value<TQueries>::Type                  TQuery;
     typedef typename Size<TQuery>::Type                     TQuerySize;
 
-    typedef Extender<TText, TQuery, TDistance>              TExtender;
+    typedef Extender<TText, TQuery, TDistance, NMatchesN_>  TExtender;
 
     double timer = sysTime();
 
@@ -629,16 +630,20 @@ inline void run(Options const & options)
         std::cout << std::fixed << Stats::totalTime << " sec" << std::endl;
     }
 
-        // DEBUG
+    // DEBUG
+    if (options.tsv)
+    {
+        forEach(concat(Stats::matchesSet), [&](Match<Nothing> const & match)
+        {
+            std::cout << getValue(match, ReadId()) << " - " << (unsigned)getValue(match, Errors()) << " @ " <<
+                         (unsigned)getValue(match, ContigId()) << " - " <<
+                         Pair<unsigned>(getValue(match, ContigBegin()), getValue(match, ContigEnd())) << '\n';
+        });
+    }
+
+    // DEBUG
 //    if (options.tsv)
 //    {
-//        forEach(concat(Stats::matchesSet), [&](Match<Nothing> const & match)
-//        {
-//            std::cout << getValue(match, ReadId()) << " - " << (unsigned)getValue(match, Errors()) << " @ " <<
-//                         (unsigned)getValue(match, ContigId()) << " - " <<
-//                         Pair<unsigned>(getValue(match, ContigBegin()), getValue(match, ContigEnd())) << '\n';
-//        });
-//
 //        forEach(Stats::verifications, [&](unsigned verificationsCount) { std::cout << verificationsCount << '\n'; });
 //    }
 }

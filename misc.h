@@ -402,6 +402,33 @@ inline void filter(Index<TText, TSpec> & index, TNeedles & needles, TThreshold t
 // ============================================================================
 
 // ----------------------------------------------------------------------------
+// Class Extender
+// ----------------------------------------------------------------------------
+
+template <typename THaystack, typename TNeedle>
+struct Extender<THaystack, TNeedle, EditDistance, NMatchesN_>
+{
+    typedef typename Infix<THaystack const>::Type       THaystackInfix;
+    typedef ModifiedString<THaystackInfix, ModReverse>  THaystackInfixRev;
+    typedef typename Infix<TNeedle const>::Type         TNeedleInfix;
+    typedef ModifiedString<TNeedleInfix, ModReverse>    TNeedleInfixRev;
+
+    typedef MyersUkkonenGlobalBanded                    TAlgorithm;
+    typedef Finder<THaystackInfix>                      TFinderRight;
+    typedef Finder<THaystackInfixRev>                   TFinderLeft;
+    typedef PatternState_<TNeedleInfix, TAlgorithm>     TPatternRight;
+    typedef PatternState_<TNeedleInfixRev, TAlgorithm>  TPatternLeft;
+
+    THaystack const &   haystack;
+    TPatternRight       patternRight;
+    TPatternLeft        patternLeft;
+
+    Extender(THaystack const & haystack) :
+        haystack(haystack)
+    {}
+};
+
+// ----------------------------------------------------------------------------
 // Class Verifier
 // ----------------------------------------------------------------------------
 
@@ -422,7 +449,6 @@ struct Verifier<THaystack, TNeedle, EditDistance>
 
     typedef MyersUkkonenBanded                          TAlgoEnd;
     typedef MyersUkkonenGlobalBanded                    TAlgoBegin;
-
     typedef Finder<THaystackInfix>                      TFinderEnd;
     typedef Finder<THaystackInfixRev>                   TFinderBegin;
     typedef PatternState_<TNeedleInfix, TAlgoEnd>       TPatternEnd;

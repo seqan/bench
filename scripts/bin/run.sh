@@ -424,7 +424,7 @@ then
     exit
 fi
 
-#SRC=~/Code/seqan/core/apps/ibench/scripts/resources
+SRC=~/Code/seqan/core/apps/ibench/scripts/resources
 BIN=~/Code/seqan-builds/Release-Gcc/bin
 DIR=~/Datasets/ibench
 ALPHABET=$1
@@ -436,26 +436,26 @@ vars_$ALPHABET\_$DATASET
 # ======================================================================================================================
 
 #exec_prepare_text
-#exec_construct_text $DIR/construct.tsv
+#exec_construct_text $SRC/construct.tsv
 
 # ======================================================================================================================
 
-#exec_visit_text $DIR/visit.tsv
+#exec_visit_text $SRC/visit.tsv
 #exec_prepare_patterns $PATTERN_LENGTHS $PATTERN_COUNT
-#exec_query $DIR/query.tsv
+#exec_query $SRC/query.tsv
 #exec_prepare_patterns $MULTI_LENGTHS $MULTI_COUNTS
-#exec_query_multi $DIR/multi.tsv
+#exec_query_multi $SRC/multi.tsv
 
 # ======================================================================================================================
 
 #exec_prepare_patterns $FILTER_LENGTHS $FILTER_COUNTS
 for distance in hamming edit;
 do
-    exec_filter_seeds $DIR/filter_occurrences.tsv $distance true true true
+    exec_filter_seeds $SRC/filter_occurrences.tsv $distance true true true
 
     for filter in seeds qgrams;
     do
-        exec_filter_$filter $DIR/filter_verify.tsv $distance true false
-        exec_filter_$filter $DIR/filter_only.tsv $distance false false
+        exec_filter_$filter $SRC/filter_verify.tsv $distance true false
+        exec_filter_$filter $SRC/filter_only.tsv $distance false false
     done
 done

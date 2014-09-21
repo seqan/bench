@@ -11,8 +11,6 @@ function vars_dna_common
     PATTERN_COUNT_BIT=32
     PATTERN_SUM_BIT=32
     PATTERN_LENGTH_BIT=8
-    PATTERN_LENGTHS=$(seq 5 5 50)
-    PATTERN_COUNT=1000000
 
     # index
     INDEX_TYPE="sa esa qgram fm-tl fm-wt"
@@ -21,12 +19,18 @@ function vars_dna_common
     VISIT_DEPTH=$(seq 1 20) #30
 
     # query
-#    QUERY_LOCATE=15
-    QUERY_ERRORS="0 1" #2
+    PATTERN_LENGTHS=$(seq 5 5 50)
+    PATTERN_COUNT=1000000
+    QUERY_ERRORS=$(seq 0 1) #2
 
     # multi-query
-    MULTI_COUNTS="10000 100000 1000000 10000000"
     MULTI_LENGTHS="15 30"
+    MULTI_COUNTS="10000 100000 1000000 10000000"
+
+    # pattern filter
+    FILTER_LENGTHS="100"
+    FILTER_COUNTS="100000"
+    FILTER_ERRORS=$(seq 3 6)
 }
 
 function vars_dna_ecoli
@@ -58,7 +62,8 @@ function vars_dna_celegans
     TEXT_NAME=celegans.txt
 
     # pattern
-    PATTERN_INPUT="SRR065390_10M_1.fastq"
+    PATTERN_INPUT="1M_1.fastq"
+#    PATTERN_INPUT="SRR065390_10M_1.fastq"
     PATTERN_NAME=celegans.pat #.$PATTERN_LENGTHS[i]
 
     # index
@@ -82,8 +87,6 @@ function vars_protein_uniprot
     PATTERN_COUNT_BIT=32
     PATTERN_SUM_BIT=32
     PATTERN_LENGTH_BIT=8
-    PATTERN_LENGTHS=$(seq 5 5 30)
-    PATTERN_COUNT=1000000
 
     # index
     INDEX_NAME=sprot #.$INDEX_TYPE
@@ -93,12 +96,13 @@ function vars_protein_uniprot
     VISIT_DEPTH=$(seq 1 10)
 
     # query
-#    QUERY_LOCATE=15
-    QUERY_ERRORS="0 1"
+    PATTERN_LENGTHS=$(seq 5 5 30)
+    PATTERN_COUNT=1000000
+    QUERY_ERRORS=$(seq 0 1)
 
     # multi-query
-    MULTI_COUNTS="10000 100000 1000000"
     MULTI_LENGTHS="10 20"
+    MULTI_COUNTS="10000 100000 1000000"
 }
 
 # ======================================================================================================================
@@ -135,9 +139,86 @@ function cmd_query
     CMD="$BIN/ibench_query --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
 }
 
+# cmd_filter_seeds text pattern alphabet count sum length index plength errors distance verify rdup seederr
+function cmd_filter_seeds
+{
+    CMD="$BIN/ibench_filter --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g seeds -se ${13}"
+    if [[ ${10} = 'edit' ]]; then
+        CMD+=" -ed"
+    fi
+    if [[ ${11} = 'true' ]]; then
+        CMD+=" -vy"
+    fi
+    if [[ ${12} = 'true' ]]; then
+        CMD+=" -rd"
+    fi
+}
+
+# cmd_filter_qgrams text pattern alphabet count sum length NONE plength errors distance verify rdup weight threshold
+function cmd_filter_qgrams
+{
+    CMD="$BIN/ibench_filter --tsv $1 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -e $9 -g qgrams -qw ${13} -qt ${14}" # -se ${13} -so
+    if [[ ${10} = 'edit' ]]; then
+        CMD+=" -ed"
+    fi
+    if [[ ${11} = 'true' ]]; then
+        CMD+=" -vy"
+    fi
+    if [[ ${12} = 'true' ]]; then
+        CMD+=" -rd"
+    fi
+}
+
 # ======================================================================================================================
 
-# prepare text
+# param_filter_seeds plength errors distance
+function param_filter_seeds
+{
+    plength=$1
+    errors=$2
+    distance=$3
+
+    SEEDS_ERRORS="0"
+    if [[ $distance = 'hamming' ]]; then
+        if [[ $errors -ge 2 ]]; then
+            SEEDS_ERRORS+=" 1"
+        fi
+        if [[ $errors -ge 5 ]]; then
+            SEEDS_ERRORS+=" 2"
+        fi
+    fi
+}
+
+# param_filter_qgrams plength errors distance
+function param_filter_qgrams
+{
+    plength=$1
+    errors=$2
+    distance=$3
+
+    qgrams_weight=$(python -c "import math; print min(int(math.ceil((${plength})/(${errors}+1))),31)")
+    qgrams_threshold=$(python -c "import math; print ${plength} - (${errors}+1) * ${qgrams_weight} + 1")
+    QGRAMS_WEIGHT=$qgrams_weight
+    QGRAMS_THRESHOLD=$qgrams_threshold
+
+    if [[ $QGRAMS_THRESHOLD -le 2 ]]; then
+        qgrams_weight=$(python -c "import math; print min(int(math.ceil((${plength} - 1)/(${errors}+1))),31)")
+        qgrams_threshold=$(python -c "import math; print ${plength} - (${errors}+1) * ${qgrams_weight} + 1")
+        QGRAMS_WEIGHT+=" ${qgrams_weight}"
+        QGRAMS_THRESHOLD+=" ${qgrams_threshold}"
+    fi
+
+    if [[ $qgrams_threshold -le 4 ]]; then
+        qgrams_weight=$(python -c "import math; print min(int(math.ceil((${plength} - 3)/(${errors}+1))),31)")
+        qgrams_threshold=$(python -c "import math; print ${plength} - (${errors}+1) * ${qgrams_weight} + 1")
+        QGRAMS_WEIGHT+=" ${qgrams_weight}"
+        QGRAMS_THRESHOLD+=" ${qgrams_threshold}"
+    fi
+}
+
+# ======================================================================================================================
+
+# exec_prepare_text
 function exec_prepare_text
 {
     cmd_prepare $SRC/$TEXT_INPUT $DIR/$TEXT_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT
@@ -145,29 +226,46 @@ function exec_prepare_text
     $CMD
 }
 
-# construct text index
+# exec_prepare_patterns lengths counts
+function exec_prepare_patterns
+{
+    for patterns_count in $2;
+    do
+        for patterns_length in $1;
+        do
+            cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$patterns_length.$patterns_count $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $patterns_length $patterns_count
+            echo $CMD
+            $CMD
+        done
+    done
+}
+
+# exec_construct_text filename.tsv
 function exec_construct_text
 {
-    if [[ ! -e $DIR/construct.tsv ]]; then
-        echo -e "alphabet\tdataset\tindex\tsymbols\ttime" > $DIR/construct.tsv
+    filename=$1
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tindex\tsymbols\ttime" > $filename
     fi
     for index_type in $INDEX_TYPE;
     do
         cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type
         echo $CMD
         output=$($CMD)
-        if [ $? -eq 0 ]
-        then
-            echo -e "$ALPHABET\t$DATASET\t$index_type\t$output" >> $DIR/construct.tsv
+        if [ $? -eq 0 ]; then
+            echo -e "$ALPHABET\t$DATASET\t$index_type\t$output" >> $filename
         fi
     done
 }
 
-# visit text index
+# exec_visit_text filename.tsv
 function exec_visit_text
 {
-    if [[ ! -e $DIR/visit.tsv ]]; then
-        echo -e "alphabet\tdataset\tindex\tdepth\tnodes\ttime" > $DIR/visit.tsv
+    filename=$1
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tindex\tdepth\tnodes\ttime" > $filename
     fi
     for index_type in $INDEX_TYPE;
     do
@@ -176,30 +274,20 @@ function exec_visit_text
             cmd_visit $depth $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type
             echo $CMD
             output=$($CMD)
-            if [ $? -eq 0 ]
-            then
-                echo -e "$ALPHABET\t$DATASET\t$index_type\t$depth\t$output" >> $DIR/visit.tsv
+            if [ $? -eq 0 ]; then
+                echo -e "$ALPHABET\t$DATASET\t$index_type\t$depth\t$output" >> $filename
             fi
         done
     done
 }
 
-# prepare patterns
-function exec_prepare_patterns
-{
-    for pattern_length in $PATTERN_LENGTHS;
-    do
-        cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$pattern_length $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $pattern_length $PATTERN_COUNT
-        echo $CMD
-        $CMD
-    done
-}
-
-# query patterns
+# exec_query filename.tsv
 function exec_query
 {
-    if [[ ! -e $DIR/query.tsv ]]; then
-        echo -e "alphabet\tdataset\tindex\terrors\tplength\toccurrences\ttime\tpreprocessing" > $DIR/query.tsv
+    filename=$1
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tindex\terrors\tplength\toccurrences\ttime\tpreprocessing" > $filename
     fi
     for index_type in $INDEX_TYPE;
     do
@@ -207,60 +295,116 @@ function exec_query
         do
             for pattern_length in $PATTERN_LENGTHS;
             do
-                cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length $errors single
+                cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length.$PATTERN_COUNT $errors single
                 echo $CMD
                 output=$($CMD)
-                if [ $? -eq 0 ]
-                then
-                    echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$pattern_length\t$output" >> $DIR/query.tsv
+                if [ $? -eq 0 ]; then
+                    echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$pattern_length\t$output" >> $filename
                 fi
             done
         done
     done
 }
 
-# prepare multi patterns
-function exec_prepare_patterns_multi
-{
-    for multi_count in $MULTI_COUNTS;
-    do
-        for multi_length in $MULTI_LENGTHS;
-        do
-            cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$multi_length.$multi_count $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $multi_length $multi_count
-            echo $CMD
-            $CMD
-        done
-    done
-}
-
-# multi-query patterns
+# exec_query_multi filename.tsv
 function exec_query_multi
 {
-    if [[ ! -e $DIR/multi.tsv ]]; then
-        echo -e "alphabet\tdataset\tindex\terrors\tplength\tpcount\talgorithm\toccurrences\ttime\tpreprocessing" > $DIR/multi.tsv
+    filename=$1
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tindex\terrors\tplength\tpcount\talgorithm\toccurrences\ttime\tpreprocessing" > $filename
     fi
     for index_type in $INDEX_TYPE;
     do
         for errors in $QUERY_ERRORS;
         do
+            multi_lengths=($MULTI_LENGTHS)
             for multi_count in $MULTI_COUNTS;
             do
-#                for multi_length in $MULTI_LENGTHS;
-#                do
-                    multi_lengths=($MULTI_LENGTHS)
-                    multi_length=${multi_lengths[$errors]}
+                multi_length=${multi_lengths[$errors]}
 
-                    for algo in single sort dfs bfs;
-                    do
-                        cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
-                        echo $CMD
-                        output=$($CMD)
-                        if [ $? -eq 0 ]
-                        then
-                            echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$multi_length\t$multi_count\t$algo\t$output" >> $DIR/multi.tsv
-                        fi
-                    done
-#                done
+                for algo in single sort dfs bfs;
+                do
+                    cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
+                    echo $CMD
+                    output=$($CMD)
+                    if [ $? -eq 0 ]; then
+                        echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$multi_length\t$multi_count\t$algo\t$output" >> $filename
+                    fi
+                done
+            done
+        done
+    done
+}
+
+# exec_filter_seeds filename.tsv distance verify remove-duplicates
+function exec_filter_seeds
+{
+    filename=$1
+    distance=$2
+    verify=$3
+    rdup=$4
+    seeds_errors=$5
+    patterns_length=$FILTER_LENGTHS
+    index_type='qgram'
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tpcount\tplength\terrors\tdistance\tfilter\tverifications\tduplicates\toccurrences\ttime" > $filename
+    fi
+
+    for errors in $FILTER_ERRORS;
+    do
+        for patterns_count in $FILTER_COUNTS;
+        do
+            param_filter_seeds $patterns_length $errors $distance
+            for seeds_errors in $SEEDS_ERRORS;
+            do
+                cmd_filter_seeds $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $patterns_length.$patterns_count $errors $distance $verify $rdup $seeds_errors
+                filter_name="seeds_${seeds_errors}"
+
+                echo $CMD
+                output=$($CMD)
+                if [ $? -eq 0 ]; then
+                    echo -e "${ALPHABET}\t${DATASET}\t${patterns_count}\t${patterns_length}\t${errors}\t${distance}\t${filter_name}\t${output}" >> $filename
+                fi
+            done
+        done
+    done
+}
+
+# exec_filter_qgrams filename.tsv distance verify remove-duplicates
+function exec_filter_qgrams
+{
+    filename=$1
+    distance=$2
+    verify=$3
+    rdup=$4
+    patterns_length=$FILTER_LENGTHS
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tpcount\tplength\terrors\tdistance\tfilter\tverifications\tduplicates\toccurrences\ttime" > $filename
+    fi
+
+    for errors in $FILTER_ERRORS;
+    do
+        for patterns_count in $FILTER_COUNTS;
+        do
+            param_filter_qgrams $patterns_length $errors $distance
+            qgrams_thresholds=($QGRAMS_THRESHOLD)
+            param_idx=0
+            for qgrams_weight in $QGRAMS_WEIGHT;
+            do
+                qgrams_threshold=${qgrams_thresholds[$param_idx]}
+                param_idx+=1
+
+                cmd_filter_qgrams $DIR/$TEXT_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT 'NONE' $patterns_length.$patterns_count $errors $distance $verify $rdup $qgrams_weight $qgrams_threshold
+                filter_name="qgrams_${param_idx}"
+
+                echo $CMD
+                output=$($CMD)
+                if [ $? -eq 0 ]; then
+                    echo -e "${ALPHABET}\t${DATASET}\t${patterns_count}\t${patterns_length}\t${errors}\t${distance}\t${filter_name}\t${output}" >> $filename
+                fi
             done
         done
     done
@@ -284,11 +428,21 @@ vars_$ALPHABET\_$DATASET
 
 # ======================================================================================================================
 
-exec_prepare_text
-exec_construct_text
-exec_visit_text
-exec_prepare_patterns
-exec_query
-exec_prepare_patterns_multi
-exec_query_multi
+#exec_prepare_text
+#exec_construct_text $DIR/construct.tsv
+#exec_visit_text $DIR/visit.tsv
+#exec_prepare_patterns $PATTERN_LENGTHS $PATTERN_COUNT
+#exec_query $DIR/query.tsv
+#exec_prepare_patterns $MULTI_LENGTHS $MULTI_COUNTS
+#exec_query_multi $DIR/multi.tsv
 
+#exec_prepare_patterns $FILTER_LENGTHS $FILTER_COUNTS
+#exec_filter_seeds $DIR/filter_occurrences.tsv hamming true true
+#exec_filter_qgrams $DIR/filter_occurrences.tsv hamming true true
+exec_filter_seeds $DIR/filter_occurrences.tsv edit true true
+exec_filter_qgrams $DIR/filter_occurrences.tsv edit true true
+
+#exec_filter_seeds $DIR/filter_verify.tsv hamming true false
+#exec_filter_qgrams $DIR/filter_verify.tsv hamming true false
+#exec_filter_seeds $DIR/filter_only.tsv hamming false false
+#exec_filter_qgrams $DIR/filter_only.tsv hamming false false

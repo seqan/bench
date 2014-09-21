@@ -69,9 +69,11 @@ scientific_10 <- function(x)
 }
 
 
-### PLOT PPV ###
+### LOAD FILES ###
 
 FILENAME_OCCS=paste(paste(INPUT, 'filter_occurrences', sep='/'), "tsv", sep='.')
+FILENAME_VERIFY=paste(paste(INPUT, 'filter_verify', sep='/'), "tsv", sep='.')
+FILENAME_FILTER=paste(paste(INPUT, 'filter_only', sep='/'), "tsv", sep='.')
 
 if ((R = load_file(FILENAME_OCCS))$ok)
 {
@@ -79,14 +81,38 @@ if ((R = load_file(FILENAME_OCCS))$ok)
 } else
   print(paste("NOT FOUND:", FILENAME_OCCS))
 
-#table_occs = subset(TABLE_OCCS, alphabet==ALPHABET & dataset==DATASET & plength==PLENGTH, select=c(filter, errors, distance, verifications, matches))
-#TABLE_FILTERS = merge(TABLE_FILTERS, TABLE_OCCS, by=c('alphabet', 'dataset', 'pcount', 'plength', 'errors', 'distance'), all=TRUE)
+if ((R = load_file(FILENAME_VERIFY))$ok)
+{
+  TABLE_VERIFY <- R$tsv;
+} else
+  print(paste("NOT FOUND:", FILENAME_VERIFY))
+
+if ((R = load_file(FILENAME_FILTER))$ok)
+{
+  TABLE_FILTER <- R$tsv;
+} else
+  print(paste("NOT FOUND:", FILENAME_FILTER))
+
+TABLE_OCCS = subset(TABLE_OCCS, select=c(alphabet, dataset, pcount, plength, errors, distance, occurrences))
+
+TABLE_VERIFY = subset(TABLE_VERIFY, select=-occurrences)
+TABLE_FILTER = subset(TABLE_FILTER, select=-occurrences)
+TABLE_FILTER = subset(TABLE_FILTER, select=-duplicates)
+
+TABLE_FULL = merge(TABLE_VERIFY, TABLE_OCCS, by=c('alphabet', 'dataset', 'pcount', 'plength', 'errors', 'distance'), all.x=TRUE)
+
+TABLE_RUNTIME = merge(TABLE_FILTER, TABLE_VERIFY, by=c('alphabet', 'dataset', 'pcount', 'plength', 'errors', 'distance', 'filter'), all=TRUE)
+TABLE_RUNTIME = rename(TABLE_RUNTIME, c("time.x"="ftime", "time.y"="time"))
+TABLE_RUNTIME = transform(TABLE_RUNTIME, vtime = time - ftime)
+TABLE_RUNTIME$vtime[TABLE_RUNTIME$vtime < 0.01] <- 0.01
+
+### PLOT PPV ###
 
 for (DISTANCE in DISTANCES)
 {
-  PLOT_PPV=paste(paste(OUTPUT, "ppv", sep='/'), ALPHABET, DATASET, DISTANCE, PLENGTH, "pdf", sep='.')
+  PLOT_PPV = paste(paste(OUTPUT, "ppv", sep='/'), ALPHABET, DATASET, DISTANCE, PLENGTH, "pdf", sep='.')
   
-  table_ppv = subset(TABLE_OCCS, alphabet==ALPHABET & dataset==DATASET & plength==PLENGTH & distance==DISTANCE, select=c(filter, errors, verifications, duplicates, occurrences))
+  table_ppv = subset(TABLE_FULL, alphabet==ALPHABET & dataset==DATASET & plength==PLENGTH & distance==DISTANCE, select=c(filter, errors, verifications, duplicates, occurrences))
   table_ppv$ppv <- table_ppv$occurrences / table_ppv$verification
   
   ggplot() +
@@ -102,25 +128,30 @@ for (DISTANCE in DISTANCES)
 }
 
 
+### PLOT FILTRATION RATIO ###
+
+for (DISTANCE in DISTANCES)
+{
+  table_ratio = subset(TABLE_RUNTIME, alphabet==ALPHABET & dataset==DATASET & distance==DISTANCE & plength==PLENGTH, select=c(filter, errors, pcount, ftime, vtime))
+  table_ratio <- transform(table_ratio, ratio = vtime/ftime)
+  
+  PLOT_RATIO=paste(paste(OUTPUT, "filter_ratio", sep='/'), ALPHABET, DATASET, DISTANCE, PLENGTH, "pdf", sep='.')
+  
+  ggplot() +
+    geom_line(data=table_ratio, aes(x=errors, y=ratio, group=filter, shape=filter, color=filter), linetype='solid') +
+    geom_point(data=table_ratio, aes(x=errors, y=ratio, group=filter, shape=filter, color=filter), size=POINT_SIZE) +
+    scale_shape_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
+    scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
+    xlab("Errors") +
+    ylab("Time (verification/filtration)") +
+    scale_y_log10(labels=scientific_10) +
+    theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
+  
+  ggsave(file=PLOT_RUNTIME, scale=SCALE, device=cairo_pdf) 
+}
+
+
 ### PLOT RUNTIME ###
-
-FILENAME_FILTER=paste(paste(INPUT, 'filter_only', sep='/'), "tsv", sep='.')
-FILENAME_VERIFY=paste(paste(INPUT, 'filter_verify', sep='/'), "tsv", sep='.')
-
-if ((R = load_file(FILENAME_FILTER))$ok)
-{
-  TABLE_FILTER <- R$tsv;
-} else
-  print(paste("NOT FOUND:", FILENAME_FILTER))
-
-if ((R = load_file(FILENAME_VERIFY))$ok)
-{
-  TABLE_VERIFY <- R$tsv;
-} else
-  print(paste("NOT FOUND:", FILENAME_VERIFY))
-
-TABLE_RUNTIME = merge(TABLE_FILTER, TABLE_VERIFY, by=c('alphabet', 'dataset', 'pcount', 'plength', 'errors', 'distance', 'filter'), all=TRUE)
-TABLE_RUNTIME = rename(TABLE_RUNTIME, c("time.x"="ftime", "time.y"="time"))
 
 for (DISTANCE in DISTANCES)
 {

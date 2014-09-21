@@ -337,7 +337,7 @@ function exec_query_multi
     done
 }
 
-# exec_filter_seeds filename.tsv distance verify remove-duplicates
+# exec_filter_seeds filename.tsv distance verify remove-duplicates exact-only
 function exec_filter_seeds
 {
     filename=$1
@@ -345,6 +345,7 @@ function exec_filter_seeds
     verify=$3
     rdup=$4
     seeds_errors=$5
+    seeds_exact_only=${5:=false}
     patterns_length=$FILTER_LENGTHS
     index_type='qgram'
 
@@ -356,7 +357,12 @@ function exec_filter_seeds
     do
         for patterns_count in $FILTER_COUNTS;
         do
-            param_filter_seeds $patterns_length $errors $distance
+            if [[ $seeds_exact_only = 'true' ]]; then
+                SEEDS_ERRORS=0
+            else
+                param_filter_seeds $patterns_length $errors $distance
+            fi
+
             for seeds_errors in $SEEDS_ERRORS;
             do
                 cmd_filter_seeds $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $patterns_length.$patterns_count $errors $distance $verify $rdup $seeds_errors
@@ -445,9 +451,10 @@ vars_$ALPHABET\_$DATASET
 #exec_prepare_patterns $FILTER_LENGTHS $FILTER_COUNTS
 for distance in hamming edit;
 do
+    exec_filter_seeds $DIR/filter_occurrences.tsv $distance true true true
+
     for filter in seeds qgrams;
     do
-        exec_filter_$filter $DIR/filter_occurrences.tsv $distance true true
         exec_filter_$filter $DIR/filter_verify.tsv $distance true false
         exec_filter_$filter $DIR/filter_only.tsv $distance false false
     done

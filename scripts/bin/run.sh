@@ -345,7 +345,7 @@ function exec_filter_seeds
     verify=$3
     rdup=$4
     seeds_errors=$5
-    seeds_exact_only=${5:=false}
+    seeds_exact_only=${5:false}
     patterns_length=$FILTER_LENGTHS
     index_type='qgram'
 

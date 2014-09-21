@@ -30,7 +30,7 @@ function vars_dna_common
     # pattern filter
     FILTER_LENGTHS="100"
     FILTER_COUNTS="100000"
-    FILTER_ERRORS=$(seq 3 6)
+    FILTER_ERRORS=$(seq 1 6)
 }
 
 function vars_dna_ecoli
@@ -438,12 +438,12 @@ vars_$ALPHABET\_$DATASET
 #exec_query_multi $DIR/multi.tsv
 
 #exec_prepare_patterns $FILTER_LENGTHS $FILTER_COUNTS
-exec_filter_seeds $DIR/filter_occurrences.tsv hamming true true
-exec_filter_qgrams $DIR/filter_occurrences.tsv hamming true true
-exec_filter_seeds $DIR/filter_occurrences.tsv edit true true
-exec_filter_qgrams $DIR/filter_occurrences.tsv edit true true
-
-#exec_filter_seeds $DIR/filter_verify.tsv hamming true false
-#exec_filter_qgrams $DIR/filter_verify.tsv hamming true false
-#exec_filter_seeds $DIR/filter_only.tsv hamming false false
-#exec_filter_qgrams $DIR/filter_only.tsv hamming false false
+for distance in hamming edit;
+do
+    for filter in seeds qgrams;
+    do
+        exec_filter_$filter $DIR/filter_occurrences.tsv $distance true true
+        exec_filter_$filter $DIR/filter_verify.tsv $distance true false
+        exec_filter_$filter $DIR/filter_only.tsv $distance false false
+    done
+done

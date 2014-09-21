@@ -395,7 +395,6 @@ function exec_filter_qgrams
             for qgrams_weight in $QGRAMS_WEIGHT;
             do
                 qgrams_threshold=${qgrams_thresholds[$param_idx]}
-                param_idx+=1
 
                 cmd_filter_qgrams $DIR/$TEXT_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT 'NONE' $patterns_length.$patterns_count $errors $distance $verify $rdup $qgrams_weight $qgrams_threshold
                 filter_name="qgrams_${param_idx}"
@@ -405,6 +404,8 @@ function exec_filter_qgrams
                 if [ $? -eq 0 ]; then
                     echo -e "${ALPHABET}\t${DATASET}\t${patterns_count}\t${patterns_length}\t${errors}\t${distance}\t${filter_name}\t${output}" >> $filename
                 fi
+
+                param_idx=$(($param_idx+1))
             done
         done
     done
@@ -437,8 +438,8 @@ vars_$ALPHABET\_$DATASET
 #exec_query_multi $DIR/multi.tsv
 
 #exec_prepare_patterns $FILTER_LENGTHS $FILTER_COUNTS
-#exec_filter_seeds $DIR/filter_occurrences.tsv hamming true true
-#exec_filter_qgrams $DIR/filter_occurrences.tsv hamming true true
+exec_filter_seeds $DIR/filter_occurrences.tsv hamming true true
+exec_filter_qgrams $DIR/filter_occurrences.tsv hamming true true
 exec_filter_seeds $DIR/filter_occurrences.tsv edit true true
 exec_filter_qgrams $DIR/filter_occurrences.tsv edit true true
 

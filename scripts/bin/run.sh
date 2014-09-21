@@ -62,8 +62,8 @@ function vars_dna_celegans
     TEXT_NAME=celegans.txt
 
     # pattern
-    PATTERN_INPUT="1M_1.fastq"
-#    PATTERN_INPUT="SRR065390_10M_1.fastq"
+#    PATTERN_INPUT="1M_1.fastq"
+    PATTERN_INPUT="SRR065390_10M_1.fastq"
     PATTERN_NAME=celegans.pat #.$PATTERN_LENGTHS[i]
 
     # index

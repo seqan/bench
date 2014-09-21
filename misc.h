@@ -357,7 +357,6 @@ inline void filter(Index<TText, TSpec> & index, TNeedles & needles, TThreshold t
     typedef typename Infix<TSA const>::Type                 TOccurrences;
     typedef typename Value<TOccurrences>::Type              TOccurrence;
 
-    typedef typename Iterator<TNeedles const, Rooted>::Type TNeedlesIt;
     typedef typename Size<TNeedles>::Type                   TNeedleId;
     typedef typename Value<TNeedles>::Type                  TNeedle;
     typedef typename Size<TNeedle>::Type                    TNeedleSize;

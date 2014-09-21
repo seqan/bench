@@ -431,11 +431,16 @@ vars_$ALPHABET\_$DATASET
 
 #exec_prepare_text
 #exec_construct_text $DIR/construct.tsv
+
+# ======================================================================================================================
+
 #exec_visit_text $DIR/visit.tsv
 #exec_prepare_patterns $PATTERN_LENGTHS $PATTERN_COUNT
 #exec_query $DIR/query.tsv
 #exec_prepare_patterns $MULTI_LENGTHS $MULTI_COUNTS
 #exec_query_multi $DIR/multi.tsv
+
+# ======================================================================================================================
 
 #exec_prepare_patterns $FILTER_LENGTHS $FILTER_COUNTS
 for distance in hamming edit;

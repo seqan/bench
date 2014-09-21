@@ -420,18 +420,12 @@ struct Verifier<THaystack, TNeedle, EditDistance>
     typedef typename Infix<TNeedle const>::Type         TNeedleInfix;
     typedef ModifiedString<TNeedleInfix, ModReverse>    TNeedleInfixRev;
 
-    typedef AlignTextBanded<FindInfix,
-                            NMatchesNone_,
-                            NMatchesNone_>              TMyersInfix;
-    typedef AlignTextBanded<FindPrefix,
-                            NMatchesNone_,
-                            NMatchesNone_>              TMyersPrefix;
-    typedef Myers<TMyersInfix, True, void>              TAlgoEnd;
-    typedef Myers<TMyersPrefix, True, void>             TAlgoBegin;
+    typedef MyersUkkonenBanded                          TAlgoEnd;
+    typedef MyersUkkonenGlobalBanded                    TAlgoBegin;
 
-    typedef Finder<THaystackInfix const>                TFinderEnd;
+    typedef Finder<THaystackInfix>                      TFinderEnd;
     typedef Finder<THaystackInfixRev>                   TFinderBegin;
-    typedef PatternState_<TNeedleInfix const, TAlgoEnd> TPatternEnd;
+    typedef PatternState_<TNeedleInfix, TAlgoEnd>       TPatternEnd;
     typedef PatternState_<TNeedleInfixRev, TAlgoBegin>  TPatternBegin;
 
     TPatternEnd         patternEnd;

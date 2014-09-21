@@ -1,7 +1,0 @@
-alphabet	dataset	pcount	plength	errors	distance	filter	verifications	time	ftime
-dna	celegans	100000	100	1	hamming	exact	100000	10.2	2.0
-dna	celegans	100000	100	1	hamming	approximate	70000	9.2	7.0
-dna	celegans	100000	100	2	hamming	exact	500000	50.2	3.0
-dna	celegans	100000	100	2	hamming	approximate	140000	12.2	8.0
-dna	celegans	100000	100	3	hamming	exact	1000000	50.2	3.0
-dna	celegans	100000	100	3	hamming	approximate	210000	12.2	8.0

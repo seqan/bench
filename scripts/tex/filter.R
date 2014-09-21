@@ -147,7 +147,7 @@ for (DISTANCE in DISTANCES)
     scale_y_log10(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
-  ggsave(file=PLOT_RUNTIME, scale=SCALE, device=cairo_pdf) 
+  ggsave(file=PLOT_RATIO, scale=SCALE, device=cairo_pdf) 
 }
 
 

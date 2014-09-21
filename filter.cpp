@@ -57,6 +57,7 @@
 #include "types.h"
 #include "run.h"
 #include "misc.h"
+#include "verifier.h"
 
 using namespace seqan;
 

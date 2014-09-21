@@ -68,7 +68,7 @@ add_executable(ibench_dump dump.cpp options.h types.h run.h misc.h)
 add_executable(ibench_construct construct.cpp options.h types.h run.h misc.h)
 add_executable(ibench_visit visit.cpp options.h types.h run.h misc.h)
 add_executable(ibench_query query.cpp options.h types.h run.h misc.h find_backtracking_dfs.h find_backtracking_bfs.h)
-add_executable(ibench_filter filter.cpp options.h types.h run.h misc.h)
+add_executable(ibench_filter filter.cpp options.h types.h run.h misc.h verifier.h)
 
 # Add dependencies found by find_package (SeqAn).
 target_link_libraries (ibench_dump ${SEQAN_LIBRARIES})

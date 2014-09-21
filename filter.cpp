@@ -631,15 +631,15 @@ inline void run(Options const & options)
     }
 
     // DEBUG
-    if (options.tsv)
-    {
-        forEach(concat(Stats::matchesSet), [&](Match<Nothing> const & match)
-        {
-            std::cout << getValue(match, ReadId()) << " - " << (unsigned)getValue(match, Errors()) << " @ " <<
-                         (unsigned)getValue(match, ContigId()) << " - " <<
-                         Pair<unsigned>(getValue(match, ContigBegin()), getValue(match, ContigEnd())) << '\n';
-        });
-    }
+//    if (options.tsv)
+//    {
+//        forEach(concat(Stats::matchesSet), [&](Match<Nothing> const & match)
+//        {
+//            std::cout << getValue(match, ReadId()) << " - " << (unsigned)getValue(match, Errors()) << " @ " <<
+//                         (unsigned)getValue(match, ContigId()) << " - " <<
+//                         Pair<unsigned>(getValue(match, ContigBegin()), getValue(match, ContigEnd())) << '\n';
+//        });
+//    }
 
     // DEBUG
 //    if (options.tsv)

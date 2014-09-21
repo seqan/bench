@@ -30,7 +30,7 @@ function vars_dna_common
     # pattern filter
     FILTER_LENGTHS="100"
     FILTER_COUNTS="100000"
-    FILTER_ERRORS=$(seq 1 6)
+    FILTER_ERRORS=$(seq 1 10)
 }
 
 function vars_dna_ecoli

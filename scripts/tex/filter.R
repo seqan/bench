@@ -81,7 +81,11 @@ copy_qgrams_rows <- function(df)
   df_Q = df_Q[!duplicated(df_Q[, c('alphabet', 'dataset', 'pcount', 'plength', 'errors', 'distance')]), ]
   df_Q0 = subset(df_Q, filter=='qgrams_0')
   df_Q0$filter[df_Q0$filter=='qgrams_0'] <- 'qgrams_1'
-  df = rbind(df, df_Q0)  
+  df_Q0$time <- NA
+  df_Q0$occurrences <- NA
+  df_Q0$duplicates <- NA
+  df_Q0$verifications <- NA
+  df = rbind(df, df_Q0)
   return(df)
 }
 
@@ -111,11 +115,11 @@ if ((R = load_file(FILENAME_FILTER))$ok)
 
 TABLE_OCCS = subset(TABLE_OCCS, select=c(alphabet, dataset, pcount, plength, errors, distance, occurrences))
 
+TABLE_VERIFY = copy_qgrams_rows(TABLE_VERIFY)
+TABLE_FILTER = copy_qgrams_rows(TABLE_FILTER)
 TABLE_VERIFY = subset(TABLE_VERIFY, select=-occurrences)
 TABLE_FILTER = subset(TABLE_FILTER, select=-occurrences)
 TABLE_FILTER = subset(TABLE_FILTER, select=-duplicates)
-TABLE_VERIFY = copy_qgrams_rows(TABLE_VERIFY)
-TABLE_FILTER = copy_qgrams_rows(TABLE_FILTER)
 
 TABLE_FULL = merge(TABLE_VERIFY, TABLE_OCCS, by=c('alphabet', 'dataset', 'pcount', 'plength', 'errors', 'distance'), all.x=TRUE)
 

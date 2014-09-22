@@ -7,7 +7,9 @@ library("Cairo")
 INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
 OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"
 
-SCALE=0.4
+PDF_SCALE=0.4
+PDF_WIDTH=15
+PDF_HEIGHT=7
 FONT_SIZE=10
 POINT_SIZE=2
 FONT_FAMILY='Cambria'
@@ -123,9 +125,10 @@ for (DISTANCE in DISTANCES)
     scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
     xlab("Errors") +
     ylab("PPV (matches/verifications)") +
+    scale_y_log10() +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
-  ggsave(file=PLOT_PPV, scale=SCALE, device=cairo_pdf) 
+  ggsave(file=PLOT_PPV, width=PDF_WIDTH, height=PDF_HEIGHT, scale=PDF_SCALE, device=cairo_pdf) 
 }
 
 
@@ -148,7 +151,7 @@ for (DISTANCE in DISTANCES)
     scale_y_log10(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
-  ggsave(file=PLOT_RATIO, scale=SCALE, device=cairo_pdf) 
+  ggsave(file=PLOT_RATIO, width=PDF_WIDTH, height=PDF_HEIGHT, scale=PDF_SCALE, device=cairo_pdf) 
 }
 
 
@@ -173,7 +176,7 @@ for (DISTANCE in DISTANCES)
     scale_y_log10(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
-  ggsave(file=PLOT_RUNTIME, scale=SCALE, device=cairo_pdf) 
+  ggsave(file=PLOT_RUNTIME, width=PDF_WIDTH, height=PDF_HEIGHT, scale=PDF_SCALE, device=cairo_pdf) 
 }
 
 
@@ -203,7 +206,7 @@ for (DISTANCE in DISTANCES)
 #   scale_x_log10() +
 #   theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 # 
-# ggsave(file=PLOT_ONOFF, scale=SCALE, device=cairo_pdf) 
+# ggsave(file=PLOT_ONOFF, scale=PDF_SCALE, device=cairo_pdf) 
 
 
 ### PLOT VERIFICATIONS ###

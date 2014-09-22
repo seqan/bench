@@ -2,7 +2,7 @@ library("reshape")
 library("xtable")
 library("ggplot2")
 library("scales")
-#library("Cairo")
+library("Cairo")
 
 INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
 OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"
@@ -13,12 +13,12 @@ POINT_SIZE=2
 FONT_FAMILY='Cambria'
 
 FILTER_NAMES=c("seeds_0","seeds_1","seeds_2","qgrams_0","qgrams_1","qgrams_2","qgrams_gapped")
-FILTER_LABELS=c("Exact seeds",
-                "1-Apx seeds",
-                "2-Apx seeds",
-                "Contig q-grams (t >= 1)",
-                "Contig q-grams (t >= 2)",
-                "Contig q-grams (t >= 4)",
+FILTER_LABELS=c("Ext",
+                "1-Apx",
+                "2-Apx",
+                "q-Grams, t \u2265 1",
+                "q-Grams, t \u2265 2",
+                "q-Grams, t \u2265 4",
                 "Gapped q-grams")
 
 DATASET='celegans'
@@ -74,7 +74,7 @@ scientific_10 <- function(x)
 FILENAME_OCCS=paste(paste(INPUT, 'filter_occurrences', sep='/'), "tsv", sep='.')
 FILENAME_VERIFY=paste(paste(INPUT, 'filter_verify', sep='/'), "tsv", sep='.')
 FILENAME_FILTER=paste(paste(INPUT, 'filter_only', sep='/'), "tsv", sep='.')
-
+  
 if ((R = load_file(FILENAME_OCCS))$ok)
 {
   TABLE_OCCS <- R$tsv;
@@ -106,11 +106,12 @@ TABLE_RUNTIME = rename(TABLE_RUNTIME, c("time.x"="ftime", "time.y"="time"))
 TABLE_RUNTIME = transform(TABLE_RUNTIME, vtime = time - ftime)
 TABLE_RUNTIME$vtime[TABLE_RUNTIME$vtime < 0.01] <- 0.01
 
+
 ### PLOT PPV ###
 
 for (DISTANCE in DISTANCES)
 {
-  PLOT_PPV = paste(paste(OUTPUT, "ppv", sep='/'), ALPHABET, DATASET, DISTANCE, PLENGTH, "pdf", sep='.')
+  PLOT_PPV = paste(paste(OUTPUT, "filter_ppv", sep='/'), ALPHABET, DATASET, DISTANCE, PLENGTH, "pdf", sep='.')
   
   table_ppv = subset(TABLE_FULL, alphabet==ALPHABET & dataset==DATASET & plength==PLENGTH & distance==DISTANCE, select=c(filter, errors, verifications, duplicates, occurrences))
   table_ppv$ppv <- table_ppv$occurrences / table_ppv$verification

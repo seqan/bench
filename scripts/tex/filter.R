@@ -15,9 +15,9 @@ POINT_SIZE=2
 FONT_FAMILY='Cambria'
 
 FILTER_NAMES=c("seeds_0","seeds_1","seeds_2","qgrams_0","qgrams_1","qgrams_gapped")
-FILTER_LABELS=c("Ext",
-                "1-Apx",
-                "2-Apx",
+FILTER_LABELS=c("Exact seeds",
+                "1-Apx seeds",
+                "2-Apx seeds",
                 "q-Grams, t \u2265 1",
                 "q-Grams, t \u2265 4",
                 "Gapped q-grams")
@@ -27,6 +27,9 @@ ALPHABET='dna'
 ALPHSIZE=4
 PLENGTH=100
 DISTANCES=c('hamming','edit')
+ERROR_LABELS=list()
+ERROR_LABELS[['hamming']]='Mismatches'
+ERROR_LABELS[['edit']]='Differences'
 
 ### FUNCTIONS ###
 
@@ -122,7 +125,7 @@ for (DISTANCE in DISTANCES)
     geom_point(data=table_ppv, aes(x=errors, y=ppv, group=filter, shape=filter, color=filter), size=POINT_SIZE) +
     scale_shape_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
     scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
-    xlab("Errors") +
+    xlab(ERROR_LABELS[[DISTANCE]]) +
     ylab("PPV (matches/verifications)") +
     scale_x_discrete(breaks=c(2,4,6,8,10)) +
     scale_y_log10() +
@@ -146,7 +149,7 @@ for (DISTANCE in DISTANCES)
     geom_point(data=table_ratio, aes(x=errors, y=ratio, group=filter, shape=filter, color=filter), size=POINT_SIZE) +
     scale_shape_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
     scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
-    xlab("Errors") +
+    xlab(ERROR_LABELS[[DISTANCE]]) +
     ylab("Time (verification/filtration)") +
     scale_x_discrete(breaks=c(2,4,6,8,10)) +
     scale_y_log10(labels=scientific_10) +
@@ -172,7 +175,7 @@ for (DISTANCE in DISTANCES)
     geom_point(data=table_runtime, aes(x=errors, y=ftime, group=filter, shape=filter, color=filter), size=POINT_SIZE-1) +
     scale_shape_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
     scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
-    xlab("Errors") +
+    xlab(ERROR_LABELS[[DISTANCE]]) +
     ylab("Time (seconds/pattern)") +
     scale_x_discrete(breaks=c(2,4,6,8,10)) +
     scale_y_log10(labels=scientific_10) +

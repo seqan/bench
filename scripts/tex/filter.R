@@ -124,6 +124,7 @@ for (DISTANCE in DISTANCES)
     scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
     xlab("Errors") +
     ylab("PPV (matches/verifications)") +
+    scale_x_discrete(breaks=c(2,4,6,8,10)) +
     scale_y_log10() +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
@@ -147,6 +148,7 @@ for (DISTANCE in DISTANCES)
     scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
     xlab("Errors") +
     ylab("Time (verification/filtration)") +
+    scale_x_discrete(breaks=c(2,4,6,8,10)) +
     scale_y_log10(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
@@ -172,6 +174,7 @@ for (DISTANCE in DISTANCES)
     scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
     xlab("Errors") +
     ylab("Time (seconds/pattern)") +
+    scale_x_discrete(breaks=c(2,4,6,8,10)) +
     scale_y_log10(labels=scientific_10) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   

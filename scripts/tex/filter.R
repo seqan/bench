@@ -14,12 +14,11 @@ FONT_SIZE=10
 POINT_SIZE=2
 FONT_FAMILY='Cambria'
 
-FILTER_NAMES=c("seeds_0","seeds_1","seeds_2","qgrams_0","qgrams_1","qgrams_2","qgrams_gapped")
+FILTER_NAMES=c("seeds_0","seeds_1","seeds_2","qgrams_0","qgrams_1","qgrams_gapped")
 FILTER_LABELS=c("Ext",
                 "1-Apx",
                 "2-Apx",
                 "q-Grams, t \u2265 1",
-                "q-Grams, t \u2265 2",
                 "q-Grams, t \u2265 4",
                 "Gapped q-grams")
 

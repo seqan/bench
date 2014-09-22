@@ -201,12 +201,12 @@ function param_filter_qgrams
     QGRAMS_WEIGHT=$qgrams_weight
     QGRAMS_THRESHOLD=$qgrams_threshold
 
-    if [[ $QGRAMS_THRESHOLD -le 2 ]]; then
-        qgrams_weight=$(python -c "import math; print min(int(math.ceil((${plength} - 1)/(${errors}+1))),31)")
-        qgrams_threshold=$(python -c "import math; print ${plength} - (${errors}+1) * ${qgrams_weight} + 1")
-        QGRAMS_WEIGHT+=" ${qgrams_weight}"
-        QGRAMS_THRESHOLD+=" ${qgrams_threshold}"
-    fi
+#    if [[ $QGRAMS_THRESHOLD -le 2 ]]; then
+#        qgrams_weight=$(python -c "import math; print min(int(math.ceil((${plength} - 1)/(${errors}+1))),31)")
+#        qgrams_threshold=$(python -c "import math; print ${plength} - (${errors}+1) * ${qgrams_weight} + 1")
+#        QGRAMS_WEIGHT+=" ${qgrams_weight}"
+#        QGRAMS_THRESHOLD+=" ${qgrams_threshold}"
+#    fi
 
     if [[ $qgrams_threshold -le 4 ]]; then
         qgrams_weight=$(python -c "import math; print min(int(math.ceil((${plength} - 3)/(${errors}+1))),31)")

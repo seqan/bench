@@ -1,5 +1,5 @@
 // ==========================================================================
-//                 iBench - Full-text indexing benchmarks
+//                             SeqAn Benchmark
 // ==========================================================================
 // Copyright (c) 2012-2014, Enrico Siragusa, FU Berlin
 // All rights reserved.
@@ -32,8 +32,8 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#ifndef APP_IBENCH_OPTIONS_H_
-#define APP_IBENCH_OPTIONS_H_
+#ifndef APP_BENCH_OPTIONS_H_
+#define APP_BENCH_OPTIONS_H_
 
 using namespace seqan;
 
@@ -189,4 +189,4 @@ void getAlgorithmType(TOptions & options, ArgumentParser const & parser)
     getOptionValue(options.algorithmType, parser, "algorithm", options.algorithmTypeList);
 }
 
-#endif  // #ifndef APP_IBENCH_OPTIONS_H_
+#endif  // #ifndef APP_BENCH_OPTIONS_H_

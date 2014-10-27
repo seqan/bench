@@ -1,5 +1,5 @@
 // ==========================================================================
-//                 iBench - Full-text indexing benchmarks
+//                             SeqAn Benchmark
 // ==========================================================================
 // Copyright (c) 2012-2014, Enrico Siragusa, FU Berlin
 // All rights reserved.
@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_IBENCH_CONSTRUCT_CPP_
+#define APP_BENCH_CONSTRUCT_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -74,9 +74,9 @@ struct Options : BaseOptions {};
 template <typename TOptions>
 inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options)
 {
-    setAppName(parser, "iBench Construct");
-    setShortDescription(parser, "Benchmark full-text index construction");
-    setCategory(parser, "Stringology");
+    setAppName(parser, "SeqAn Benchmark - Index Construction");
+    setShortDescription(parser, "Benchmark construction of full-text indices");
+    setCategory(parser, "Benchmarking");
 
     addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT FILE\\fP> <\\fIINDEX FILE\\fP>");
 

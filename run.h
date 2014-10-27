@@ -1,5 +1,5 @@
 // ==========================================================================
-//                 iBench - Full-text indexing benchmarks
+//                             SeqAn Benchmark
 // ==========================================================================
 // Copyright (c) 2012-2014, Enrico Siragusa, FU Berlin
 // All rights reserved.
@@ -32,8 +32,8 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#ifndef APP_IBENCH_RUN_H_
-#define APP_IBENCH_RUN_H_
+#ifndef APP_BENCH_RUN_H_
+#define APP_BENCH_RUN_H_
 
 using namespace seqan;
 
@@ -178,4 +178,4 @@ inline int run(int argc, char const ** argv)
     return 0;
 }
 
-#endif  // #ifndef APP_IBENCH_RUN_H_
+#endif  // #ifndef APP_BENCH_RUN_H_

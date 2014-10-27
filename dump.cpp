@@ -1,5 +1,5 @@
 // ==========================================================================
-//                 iBench - Full-text indexing benchmarks
+//                             SeqAn Benchmark
 // ==========================================================================
 // Copyright (c) 2012-2014, Enrico Siragusa, FU Berlin
 // All rights reserved.
@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_IBENCH_DUMP_CPP_
+#define APP_BENCH_DUMP_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -88,9 +88,9 @@ struct Options : BaseOptions
 template <typename TOptions>
 inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options)
 {
-    setAppName(parser, "iBench Dump");
+    setAppName(parser, "SeqAn Benchmark - Sequence Dump");
     setShortDescription(parser, "Dump any sequence file as a StringSet");
-    setCategory(parser, "Stringology");
+    setCategory(parser, "Benchmarking");
 
     addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT FILE\\fP> <\\fIOUTPUT FILE\\fP>");
 

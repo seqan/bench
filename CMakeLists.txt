@@ -101,7 +101,7 @@ install (FILES LICENSE README
 
 if (SEQAN_BUILD_SYSTEM STREQUAL "APP:bench")
   set (CPACK_PACKAGE_NAME "bench")
-  set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "iBench - Full-text indexing benchmarks")
+  set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "SeqAn Benchmarks")
   set (CPACK_DEBIAN_PACKAGE_MAINTAINER "Enrico Siragusa <enrico.siragusa@fu-berlin.de>")
   set (CPACK_PACKAGE_VENDOR "SeqAn Team, FU Berlin")
 

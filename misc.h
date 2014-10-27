@@ -1,5 +1,5 @@
 // ==========================================================================
-//                 iBench - Full-text indexing benchmarks
+//                             SeqAn Benchmark
 // ==========================================================================
 // Copyright (c) 2012-2014, Enrico Siragusa, FU Berlin
 // All rights reserved.
@@ -32,8 +32,8 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#ifndef APP_IBENCH_MISC_H_
-#define APP_IBENCH_MISC_H_
+#ifndef APP_BENCH_MISC_H_
+#define APP_BENCH_MISC_H_
 
 #include <seqan/misc/edit_environment.h>
 
@@ -395,4 +395,4 @@ inline void filter(Index<TText, TSpec> & index, TNeedles & needles, TThreshold t
     Backtracking<TDistance>());
 }
 
-#endif  // #ifndef APP_IBENCH_MISC_H_
+#endif  // #ifndef APP_BENCH_MISC_H_

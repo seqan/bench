@@ -1,5 +1,5 @@
 // ==========================================================================
-//                 iBench - Full-text indexing benchmarks
+//                             SeqAn Benchmark
 // ==========================================================================
 // Copyright (c) 2012-2014, Enrico Siragusa, FU Berlin
 // All rights reserved.
@@ -32,8 +32,8 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#ifndef APP_IBENCH_TYPES_H_
-#define APP_IBENCH_TYPES_H_
+#ifndef APP_BENCH_TYPES_H_
+#define APP_BENCH_TYPES_H_
 
 using namespace seqan;
 
@@ -287,7 +287,7 @@ struct Fibre<SparseString<String<TValue, TSpec>, void>, FibreIndicators>
 
 namespace seqan
 {
-#ifdef APP_IBENCH_CONSTRUCT_CPP_
+#ifdef APP_BENCH_CONSTRUCT_CPP_
 template <typename TString, typename TSSetSpec, typename TSpec>
 struct Fibre<Index<StringSet<TString, TSSetSpec>, IndexEsa<TSpec> >, FibreLcp>
 {
@@ -317,7 +317,7 @@ struct Fibre<Index<StringSet<TString, TSSetSpec>, IndexEsa<TSpec> >, FibreLcp>
 // ----------------------------------------------------------------------------
 // This function is overloaded to save the Lcp values in a 8 bits encoding.
 
-#ifdef APP_IBENCH_CONSTRUCT_CPP_
+#ifdef APP_BENCH_CONSTRUCT_CPP_
 namespace seqan {
 template <typename TText, typename TSSetSpec, typename TSpec>
 inline bool save(Index<StringSet<TText, TSSetSpec>, IndexEsa<TSpec> > const & index,
@@ -405,7 +405,7 @@ inline bool open(Index<StringSet<TText, TSSetSpec>, FMIndex<TSpec, TConfig> > & 
 // ----------------------------------------------------------------------------
 // This function is overloaded to avoid building the index except for Wotd Dir.
 
-#if !defined(APP_IBENCH_CONSTRUCT_CPP_) && !defined(APP_IBENCH_FILTER_CPP_)
+#if !defined(APP_BENCH_CONSTRUCT_CPP_) && !defined(APP_BENCH_FILTER_CPP_)
 namespace seqan {
 template <typename TText, typename TSSetSpec, typename TSpec, typename TFibre>
 inline bool indexRequire(Index<StringSet<TText, TSSetSpec>, TSpec> & index, Tag<TFibre> const fibre)
@@ -451,4 +451,4 @@ inline bool indexCreate(Index<TText, IndexWotd<TSpec> > & index, FibreSA, Trie)
     return true;
 }
 
-#endif  // #ifndef APP_IBENCH_TYPES_H_
+#endif  // #ifndef APP_BENCH_TYPES_H_

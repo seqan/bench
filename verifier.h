@@ -1,5 +1,5 @@
 // ==========================================================================
-//                 iBench - Full-text indexing benchmarks
+//                             SeqAn Benchmark
 // ==========================================================================
 // Copyright (c) 2012-2014, Enrico Siragusa, FU Berlin
 // All rights reserved.
@@ -32,8 +32,8 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#ifndef APP_IBENCH_VERIFIER_H_
-#define APP_IBENCH_VERIFIER_H_
+#ifndef APP_BENCH_VERIFIER_H_
+#define APP_BENCH_VERIFIER_H_
 
 using namespace seqan;
 
@@ -242,4 +242,4 @@ getLocalPos(TText const & /* text */, TInfix const & /* infix */, False)
     return typename StringSetPosition<TText const>::Type();
 }
 
-#endif  // #ifndef APP_IBENCH_VERIFIER_H_
+#endif  // #ifndef APP_BENCH_VERIFIER_H_

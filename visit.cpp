@@ -1,5 +1,5 @@
 // ==========================================================================
-//                 iBench - Full-text indexing benchmarks
+//                             SeqAn Benchmark
 // ==========================================================================
 // Copyright (c) 2012-2014, Enrico Siragusa, FU Berlin
 // All rights reserved.
@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_IBENCH_VISIT_CPP_
+#define APP_BENCH_VISIT_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -83,9 +83,9 @@ struct Options : BaseOptions
 template <typename TOptions>
 inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options)
 {
-    setAppName(parser, "iBench Visit");
-    setShortDescription(parser, "Benchmark full-text index top-down visit");
-    setCategory(parser, "Stringology");
+    setAppName(parser, "SeqAn Benchmark - Index Visit");
+    setShortDescription(parser, "Benchmark top-down traversal of full-text indices");
+    setCategory(parser, "Benchmarking");
 
     addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fIINDEX FILE\\fP>");
 

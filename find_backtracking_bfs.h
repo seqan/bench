@@ -34,8 +34,8 @@
 // Approximate string matching via backtracking on VSTrees
 // ==========================================================================
 
-#ifndef APP_IBENCH_FIND_BACKTRACKING_BFS_H_
-#define APP_IBENCH_FIND_BACKTRACKING_BFS_H_
+#ifndef APP_BENCH_FIND_BACKTRACKING_BFS_H_
+#define APP_BENCH_FIND_BACKTRACKING_BFS_H_
 
 //#define SEQAN_DEBUG
 
@@ -375,4 +375,4 @@ void find(TTextIndex & text,
 
 }
 
-#endif  // #ifndef APP_IBENCH_FIND_BACKTRACKING_BFS_H_
+#endif  // #ifndef APP_BENCH_FIND_BACKTRACKING_BFS_H_

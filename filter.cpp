@@ -1,5 +1,5 @@
 // ==========================================================================
-//                 iBench - Full-text indexing benchmarks
+//                             SeqAn Benchmark
 // ==========================================================================
 // Copyright (c) 2012-2014, Enrico Siragusa, FU Berlin
 // All rights reserved.
@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_IBENCH_FILTER_CPP_
+#define APP_BENCH_FILTER_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -184,9 +184,9 @@ struct SwiftSpec<HammingDistance>
 template <typename TOptions>
 inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options)
 {
-    setAppName(parser, "iBench Filter");
+    setAppName(parser, "SeqAn Benchmark - Filtering methods");
     setShortDescription(parser, "Benchmark filtration efficiency");
-    setCategory(parser, "Stringology");
+    setCategory(parser, "Benchmarking");
 
     addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT|INDEX FILE\\fP> <\\fIQUERY FILE\\fP>");
 

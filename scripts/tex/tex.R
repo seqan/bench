@@ -12,8 +12,8 @@ FONT_SIZE=10
 POINT_SIZE=2
 FONT_FAMILY='Cambria'
 
-INDEX_NAMES=c("esa","sa","qgram","fm-wt","fm-tl")
-INDEX_LABELS=c("ESA","SA","q-Gram","FM-WT","FM-TL")
+INDEX_NAMES=c("esa","sa","lst","qgram","fm-wt","fm-tl")
+INDEX_LABELS=c("ESA","SA","LST","q-Gram","FM-WT","FM-TL")
 INDEX_SCALING=c('sa', 'fm-tl')
 
 ALGORITHM_NAMES=c("single","sort","dfs")   #,"bfs")

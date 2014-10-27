@@ -94,8 +94,8 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
 
     addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT FILE\\fP> <\\fIOUTPUT FILE\\fP>");
 
-    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
-    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
+    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
+    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
 
     addSection(parser, "Main Options");
     setAlphabetType(parser, options);

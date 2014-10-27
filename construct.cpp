@@ -80,8 +80,8 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
 
     addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT FILE\\fP> <\\fIINDEX FILE\\fP>");
 
-    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
-    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUTFILE));
+    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
+    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
     addOption(parser, ArgParseOption("v", "tsv", "Tab separated value output."));
 
     addSection(parser, "Main Options");

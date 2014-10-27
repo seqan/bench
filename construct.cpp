@@ -50,6 +50,7 @@
 #include "options.h"
 #include "types.h"
 #include "run.h"
+#include "misc.h"
 
 using namespace seqan;
 
@@ -126,6 +127,7 @@ inline void construct(TIndex & index)
     typedef typename Iterator<TIndex, TopDown<> >::Type TIter;
 
     TIter it(index);
+    indexBuild(index);
     ignoreUnusedVariableWarning(it);
 }
 

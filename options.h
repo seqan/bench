@@ -57,7 +57,7 @@ struct BaseOptions
 
     enum IndexType
     {
-        INDEX_SA, INDEX_ESA, INDEX_QGRAM, INDEX_FMTL, INDEX_FMWT
+        INDEX_SA, INDEX_ESA, INDEX_LST, INDEX_QGRAM, INDEX_FMTL, INDEX_FMWT
     };
 
     CharString      textFile;
@@ -88,6 +88,7 @@ struct BaseOptions
 
         textIndexTypeList.push_back("sa");
         textIndexTypeList.push_back("esa");
+        textIndexTypeList.push_back("lst");
         textIndexTypeList.push_back("qgram");
         textIndexTypeList.push_back("fm-tl");
         textIndexTypeList.push_back("fm-wt");

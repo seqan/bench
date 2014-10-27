@@ -96,6 +96,7 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
 
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
+    setValidValues(parser, 0, SeqFileIn::getFileExtensions());
 
     addSection(parser, "Main Options");
     setAlphabetType(parser, options);
@@ -169,16 +170,16 @@ inline void run(Options & options)
     typedef StringSet<CharString, Owner<ConcatDirect<> > >                  TCharStringSet;
     typedef typename Size<CharString>::Type                                 TSize;
 
-    SequenceStream seqStream(toCString(options.textFile));
+    SeqFileIn seqFile;
+    open(seqFile, toCString(options.textFile));
 
     TCharStringSet seqs;
     CharString  seq;
     CharString  id;
 
-    while (!atEnd(seqStream))
+    while (!atEnd(seqFile))
     {
-        if (readRecord(id, seq, seqStream) != 0)
-            throw RuntimeError("Error while reading text");
+        readRecord(id, seq, seqFile);
 
         if (options.limitLength <= 0)
         {

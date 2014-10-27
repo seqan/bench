@@ -110,7 +110,7 @@ function vars_protein_uniprot
 # cmd_prepare input output alphabet count sum length [plength] [pcount]
 function cmd_prepare
 {
-    CMD="$BIN/ibench_dump $1 $2 -a $3 -tc $4 -ts $5 -tl $6"
+    CMD="$BIN/bench_dump $1 $2 -a $3 -tc $4 -ts $5 -tl $6"
     if [ $# -ge 7 ]
     then
         CMD+=" -ll $7"
@@ -124,25 +124,25 @@ function cmd_prepare
 # cmd_construct input output alphabet count sum length index
 function cmd_construct
 {
-    CMD="$BIN/ibench_construct --tsv $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7"
+    CMD="$BIN/bench_construct --tsv $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7"
 }
 
 # cmd_visit depth input alphabet count sum length index
 function cmd_visit
 {
-    CMD="$BIN/ibench_visit --tsv $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -d $1"
+    CMD="$BIN/bench_visit --tsv $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -d $1"
 }
 
 # cmd_query text pattern alphabet count sum length index plength errors algo
 function cmd_query
 {
-    CMD="$BIN/ibench_query --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
+    CMD="$BIN/bench_query --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
 }
 
 # cmd_filter_seeds text pattern alphabet count sum length index plength errors distance verify rdup seederr
 function cmd_filter_seeds
 {
-    CMD="$BIN/ibench_filter --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g seeds -se ${13}"
+    CMD="$BIN/bench_filter --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g seeds -se ${13}"
     if [[ ${10} = 'edit' ]]; then
         CMD+=" -ed"
     fi
@@ -157,7 +157,7 @@ function cmd_filter_seeds
 # cmd_filter_qgrams text pattern alphabet count sum length NONE plength errors distance verify rdup weight threshold
 function cmd_filter_qgrams
 {
-    CMD="$BIN/ibench_filter --tsv $1 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -e $9 -g qgrams -qw ${13} -qt ${14}" # -se ${13} -so
+    CMD="$BIN/bench_filter --tsv $1 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -e $9 -g qgrams -qw ${13} -qt ${14}" # -se ${13} -so
     if [[ ${10} = 'edit' ]]; then
         CMD+=" -ed"
     fi

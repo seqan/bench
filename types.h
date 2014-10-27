@@ -323,7 +323,6 @@ template <typename TText, typename TSSetSpec, typename TSpec>
 inline bool save(Index<StringSet<TText, TSSetSpec>, IndexEsa<TSpec> > const & index,
                  const char * fileName, int openMode)
 {
-    typedef Index<StringSet<TText, TSSetSpec>, IndexEsa<TSpec> >    TIndex;
     typedef String<__uint8, External<ExternalConfigLarge<> > >      TLcp;
 
     String<char> name;

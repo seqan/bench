@@ -13,7 +13,7 @@ function vars_dna_common
     PATTERN_LENGTH_BIT=8
 
     # index
-    INDEX_TYPE="sa esa qgram fm-tl fm-wt"
+    INDEX_TYPE="sa esa lst qgram fm-tl fm-wt"
 
     # visit
     VISIT_DEPTH=$(seq 1 20) #30
@@ -90,7 +90,7 @@ function vars_protein_uniprot
 
     # index
     INDEX_NAME=sprot #.$INDEX_TYPE
-    INDEX_TYPE="sa qgram fm-wt" #esa
+    INDEX_TYPE="sa lst qgram fm-wt" #esa
 
     # visit
     VISIT_DEPTH=$(seq 1 10)

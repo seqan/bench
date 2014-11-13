@@ -67,20 +67,6 @@ struct Value<Limits<T1, T2>, 2>
 };
 }
 
-// ----------------------------------------------------------------------------
-// Function appendValue(StringSet<Limits>)
-// ----------------------------------------------------------------------------
-
-template <typename TString, typename TSize, typename TSum, typename TSource, typename TExpand>
-inline void
-appendValue(StringSet<TString, Owner<ConcatDirect<Limits<TSize, TSum> > > > & me,
-            TSource const & obj,
-            Tag<TExpand> tag)
-{
-    appendValue(me.limits, lengthSum(me) + length(obj), tag);
-    append(me.concat, obj, tag);
-}
-
 // ============================================================================
 // Container Types
 // ============================================================================

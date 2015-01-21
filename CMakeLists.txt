@@ -1,14 +1,14 @@
 # ===========================================================================
 #                  SeqAn - The Library for Sequence Analysis
 # ===========================================================================
-# File: /core/apps/bench/CMakeLists.txt
+# File: /apps/bench/CMakeLists.txt
 #
 # CMakeLists.txt file for bench.
 # ===========================================================================
 
 cmake_minimum_required (VERSION 2.8.9)
-project (seqan_core_apps_bench)
-message (STATUS "Configuring core/apps/bench")
+project (seqan_apps_bench)
+message (STATUS "Configuring apps/bench")
 
 # ----------------------------------------------------------------------------
 # Dependencies

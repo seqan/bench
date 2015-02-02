@@ -1,10 +1,11 @@
 library("reshape")
-library("xtable")
 library("ggplot2")
+library("ggthemes")
 library("scales")
+library("sitools")
 library("Cairo")
 
-INPUT="/Users/esiragusa/Code/seqan/core/apps/ibench/scripts/resources"
+INPUT="/Volumes/barracuda/Code/seqan/apps/bench/scripts/resources"
 OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"
 
 PDF_SCALE=0.4
@@ -21,6 +22,10 @@ FILTER_LABELS=c("Exact seeds",
                 "q-Grams, t \u2265 1",
                 "q-Grams, t \u2265 4",
                 "Gapped q-grams")
+FILTER_COLORS <- c("#D62728", "#FF7F0E", "#8C564B", "#9467BD", "#1F77B4", "#2CA02C")
+names(FILTER_COLORS) <- FILTER_NAMES
+FILTER_SHAPES <- c(0,1,2,3,4,5)
+names(FILTER_SHAPES) <- FILTER_NAMES
 
 DATASET='celegans'
 ALPHABET='dna'
@@ -65,11 +70,6 @@ load_file <- function(filename)
         return(list(ok=TRUE,tsv=tsvFile))
     } else
         return(list(ok=FALSE))
-}
-
-scientific_10 <- function(x)
-{
-  parse(text=gsub("e", " %*% 10^", scientific_format()(x)))
 }
 
 # Copy over qgrams_0 rows to qgrams_1 absent rows
@@ -141,10 +141,10 @@ for (DISTANCE in DISTANCES)
   ggplot() +
     geom_line(data=table_ppv, aes(x=errors, y=ppv, group=filter, shape=filter, color=filter), linetype='solid') +
     geom_point(data=table_ppv, aes(x=errors, y=ppv, group=filter, shape=filter, color=filter), size=POINT_SIZE) +
-    scale_shape_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
-    scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
+    scale_shape_manual(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS, values=FILTER_SHAPES) +
+    scale_color_manual(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS, values=FILTER_COLORS) +
     xlab(ERROR_LABELS[[DISTANCE]]) +
-    ylab("PPV (matches/verifications)") +
+    ylab("PPV [matches/verifications]") +
     scale_x_discrete(breaks=c(2,4,6,8,10)) +
     scale_y_log10() +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
@@ -165,12 +165,12 @@ for (DISTANCE in DISTANCES)
   ggplot() +
     geom_line(data=table_ratio, aes(x=errors, y=ratio, group=filter, shape=filter, color=filter), linetype='solid') +
     geom_point(data=table_ratio, aes(x=errors, y=ratio, group=filter, shape=filter, color=filter), size=POINT_SIZE) +
-    scale_shape_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
-    scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
+    scale_shape_manual(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS, values=FILTER_SHAPES) +
+    scale_color_manual(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS, values=FILTER_COLORS) +
     xlab(ERROR_LABELS[[DISTANCE]]) +
-    ylab("Time (verification/filtration)") +
+    ylab("Verification/filtration time [s]") +
     scale_x_discrete(breaks=c(2,4,6,8,10)) +
-    scale_y_log10(labels=scientific_10) +
+    scale_y_log10(labels=f2si) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
   ggsave(file=PLOT_RATIO, width=PDF_WIDTH, height=PDF_HEIGHT, scale=PDF_SCALE, device=cairo_pdf) 
@@ -191,12 +191,12 @@ for (DISTANCE in DISTANCES)
     geom_point(data=table_runtime, aes(x=errors, y=time, group=filter, shape=filter, color=filter), size=POINT_SIZE) +
     geom_line(data=table_runtime, aes(x=errors, y=ftime, group=filter, shape=filter, color=filter), linetype='dashed') +
     geom_point(data=table_runtime, aes(x=errors, y=ftime, group=filter, shape=filter, color=filter), size=POINT_SIZE-1) +
-    scale_shape_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
-    scale_color_discrete(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS) +
+    scale_shape_manual(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS, values=FILTER_SHAPES) +
+    scale_color_manual(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS, values=FILTER_COLORS) +
     xlab(ERROR_LABELS[[DISTANCE]]) +
-    ylab("Time (seconds/pattern)") +
+    ylab("Average time per pattern [s]") +
     scale_x_discrete(breaks=c(2,4,6,8,10)) +
-    scale_y_log10(labels=scientific_10) +
+    scale_y_log10(labels=f2si) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
   ggsave(file=PLOT_RUNTIME, width=PDF_WIDTH, height=PDF_HEIGHT, scale=PDF_SCALE, device=cairo_pdf) 

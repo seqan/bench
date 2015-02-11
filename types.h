@@ -195,8 +195,9 @@ struct TLFMIndexConfig;
 template <typename TSize, typename TSum>
 struct TLFMIndexConfig<Limits<TSize, TSum> >
 {
-    typedef TwoLevels<TSum>     TValuesSpec;
-    typedef TwoLevels<TSum>     TSentinelsSpec;
+    typedef TSum                                        LengthSum;
+    typedef Levels<void, LevelsRDConfig<LengthSum> >    Bwt;
+    typedef Levels<void, LevelsRDConfig<LengthSum> >    Sentinels;
 
     static const unsigned SAMPLING = 10;
 };
@@ -204,8 +205,9 @@ struct TLFMIndexConfig<Limits<TSize, TSum> >
 template <typename TSum>
 struct TLFMIndexConfig<Limits<__uint8, TSum> >
 {
-    typedef TwoLevels<TSum>     TValuesSpec;
-    typedef Naive<TSum>         TSentinelsSpec;
+    typedef TSum                                        LengthSum;
+    typedef Levels<void, LevelsRDConfig<LengthSum> >    Bwt;
+    typedef Naive<void, RDConfig<LengthSum> >           Sentinels;
 
     static const unsigned SAMPLING = 10;
 };
@@ -216,8 +218,9 @@ struct WTFMIndexConfig;
 template <typename TSize, typename TSum>
 struct WTFMIndexConfig<Limits<TSize, TSum> >
 {
-    typedef WaveletTree<TSum>   TValuesSpec;
-    typedef TwoLevels<TSum>     TSentinelsSpec;
+    typedef TSum                                        LengthSum;
+    typedef WaveletTree<void, WTRDConfig<LengthSum> >   Bwt;
+    typedef Levels<void, LevelsRDConfig<LengthSum> >    Sentinels;
 
     static const unsigned SAMPLING = 10;
 };
@@ -225,33 +228,22 @@ struct WTFMIndexConfig<Limits<TSize, TSum> >
 template <typename TSum>
 struct WTFMIndexConfig<Limits<__uint8, TSum> >
 {
-    typedef WaveletTree<TSum>   TValuesSpec;
-    typedef Naive<TSum>         TSentinelsSpec;
+    typedef TSum                                        LengthSum;
+    typedef WaveletTree<void, WTRDConfig<LengthSum> >   Bwt;
+    typedef Naive<void, RDConfig<LengthSum> >           Sentinels;
 
     static const unsigned SAMPLING = 10;
 };
 
 // ----------------------------------------------------------------------------
-// RankDictionary Size
+// SparseString FibreIndicators
 // ----------------------------------------------------------------------------
 
 namespace seqan {
-template <typename TValue, typename TSize>
-struct Size<RankDictionary<TValue, WaveletTree<TSize> > >
+template <typename TValue, typename TSpec>
+struct Fibre<SparseString<String<TValue, TSpec>, void>, FibreIndicators>
 {
-    typedef TSize Type;
-};
-
-template <typename TValue, typename TSize>
-struct Size<RankDictionary<TValue, TwoLevels<TSize> > >
-{
-    typedef TSize Type;
-};
-
-template <typename TValue, typename TSize>
-struct Size<RankDictionary<TValue, Naive<TSize> > >
-{
-    typedef TSize Type;
+    typedef RankDictionary<bool, Levels<void, __uint32> > Type;
 };
 }
 
@@ -260,10 +252,16 @@ struct Size<RankDictionary<TValue, Naive<TSize> > >
 // ----------------------------------------------------------------------------
 
 namespace seqan {
-template <typename TValue, typename TSpec>
-struct Fibre<SparseString<String<TValue, TSpec>, void>, FibreIndicators>
+template <typename TString, typename TSize, typename TSum>
+struct Size<SparseString<TString, TLFMIndexConfig<Limits<TSize, TSum> > > >
 {
-    typedef RankDictionary<bool, TwoLevels<__uint32> > Type;
+    typedef TSum Type;
+};
+
+template <typename TString, typename TSize, typename TSum>
+struct Size<SparseString<TString, WTFMIndexConfig<Limits<TSize, TSum> > > >
+{
+    typedef TSum Type;
 };
 }
 

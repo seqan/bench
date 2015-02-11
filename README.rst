@@ -26,21 +26,21 @@ Installation
 
 2. Download the bench app **into the SeqAn apps folder**:
 
-  ``git clone https://github.com/esiragusa/bench.git seqan/apps/bench``
+   ``git clone https://github.com/esiragusa/bench.git seqan/apps/bench``
 
 3. Create a Makefile project:
 
- ``mkdir seqan-build``
- ``cd seqan-build``
- ``cmake ../seqan -DCMAKE_C_COMPILER=/usr/bin/gcc-4.8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-4.8``
+   ``mkdir seqan-build``
+   ``cd seqan-build``
+   ``cmake ../seqan -DCMAKE_C_COMPILER=/usr/bin/gcc-4.8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-4.8``
 
 4. List all Makefile targets of the bench app:
 
-  ``make help | grep bench_``
+   ``make help | grep bench_``
 
 5. Build e.g. the index construction benchmark:
 
-  ``make bench_construct``
+   ``make bench_construct``
 
 Usage
 -----

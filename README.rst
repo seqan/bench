@@ -31,7 +31,9 @@ Installation
 3. Create a Makefile project:
 
    ``mkdir seqan-build``
+   
    ``cd seqan-build``
+   
    ``cmake ../seqan -DCMAKE_C_COMPILER=/usr/bin/gcc-4.8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-4.8``
 
 4. List all Makefile targets of the bench app:

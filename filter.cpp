@@ -48,15 +48,16 @@
 #include <seqan/index.h>
 #include <seqan/arg_parse.h>
 
+#include "options.h"
+#include "types.h"
+#include "run.h"
+#include "misc.h"
+
 #include "../yara/misc_tags.h"
 #include "../yara/bits_bucket.h"
 #include "../yara/bits_matches.h"
 #include "../yara/find_extender.h"
 
-#include "options.h"
-#include "types.h"
-#include "run.h"
-#include "misc.h"
 #include "verifier.h"
 
 using namespace seqan;
@@ -72,6 +73,14 @@ using namespace seqan;
 typedef Match<Nothing>                                          TMatch;
 typedef String<TMatch>                                          TMatches;
 typedef StringSet<TMatches, Segment<TMatches> >                 TMatchesSet;
+
+namespace seqan {
+template <typename TSpec>
+struct Member<Match<TSpec>, ContigSize>
+{
+    typedef __uint32  Type;
+};
+}
 
 // ----------------------------------------------------------------------------
 // Class Stats

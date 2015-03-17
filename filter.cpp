@@ -380,6 +380,13 @@ inline void runOffline(Options const &, Index<TText, IndexEsa<void> > &, TQuerie
     throw RuntimeError("Unsupported index");
 }
 
+template <typename TText, typename TQueries, typename TDistance, typename TSeeding, typename TCollect>
+inline void runOffline(Options const &, Index<TText, IndexWotd<void> > &, TQueries &, TDistance const &,
+                       TSeeding const &, TCollect const &)
+{
+    throw RuntimeError("Unsupported index");
+}
+
 template <typename TText, typename TQueries, typename TIndexSpec, typename TDistance, typename TSeeding, typename TCollect>
 inline void runOffline(Options const &, Index<TText, FMIndex<void, TIndexSpec> > &, TQueries &, TDistance const &,
                        TSeeding const &, TCollect const &)

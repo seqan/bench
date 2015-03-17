@@ -269,28 +269,28 @@ struct Size<SparseString<TString, WTFMIndexConfig<Limits<TSize, TSum> > > >
 // Lcp Fibre
 // ----------------------------------------------------------------------------
 
-namespace seqan
-{
-#ifdef APP_BENCH_CONSTRUCT_CPP_
-template <typename TString, typename TSSetSpec, typename TSpec>
-struct Fibre<Index<StringSet<TString, TSSetSpec>, IndexEsa<TSpec> >, FibreLcp>
-{
-    typedef StringSet<TString, TSSetSpec>   TText;
-    typedef Index<TText, IndexEsa<TSpec> >  TIndex;
-
-    typedef String<typename LengthSum<TText>::Type, typename DefaultIndexStringSpec<TIndex>::Type> Type;
-};
-#else
-template <typename TString, typename TSSetSpec, typename TSpec>
-struct Fibre<Index<StringSet<TString, TSSetSpec>, IndexEsa<TSpec> >, FibreLcp>
-{
-    typedef StringSet<TString, TSSetSpec>   TText;
-    typedef Index<TText, IndexEsa<TSpec> >  TIndex;
-
-    typedef String<__uint8, typename DefaultIndexStringSpec<TIndex>::Type> Type;
-};
-#endif
-}
+//namespace seqan
+//{
+//#ifdef APP_BENCH_CONSTRUCT_CPP_
+//template <typename TString, typename TSSetSpec, typename TSpec>
+//struct Fibre<Index<StringSet<TString, TSSetSpec>, IndexEsa<TSpec> >, FibreLcp>
+//{
+//    typedef StringSet<TString, TSSetSpec>   TText;
+//    typedef Index<TText, IndexEsa<TSpec> >  TIndex;
+//
+//    typedef String<typename LengthSum<TText>::Type, typename DefaultIndexStringSpec<TIndex>::Type> Type;
+//};
+//#else
+//template <typename TString, typename TSSetSpec, typename TSpec>
+//struct Fibre<Index<StringSet<TString, TSSetSpec>, IndexEsa<TSpec> >, FibreLcp>
+//{
+//    typedef StringSet<TString, TSSetSpec>   TText;
+//    typedef Index<TText, IndexEsa<TSpec> >  TIndex;
+//
+//    typedef String<__uint8, typename DefaultIndexStringSpec<TIndex>::Type> Type;
+//};
+//#endif
+//}
 
 // ============================================================================
 // Functions
@@ -301,41 +301,41 @@ struct Fibre<Index<StringSet<TString, TSSetSpec>, IndexEsa<TSpec> >, FibreLcp>
 // ----------------------------------------------------------------------------
 // This function is overloaded to save the Lcp values in a 8 bits encoding.
 
-#ifdef APP_BENCH_CONSTRUCT_CPP_
-namespace seqan {
-template <typename TText, typename TSSetSpec, typename TSpec>
-inline bool save(Index<StringSet<TText, TSSetSpec>, IndexEsa<TSpec> > const & index,
-                 const char * fileName, int openMode)
-{
-    typedef String<__uint8, External<ExternalConfigLarge<> > >      TLcp;
-
-    String<char> name;
-
-    name = fileName;	append(name, ".txt");
-    if ((!save(getFibre(index, EsaText()), toCString(name), openMode)) &&
-        (!save(getFibre(index, EsaText()), fileName, openMode))) return false;
-
-    name = fileName;	append(name, ".sa");
-    if (!save(getFibre(index, EsaSA()), toCString(name), openMode)) return false;
-
-    name = fileName;    append(name, ".isa");
-    if (!save(getFibre(index, EsaIsa()), toCString(name), openMode)) return false;
-
-    name = fileName;	append(name, ".lcp");
-    TLcp extLcp;
-    if (!open(extLcp, toCString(name), openMode)) return false;
-    assign(extLcp, getFibre(index, EsaLcp()), Exact());
-
-    name = fileName;	append(name, ".child");
-    if (!save(getFibre(index, EsaChildtab()), toCString(name), openMode)) return false;
-
-    name = fileName;	append(name, ".bwt");
-    if (!save(getFibre(index, EsaBwt()), toCString(name), openMode)) return false;
-
-    return true;
-}
-}
-#endif
+//#ifdef APP_BENCH_CONSTRUCT_CPP_
+//namespace seqan {
+//template <typename TText, typename TSSetSpec, typename TSpec>
+//inline bool save(Index<StringSet<TText, TSSetSpec>, IndexEsa<TSpec> > const & index,
+//                 const char * fileName, int openMode)
+//{
+//    typedef String<__uint8, External<ExternalConfigLarge<> > >      TLcp;
+//
+//    String<char> name;
+//
+//    name = fileName;	append(name, ".txt");
+//    if ((!save(getFibre(index, EsaText()), toCString(name), openMode)) &&
+//        (!save(getFibre(index, EsaText()), fileName, openMode))) return false;
+//
+//    name = fileName;	append(name, ".sa");
+//    if (!save(getFibre(index, EsaSA()), toCString(name), openMode)) return false;
+//
+//    name = fileName;    append(name, ".isa");
+//    if (!save(getFibre(index, EsaIsa()), toCString(name), openMode)) return false;
+//
+//    name = fileName;	append(name, ".lcp");
+//    TLcp extLcp;
+//    if (!open(extLcp, toCString(name), openMode)) return false;
+//    assign(extLcp, getFibre(index, EsaLcp()), Exact());
+//
+//    name = fileName;	append(name, ".child");
+//    if (!save(getFibre(index, EsaChildtab()), toCString(name), openMode)) return false;
+//
+//    name = fileName;	append(name, ".bwt");
+//    if (!save(getFibre(index, EsaBwt()), toCString(name), openMode)) return false;
+//
+//    return true;
+//}
+//}
+//#endif
 
 // ----------------------------------------------------------------------------
 // Function save()

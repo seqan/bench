@@ -110,8 +110,6 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     addOption(parser, ArgParseOption("lc", "limit-count", "Limit the number of texts.", ArgParseOption::INTEGER));
     setDefaultValue(parser, "limit-count", options.limitLength);
     addOption(parser, ArgParseOption("lo", "limit-one", "Limit to one text per input sequence."));
-    setDefaultValue(parser, "limit-one", options.limitOne);
-
 }
 
 // ----------------------------------------------------------------------------

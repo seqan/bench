@@ -101,6 +101,12 @@ struct Size<String<TValue, Alloc<Limits<TSize> > > >
 {
     typedef TSize Type;
 };
+
+template <typename TValue, typename TSize>
+struct StringSpec<String<TValue, Alloc<Limits<TSize> > > >
+{
+    typedef Alloc<> Type;
+};
 }
 
 // ----------------------------------------------------------------------------

@@ -69,11 +69,13 @@ struct Options : BaseOptions
     CharString      outputFile;
     unsigned        limitLength;
     unsigned        limitCount;
+    bool            limitOne;
 
     Options() :
         BaseOptions(),
         limitLength(0),
-        limitCount(0)
+        limitCount(0),
+        limitOne(false)
     {}
 };
 
@@ -107,6 +109,9 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setDefaultValue(parser, "limit-length", options.limitLength);
     addOption(parser, ArgParseOption("lc", "limit-count", "Limit the number of texts.", ArgParseOption::INTEGER));
     setDefaultValue(parser, "limit-count", options.limitLength);
+    addOption(parser, ArgParseOption("lo", "limit-one", "Limit to one text per input sequence."));
+    setDefaultValue(parser, "limit-one", options.limitOne);
+
 }
 
 // ----------------------------------------------------------------------------
@@ -129,6 +134,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
     getTextLimits(options, parser);
     getOptionValue(options.limitLength, parser, "limit-length");
     getOptionValue(options.limitCount, parser, "limit-count");
+    getOptionValue(options.limitOne, parser, "limit-one");
 
     return ArgumentParser::PARSE_OK;
 }
@@ -192,6 +198,9 @@ inline void run(Options & options)
             for (TSize seqId = 0; seqId < seqCount; seqId++)
             {
                 appendValue(seqs, infix(seq, seqId * options.limitLength, (seqId + 1) * options.limitLength), Generous());
+
+                if (options.limitOne)
+                    break;
 
                 if (options.limitCount > 0 && options.limitCount <= length(seqs))
                     break;

@@ -21,7 +21,7 @@ function vars_dna_common
     # query
     PATTERN_LENGTHS=$(seq 5 5 50)
     PATTERN_COUNT=1000000
-    QUERY_ERRORS=$(seq 0 1) #2
+    QUERY_ERRORS=$(seq 0 1)
 
     # multi-query
     MULTI_LENGTHS="15 30"
@@ -118,6 +118,9 @@ function cmd_prepare
     if [ $# -ge 8 ]
     then
         CMD+=" -lc $8"
+    fi
+    if [[ ${9} = 'true' ]]; then
+        CMD+=" -lo"
     fi
 }
 
@@ -226,14 +229,14 @@ function exec_prepare_text
     $CMD
 }
 
-# exec_prepare_patterns lengths counts
+# exec_prepare_patterns lengths counts one-per-sequence
 function exec_prepare_patterns
 {
     for patterns_count in $2;
     do
         for patterns_length in $1;
         do
-            cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$patterns_length.$patterns_count $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $patterns_length $patterns_count
+            cmd_prepare $SRC/$PATTERN_INPUT $DIR/$PATTERN_NAME.$patterns_length.$patterns_count $ALPHABET $PATTERN_COUNT_BIT $PATTERN_SUM_BIT $PATTERN_LENGTH_BIT $patterns_length $patterns_count $3
             echo $CMD
             $CMD
         done
@@ -442,21 +445,21 @@ vars_$ALPHABET\_$DATASET
 # ======================================================================================================================
 
 #exec_visit_text $TSV/visit.tsv
-#exec_prepare_patterns $PATTERN_LENGTHS $PATTERN_COUNT
+#exec_prepare_patterns "${PATTERN_LENGTHS}" "${PATTERN_COUNT}" true
 #exec_query $TSV/query.tsv
-#exec_prepare_patterns $MULTI_LENGTHS $MULTI_COUNTS
+#exec_prepare_patterns "${MULTI_LENGTHS} ${MULTI_COUNTS}" true
 #exec_query_multi $TSV/multi.tsv
 
 # ======================================================================================================================
 
-exec_prepare_patterns $FILTER_LENGTHS $FILTER_COUNTS
-for distance in hamming edit;
-do
-    exec_filter_seeds $TSV/filter_occurrences.tsv $distance true true true
-
-    for filter in seeds qgrams;
-    do
-        exec_filter_$filter $TSV/filter_verify.tsv $distance true false
-        exec_filter_$filter $TSV/filter_only.tsv $distance false false
-    done
-done
+#exec_prepare_patterns "${FILTER_LENGTHS}" "${FILTER_COUNTS}" false
+#for distance in hamming edit;
+#do
+#    exec_filter_seeds $TSV/filter_occurrences.tsv $distance true true true
+#
+#    for filter in seeds qgrams;
+#    do
+#        exec_filter_$filter $TSV/filter_verify.tsv $distance true false
+#        exec_filter_$filter $TSV/filter_only.tsv $distance false false
+#    done
+#done

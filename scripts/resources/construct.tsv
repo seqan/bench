@@ -4,7 +4,4 @@ dna	celegans	esa	100267633	68.664328
 dna	celegans	qgram	100267633	52.165303
 dna	celegans	fm-tl	100267633	58.262004
 dna	celegans	fm-wt	100267633	59.478930
-protein	uniprot	sa	193019802	133.650770
-protein	uniprot	esa	193019802	171.979519
-protein	uniprot	qgram	193019802	138.614862
-protein	uniprot	fm-wt	193019802	154.586415
+dna	celegans	lst	100267633	53.939740

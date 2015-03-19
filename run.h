@@ -67,9 +67,9 @@ inline void run(TOptions & options)
     case TOptions::INDEX_SA:
         run<TAlphabet, TLimits, TSetLimits, IndexSa<void> >(options);
         break;
-//    case TOptions::INDEX_LST:
-//        run<TAlphabet, TLimits, TSetLimits, IndexWotd<void> >(options);
-//        break;
+    case TOptions::INDEX_LST:
+        run<TAlphabet, TLimits, TSetLimits, IndexWotd<void> >(options);
+        break;
     case TOptions::INDEX_QGRAM:
         run<TAlphabet, TLimits, TSetLimits, IndexQGram<typename DefaultShape<TAlphabet>::Type, BucketRefinement> >(options);
         break;

@@ -14,8 +14,8 @@ POINT_SIZE=2
 FONT_FAMILY='Cambria'
 
 INDEX_LABELS = c(
-    'esa'="ESA",
     'lst'="LST",
+    'esa'="ESA",
     'sa'="SA",
     'qgram'="q-Gram",
     'fm-wt'="FM-WT",
@@ -53,6 +53,11 @@ QUERY_BREAKS = list(
 MULTI_BREAKS = list(
   c(0,0.5,1,1.5) * 10^-6,
   c(0,2,4,6) * 10^-5
+)
+
+MULTI_LABELS = list(
+  c("0 u", "0.5 u", "1 u", "1.5 u"),
+  c("0 u", "20 u", "40 u", "60 u")
 )
 
 ### FUNCTIONS ###
@@ -107,7 +112,7 @@ if ((R = load_file(FILENAME_VISIT))$ok)
 } else
   print(paste("NOT FOUND:", FILENAME_VISIT))
 
-table_visit = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET, select=c(index, depth, time))
+table_visit = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET & depth >= 6 & depth <= 16, select=c(index, depth, time))
 #table_nodes = subset(TABLE_VISIT, alphabet==ALPHABET & dataset==DATASET & index=='fm-wt', select=c(depth, nodes))
 #table_nodes[,'nodes'] = 10^log(table_nodes[, 'nodes'], ALPHSIZE)
 #  geom_line(data=table_nodes, aes(x=depth, y=nodes/ALPHSIZE), linetype='dotted') +
@@ -118,6 +123,7 @@ ggplot() +
   scale_shape_manual(name="Index", breaks=names(INDEX_LABELS), labels=INDEX_LABELS, values=INDEX_SHAPES) +
   scale_color_manual(name="Index", breaks=names(INDEX_LABELS), labels=INDEX_LABELS, values=INDEX_COLORS) +
   scale_y_log10(labels=f2si) +
+  #scale_x_discrete() +
   xlab("Depth") +
   ylab("Time [s]") +
   theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
@@ -192,7 +198,7 @@ for (ERRORS in 0:1)
       scale_fill_manual(name="Index", breaks=names(INDEX_LABELS), labels=INDEX_LABELS, values=INDEX_COLORS) +
       scale_color_manual(name="Index", breaks=names(INDEX_LABELS), labels=INDEX_LABELS, values=INDEX_COLORS) +
       scale_x_discrete(breaks=ALGORITHM_NAMES, labels=ALGORITHM_LABELS) +
-      scale_y_continuous(breaks=MULTI_BREAKS[[ERRORS+1]], labels=f2si) +
+      scale_y_continuous(breaks=MULTI_BREAKS[[ERRORS+1]], labels=MULTI_LABELS[[ERRORS+1]]) + #labels=f2si)
       xlab("Algorithm") +
       ylab("Average time per pattern [s]") +
       theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
@@ -200,6 +206,14 @@ for (ERRORS in 0:1)
     ggsave(file=PLOT_MULTI, scale=SCALE, device=cairo_pdf)
 }
 
+
+MULTI_IDX_X_BREAKS=c(10000,100000,1000000,10000000)
+MULTI_IDX_X_LABELS=c('10k', '100k', '1M', '10M')
+
+MULTI_IDX_Y_BREAKS=list(
+  'sa'=c(20,40,60) * 10^-6,
+  'fm-tl'=c(10,15,20,25) * 10^-6
+)
 
 ERRORS=1
 PLENGTH=PLENGTHS[ERRORS+1]
@@ -211,9 +225,6 @@ for (INDEX in INDEX_SCALING)
   table_multi_idx_t <- transform(table_multi_idx, time = time / pcount)
   table_multi_idx_p <- transform(table_multi_idx, time = (time + preprocessing) / pcount)
   
-  table_multi_idx_breaks=c(10000,100000,1000000,10000000)
-  table_multi_idx_labels=c('10k', '100k', '1M', '10M')
-
   ggplot() +
     geom_line(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), linetype='solid') +
     geom_point(data=table_multi_idx_p, aes(x=pcount, y=time, group=algorithm, shape=algorithm, color=algorithm), size=POINT_SIZE) +
@@ -223,8 +234,8 @@ for (INDEX in INDEX_SCALING)
     scale_color_manual(name="Algorithm", breaks=ALGORITHM_NAMES, labels=ALGORITHM_LABELS, values=ALGORITHM_COLORS) +
     xlab("Patterns") +
     ylab("Average time per pattern [s]") +
-    scale_x_log10(breaks=table_multi_idx_breaks, labels=table_multi_idx_labels) +
-    scale_y_continuous(labels=f2si) +
+    scale_x_log10(breaks=MULTI_IDX_X_BREAKS, labels=MULTI_IDX_X_LABELS) +
+    scale_y_continuous(breaks=MULTI_IDX_Y_BREAKS[[INDEX]], labels=f2si) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
 
   ggsave(file=PLOT_MULTI_IDX, scale=SCALE, device=cairo_pdf)

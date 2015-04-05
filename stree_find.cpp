@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_BENCH_QUERY_CPP_
+#define APP_BENCH_STREE_FIND_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -77,7 +77,7 @@ double Stats::locateTime = 0;
 // Class Options
 // ----------------------------------------------------------------------------
 
-struct Options : BaseOptions
+struct Options : StreeOptions
 {
     typedef std::string             TString;
     typedef std::vector<TString>    TList;
@@ -97,7 +97,7 @@ struct Options : BaseOptions
     bool            locate;
 
     Options() :
-        BaseOptions(),
+        StreeOptions(),
         algorithmType(ALGO_SINGLE),
         edit(false),
         errors(0),

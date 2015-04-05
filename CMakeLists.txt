@@ -70,18 +70,22 @@ add_definitions (-DSEQAN_DATE="${SEQAN_DATE}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SEQAN_CXX_FLAGS} ${CXX11_CXX_FLAGS}")
 
 # Update the list of file names below if you add source files to your application.
-add_executable(bench_dump dump.cpp options.h types.h run.h misc.h)
-add_executable(bench_construct construct.cpp options.h types.h run.h misc.h)
-add_executable(bench_visit visit.cpp options.h types.h run.h misc.h)
-add_executable(bench_query query.cpp options.h types.h run.h misc.h find_backtracking_dfs.h find_backtracking_bfs.h)
-add_executable(bench_filter filter.cpp options.h types.h run.h misc.h verifier.h)
+add_executable(bench_io_dump io_dump.cpp options.h types.h run.h misc.h)
+add_executable(bench_stree_construct stree_construct.cpp options.h types.h run.h misc.h)
+add_executable(bench_stree_visit stree_visit.cpp options.h types.h run.h misc.h)
+add_executable(bench_stree_find stree_find.cpp options.h types.h run.h misc.h find_backtracking_dfs.h find_backtracking_bfs.h)
+add_executable(bench_qgrams_construct qgrams_construct.cpp options.h types.h run.h misc.h)
+add_executable(bench_qgrams_find qgrams_find.cpp options.h types.h run.h misc.h)
+add_executable(bench_asm_filter asm_filter.cpp options.h types.h run.h misc.h verifier.h)
 
 # Add dependencies found by find_package (SeqAn).
-target_link_libraries (bench_dump ${SEQAN_LIBRARIES})
-target_link_libraries (bench_construct ${SEQAN_LIBRARIES})
-target_link_libraries (bench_visit ${SEQAN_LIBRARIES})
-target_link_libraries (bench_query ${SEQAN_LIBRARIES})
-target_link_libraries (bench_filter ${SEQAN_LIBRARIES})
+target_link_libraries (bench_io_dump ${SEQAN_LIBRARIES})
+target_link_libraries (bench_stree_construct ${SEQAN_LIBRARIES})
+target_link_libraries (bench_stree_visit ${SEQAN_LIBRARIES})
+target_link_libraries (bench_stree_find ${SEQAN_LIBRARIES})
+target_link_libraries (bench_qgrams_construct ${SEQAN_LIBRARIES})
+target_link_libraries (bench_qgrams_find ${SEQAN_LIBRARIES})
+target_link_libraries (bench_asm_filter ${SEQAN_LIBRARIES})
 
 # ----------------------------------------------------------------------------
 # Installation
@@ -89,11 +93,23 @@ target_link_libraries (bench_filter ${SEQAN_LIBRARIES})
 
 # Set variables for installing, depending on the selected build type.
 if (NOT SEQAN_PREFIX_SHARE_DOC)
-  seqan_setup_install_vars (bench_dump bench_construct bench_visit bench_query bench_filter)
+  seqan_setup_install_vars (bench_io_dump
+                            bench_stree_construct
+                            bench_stree_visit
+                            bench_stree_find
+                            bench_qgrams_construct
+                            bench_qgrams_find
+                            bench_asm_filter)
 endif (NOT SEQAN_PREFIX_SHARE_DOC)
 
 # Install bench in ${PREFIX}/bin directory
-install (TARGETS bench_dump bench_construct bench_visit bench_query bench_filter
+install (TARGETS bench_io_dump
+                 bench_stree_construct
+                 bench_stree_visit
+                 bench_stree_find
+                 bench_qgrams_construct
+                 bench_qgrams_find
+                 bench_asm_filter
          DESTINATION bin)
 
 # Install non-binary files for the package to "." for app builds and

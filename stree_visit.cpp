@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_BENCH_DUMP_CPP_
+#define APP_BENCH_STREE_VISIT_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -45,8 +45,6 @@
 #include <seqan/basic.h>
 #include <seqan/sequence.h>
 #include <seqan/index.h>
-#include <seqan/seq_io.h>
-#include <seqan/random.h>
 #include <seqan/arg_parse.h>
 
 #include "options.h"
@@ -64,18 +62,13 @@ using namespace seqan;
 // Class Options
 // ----------------------------------------------------------------------------
 
-struct Options : BaseOptions
+struct Options : StreeOptions
 {
-    CharString      outputFile;
-    unsigned        limitLength;
-    unsigned        limitCount;
-    bool            limitOne;
+    unsigned        depth;
 
     Options() :
-        BaseOptions(),
-        limitLength(0),
-        limitCount(0),
-        limitOne(false)
+        StreeOptions(),
+        depth(0)
     {}
 };
 
@@ -90,26 +83,23 @@ struct Options : BaseOptions
 template <typename TOptions>
 inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options)
 {
-    setAppName(parser, "SeqAn Benchmark - Sequence Dump");
-    setShortDescription(parser, "Dump any sequence file as a StringSet");
+    setAppName(parser, "SeqAn Benchmark - Index Visit");
+    setShortDescription(parser, "Benchmark top-down traversal of full-text indices");
     setCategory(parser, "Benchmarking");
 
-    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT FILE\\fP> <\\fIOUTPUT FILE\\fP>");
+    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fIINDEX FILE\\fP>");
 
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
-    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
-    setValidValues(parser, 0, SeqFileIn::getFileExtensions());
+    addOption(parser, ArgParseOption("v", "tsv", "Tab separated value output."));
 
     addSection(parser, "Main Options");
     setAlphabetType(parser, options);
+    setIndexType(parser, options);
     setTextLimits(parser, options);
 
-    addSection(parser, "Dump Options");
-    addOption(parser, ArgParseOption("ll", "limit-length", "Limit the length of the texts.", ArgParseOption::INTEGER));
-    setDefaultValue(parser, "limit-length", options.limitLength);
-    addOption(parser, ArgParseOption("lc", "limit-count", "Limit the number of texts.", ArgParseOption::INTEGER));
-    setDefaultValue(parser, "limit-count", options.limitLength);
-    addOption(parser, ArgParseOption("lo", "limit-one", "Limit to one text per input sequence."));
+    addSection(parser, "Visit Options");
+    addOption(parser, ArgParseOption("d", "depth", "Limit the visit to this depth.", ArgParseOption::INTEGER));
+    setDefaultValue(parser, "depth", options.depth);
 }
 
 // ----------------------------------------------------------------------------
@@ -117,50 +107,23 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
 // ----------------------------------------------------------------------------
 
 template <typename TOptions>
-ArgumentParser::ParseResult
-inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char const ** argv)
+inline ArgumentParser::ParseResult
+parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char const ** argv)
 {
     ArgumentParser::ParseResult res = parse(parser, argc, argv);
 
     if (res != ArgumentParser::PARSE_OK)
         return res;
 
-    getArgumentValue(options.textFile, parser, 0);
-    getArgumentValue(options.outputFile, parser, 1);
+    getArgumentValue(options.textIndexFile, parser, 0);
+    getOptionValue(options.tsv, parser, "tsv");
 
     getAlphabetType(options, parser);
+    getIndexType(options, parser);
     getTextLimits(options, parser);
-    getOptionValue(options.limitLength, parser, "limit-length");
-    getOptionValue(options.limitCount, parser, "limit-count");
-    getOptionValue(options.limitOne, parser, "limit-one");
+    getOptionValue(options.depth, parser, "depth");
 
     return ArgumentParser::PARSE_OK;
-}
-
-// ----------------------------------------------------------------------------
-// Function randomize()
-// ----------------------------------------------------------------------------
-
-template <typename TAlphabet, typename TString>
-inline void randomize(TString & me)
-{
-    typedef typename Iterator<TString, Standard>::Type      TIter;
-    typedef typename Value<TString>::Type                   TValue;
-
-    Rng<MersenneTwister> rng(0xBADC0FFE);
-
-    TIter it = begin(me, Standard());
-    TIter itEnd = end(me, Standard());
-
-    while (it != itEnd)
-    {
-        for (; it != itEnd && value(it) == TValue(TAlphabet(value(it))); ++it) ;
-
-        if (it == itEnd) break;
-
-        for (; it != itEnd && value(it) != TValue(TAlphabet(value(it))); ++it)
-            value(it) = TAlphabet(pickRandomNumber(rng) % ValueSize<TAlphabet>::VALUE);
-    }
 }
 
 // ----------------------------------------------------------------------------
@@ -171,66 +134,25 @@ template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TI
 inline void run(Options & options)
 {
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
-    typedef StringSet<CharString, Owner<ConcatDirect<> > >                  TCharStringSet;
-    typedef typename Size<CharString>::Type                                 TSize;
+    typedef Index<TText, TIndexSpec>                                        TIndex;
 
-    SeqFileIn seqFile;
-    open(seqFile, toCString(options.textFile));
+    TIndex index;
 
-    TCharStringSet seqs;
-    CharString  seq;
-    CharString  id;
+    if (!open(index, toCString(options.textIndexFile)))
+        throw RuntimeError("Error while loading full-text index");
 
-    while (!atEnd(seqFile))
+    double start = sysTime();
+    unsigned long substrings = countSubstrings(index, options.depth);
+    double finish = sysTime();
+
+    if (options.tsv)
     {
-        readRecord(id, seq, seqFile);
-
-        if (options.limitLength <= 0)
-        {
-            appendValue(seqs, seq, Generous());
-        }
-        else
-        {
-            TSize seqCount = length(seq) / options.limitLength;
-
-            for (TSize seqId = 0; seqId < seqCount; seqId++)
-            {
-                appendValue(seqs, infix(seq, seqId * options.limitLength, (seqId + 1) * options.limitLength), Generous());
-
-                if (options.limitOne)
-                    break;
-
-                if (options.limitCount > 0 && options.limitCount <= length(seqs))
-                    break;
-            }
-        }
-
-        if (options.limitCount > 0 && options.limitCount <= length(seqs))
-            break;
+        std::cout << substrings << '\t' << std::fixed << finish - start << std::endl;
     }
-
-    if (maxLength(seqs) > MaxValue<typename Value<TLimits, 1>::Type>::VALUE)
-        throw RuntimeError("Too long sequences");
-
-    if (length(seqs) > MaxValue<typename Value<TSetLimits, 1>::Type>::VALUE)
-        throw RuntimeError("Too many sequences");
-
-    if (lengthSum(seqs) > MaxValue<typename Value<TSetLimits, 2>::Type>::VALUE)
-        throw RuntimeError("Too many symbols");
-
-    if (IsSameType<TAlphabet, Dna>::VALUE)
-        randomize<Dna>(concat(seqs));
-
-    TText text;
-    assign(text, seqs);
-
-    if (!save(text, toCString(options.outputFile)))
-        throw RuntimeError("Error while saving text");
-
-    if (!options.tsv)
+    else
     {
-        std::cout << length(text) << " sequences" << std::endl;
-        std::cout << lengthSum(text) << " symbols" << std::endl;
+        std::cout << substrings << " nodes" << std::endl;
+        std::cout << std::fixed << finish - start << " sec" << std::endl;
     }
 }
 

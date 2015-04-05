@@ -55,19 +55,10 @@ struct BaseOptions
         ALPHABET_DNA, ALPHABET_PROTEIN, ALPHABET_CHAR
     };
 
-    enum IndexType
-    {
-        INDEX_SA, INDEX_ESA, INDEX_LST, INDEX_QGRAM, INDEX_FMTL, INDEX_FMWT
-    };
-
     CharString      textFile;
     unsigned        textCount;
     unsigned        textSum;
     unsigned        textLen;
-
-    CharString      textIndexFile;
-    IndexType       textIndexType;
-    TList           textIndexTypeList;
 
     AlphabetType    alphabetType;
     TList           alphabetTypeList;
@@ -78,20 +69,67 @@ struct BaseOptions
         textCount(32),
         textSum(32),
         textLen(32),
-        textIndexType(INDEX_SA),
         alphabetType(ALPHABET_DNA),
         tsv(false)
     {
         alphabetTypeList.push_back("dna");
         alphabetTypeList.push_back("protein");
         alphabetTypeList.push_back("char");
+    }
+};
 
+// ----------------------------------------------------------------------------
+// Class StreeOptions
+// ----------------------------------------------------------------------------
+
+struct StreeOptions : BaseOptions
+{
+    enum IndexType
+    {
+        INDEX_SA, INDEX_ESA, INDEX_LST, INDEX_QGRAM, INDEX_FMTL, INDEX_FMWT
+    };
+
+    CharString      textIndexFile;
+    IndexType       textIndexType;
+    TList           textIndexTypeList;
+
+    StreeOptions() :
+        BaseOptions(),
+        textIndexType(INDEX_SA)
+    {
         textIndexTypeList.push_back("sa");
         textIndexTypeList.push_back("esa");
         textIndexTypeList.push_back("lst");
         textIndexTypeList.push_back("qgram");
         textIndexTypeList.push_back("fm-tl");
         textIndexTypeList.push_back("fm-wt");
+    }
+};
+
+// ----------------------------------------------------------------------------
+// Class QGramOptions
+// ----------------------------------------------------------------------------
+
+struct QGramOptions : BaseOptions
+{
+    enum IndexType
+    {
+        INDEX_QGRAM_DIRECT, INDEX_QGRAM_OPEN
+    };
+
+    CharString      textIndexFile;
+    IndexType       textIndexType;
+    TList           textIndexTypeList;
+
+    unsigned        q;
+
+    QGramOptions() :
+        BaseOptions(),
+        textIndexType(INDEX_QGRAM_DIRECT),
+        q(5)
+    {
+        textIndexTypeList.push_back("direct");
+        textIndexTypeList.push_back("open");
     }
 };
 

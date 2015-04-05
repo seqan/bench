@@ -19,6 +19,7 @@ function vars_dna_common
     VISIT_DEPTH=$(seq 1 20) #30
 
     # query
+    QGRAM_LENGTHS=$(seq 5 5 30)
     PATTERN_LENGTHS=$(seq 5 5 50)
     PATTERN_COUNT=1000000
     QUERY_ERRORS=$(seq 0 1)
@@ -124,10 +125,16 @@ function cmd_prepare
     fi
 }
 
-# cmd_construct input output alphabet count sum length index
-function cmd_construct
+# cmd_stree_construct input output alphabet count sum length index
+function cmd_stree_construct
 {
     CMD="$BIN/bench_stree_construct --tsv $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7"
+}
+
+# cmd_qgrams_construct input output alphabet count sum length index weight
+function cmd_qgrams_construct
+{
+    CMD="$BIN/bench_qgrams_construct --tsv $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -q $8"
 }
 
 # cmd_visit depth input alphabet count sum length index
@@ -253,12 +260,35 @@ function exec_construct_text
     fi
     for index_type in $INDEX_TYPE;
     do
-        cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type
+        cmd_stree_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type
         echo $CMD
         output=$($CMD)
         if [ $? -eq 0 ]; then
             echo -e "$ALPHABET\t$DATASET\t$index_type\t$output" >> $filename
         fi
+    done
+}
+
+# exec_construct_text_qgrams filename.tsv
+function exec_construct_text_qgrams
+{
+    filename=$1
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tindex\tsymbols\ttime" > $filename
+    fi
+
+    for index_type in direct open;
+    do
+        for pattern_length in $QGRAM_LENGTHS;
+        do
+            cmd_qgrams_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length
+            echo $CMD
+            output=$($CMD)
+            if [ $? -eq 0 ]; then
+                echo -e "$ALPHABET\t$DATASET\t$index_type\t$output" >> $filename
+            fi
+        done
     done
 }
 
@@ -305,6 +335,30 @@ function exec_query
                     echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$pattern_length\t$output" >> $filename
                 fi
             done
+        done
+    done
+}
+
+# exec_query_qgrams filename.tsv
+function exec_query_qgrams
+{
+    filename=$1
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tindex\terrors\tplength\toccurrences\ttime\tpreprocessing" > $filename
+    fi
+
+    errors=0
+    for index_type in direct open;
+    do
+        for pattern_length in $QGRAM_LENGTHS;
+        do
+            cmd_query_qgrams $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length.$PATTERN_COUNT $pattern_length
+            echo $CMD
+            output=$($CMD)
+            if [ $? -eq 0 ]; then
+                echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$pattern_length\t$output" >> $filename
+            fi
         done
     done
 }
@@ -441,14 +495,17 @@ vars_$ALPHABET\_$DATASET
 
 #exec_prepare_text
 #exec_construct_text $TSV/construct.tsv
+exec_construct_text_qgrams $TSV/construct.tsv
 
 # ======================================================================================================================
 
 #exec_visit_text $TSV/visit.tsv
 #exec_prepare_patterns "${PATTERN_LENGTHS}" "${PATTERN_COUNT}" true
 #exec_query $TSV/query.tsv
+exec_query_qgrams $TSV/query.tsv
 #exec_prepare_patterns "${MULTI_LENGTHS} ${MULTI_COUNTS}" true
 #exec_query_multi $TSV/multi.tsv
+
 
 # ======================================================================================================================
 

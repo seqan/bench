@@ -134,7 +134,7 @@ function cmd_stree_construct
 # cmd_qgrams_construct input output alphabet count sum length index weight
 function cmd_qgrams_construct
 {
-    CMD="$BIN/bench_qgrams_construct --tsv $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -q $8"
+    CMD="$BIN/bench_qgrams_construct --tsv $1 $2.$7.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -q $8"
 }
 
 # cmd_visit depth input alphabet count sum length index
@@ -143,10 +143,16 @@ function cmd_visit
     CMD="$BIN/bench_stree_visit --tsv $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -d $1"
 }
 
-# cmd_query text pattern alphabet count sum length index plength errors algo
-function cmd_query
+# cmd_stree_find index pattern alphabet count sum length index plength errors algo
+function cmd_stree_find
 {
     CMD="$BIN/bench_stree_find --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
+}
+
+# cmd_qgrams_find index pattern alphabet count sum length index plength
+function cmd_qgrams_find
+{
+    CMD="$BIN/bench_qgrams_find --tsv $1.$7.8 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7"
 }
 
 # cmd_filter_seeds text pattern alphabet count sum length index plength errors distance verify rdup seederr
@@ -328,7 +334,7 @@ function exec_query
         do
             for pattern_length in $PATTERN_LENGTHS;
             do
-                cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length.$PATTERN_COUNT $errors single
+                cmd_stree_find $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length.$PATTERN_COUNT $errors single
                 echo $CMD
                 output=$($CMD)
                 if [ $? -eq 0 ]; then
@@ -353,7 +359,7 @@ function exec_query_qgrams
     do
         for pattern_length in $QGRAM_LENGTHS;
         do
-            cmd_query_qgrams $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length.$PATTERN_COUNT $pattern_length
+            cmd_qgrams_find $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length.$PATTERN_COUNT $pattern_length
             echo $CMD
             output=$($CMD)
             if [ $? -eq 0 ]; then
@@ -382,7 +388,7 @@ function exec_query_multi
 
                 for algo in single sort dfs bfs;
                 do
-                    cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
+                    cmd_stree_find $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
                     echo $CMD
                     output=$($CMD)
                     if [ $? -eq 0 ]; then

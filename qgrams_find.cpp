@@ -121,11 +121,11 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     addOption(parser, ArgParseOption("q", "qgram", "Fix the q-gram weight.", ArgParseOption::INTEGER));
     setDefaultValue(parser, "q", options.q);
 
-//    addSection(parser, "Query Options");
-//    addOption(parser, ArgParseOption("e", "errors", "Number of errors.", ArgParseOption::INTEGER));
-//    setMinValue(parser, "errors", "0");
-//    setMaxValue(parser, "errors", "5");
-//    setDefaultValue(parser, "errors", options.errors);
+    addSection(parser, "Query Options");
+    addOption(parser, ArgParseOption("e", "errors", "Number of errors.", ArgParseOption::INTEGER));
+    setMinValue(parser, "errors", "0");
+    setMaxValue(parser, "errors", "1");
+    setDefaultValue(parser, "errors", options.errors);
 //    addOption(parser, ArgParseOption("l", "locate", "Locate occurrences. Default: count only."));
 }
 
@@ -152,7 +152,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 
     getOptionValue(options.q, parser, "q");
 
-//    getOptionValue(options.errors, parser, "errors");
+    getOptionValue(options.errors, parser, "errors");
 //    getOptionValue(options.locate, parser, "locate");
 
     return ArgumentParser::PARSE_OK;
@@ -212,6 +212,48 @@ inline unsigned long findOccurrences(Options const & /* options */, TIndex & ind
 }
 
 // ----------------------------------------------------------------------------
+// Function findOccurrences()
+// ----------------------------------------------------------------------------
+// Exact search.
+
+template <typename TIndex, typename TQueries, typename TLocate>
+inline unsigned long findOccurrences(Options const & /* options */, TIndex & index, TQueries & queries, TLocate, HammingDistance)
+{
+    typedef typename Value<TQueries const>::Type      TQuery;
+//    typedef typename Fibre<TIndex, FibreSA>::Type     TSA;
+//    typedef typename Infix<TSA const>::Type           TOccurrences;
+
+    typedef typename Value<TQuery>::Type                TAlphabet;
+    typedef String<TAlphabet>                           TQGram;
+    typedef EditEnvironment<HammingDistance, 1>         TEnvironment;
+    typedef StringEnumerator<TQGram, TEnvironment>      TNeighborhood;
+    typedef typename Iterator<TNeighborhood>::Type      TNeighborhoodIt;
+
+    unsigned long count = 0;
+
+    double timer = sysTime();
+
+    TQGram qgram;
+    forEach(queries, [&](TQuery const & query)
+    {
+        assign(qgram, query);
+        TNeighborhood neighborhood(qgram);
+
+        for (TNeighborhoodIt itN = begin(neighborhood); !atEnd(itN); goNext(itN))
+        {
+            hash(indexShape(index), begin(*itN));
+            count += countOccurrences(index, indexShape(index));
+//        TOccurrences const & occs = getOccurrences(index, indexShape(index));
+//        count += length(occs);
+        }
+    });
+
+    Stats::countTime = sysTime() - timer;
+
+    return count;
+}
+
+// ----------------------------------------------------------------------------
 // Function countOccurrences()
 // ----------------------------------------------------------------------------
 // Dispatch locate and distance.
@@ -219,9 +261,9 @@ inline unsigned long findOccurrences(Options const & /* options */, TIndex & ind
 template <typename TIndex, typename TQueries, typename TLocate>
 inline unsigned long countOccurrences(Options const & options, TIndex & index, TQueries & queries, TLocate)
 {
-//    if (options.errors)
-//        return findOccurrences(options, index, queries, TLocate(), HammingDistance());
-//    else
+    if (options.errors)
+        return findOccurrences(options, index, queries, TLocate(), HammingDistance());
+    else
         return findOccurrences(options, index, queries, TLocate(), Exact());
 }
 

@@ -41,6 +41,9 @@ using namespace seqan;
 // Forwards
 // ============================================================================
 
+//template <typename Type1, typename Type2>
+//struct IsBaseType : IsSameType<typename std::is_base_of<Type1, Type2>::type, std::true_type> {};
+
 template <typename TOptions>
 inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options);
 
@@ -56,6 +59,55 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
 // Function run()
 // ----------------------------------------------------------------------------
 
+#if defined(APP_BENCH_QGRAMS_CONSTRUCT_CPP_) || defined(APP_BENCH_QGRAMS_FIND_CPP_)
+template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TOptions>
+inline void run(TOptions & options)
+{
+    switch (options.textIndexType)
+    {
+    case TOptions::INDEX_QGRAM_DIRECT:
+        switch (options.q)
+        {
+        case 5:
+            run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<5> > >(options);
+            break;
+        case 10:
+            run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<10> > >(options);
+            break;
+        case 15:
+            run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<15> > >(options);
+            break;
+        default:
+            throw RuntimeError("Unsupported q-gram weight");
+        }
+        break;
+    case TOptions::INDEX_QGRAM_OPEN:
+        switch (options.q)
+        {
+        case 10:
+            run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<10>, OpenAddressing> >(options);
+            break;
+        case 15:
+            run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<15>, OpenAddressing> >(options);
+            break;
+        case 20:
+            run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<20>, OpenAddressing> >(options);
+            break;
+        case 25:
+            run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<25>, OpenAddressing> >(options);
+            break;
+        case 30:
+            run<TAlphabet, TLimits, TSetLimits, IndexQGram<UngappedShape<30>, OpenAddressing> >(options);
+            break;
+        default:
+            throw RuntimeError("Unsupported q-gram weight");
+        }
+        break;
+    default:
+        throw RuntimeError("Unsupported index type");
+    }
+}
+#else
 template <typename TAlphabet, typename TLimits, typename TSetLimits, typename TOptions>
 inline void run(TOptions & options)
 {
@@ -83,6 +135,7 @@ inline void run(TOptions & options)
         throw RuntimeError("Unsupported index type");
     }
 }
+#endif
 
 template <typename TAlphabet, typename TLimits, typename TOptions>
 inline void run(TOptions & options)

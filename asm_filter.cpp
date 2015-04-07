@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_BENCH_FILTER_CPP_
+#define APP_BENCH_ASM_FILTER_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -105,7 +105,7 @@ TMatchesSet Stats::matchesSet(matches);
 // Class Options
 // ----------------------------------------------------------------------------
 
-struct Options : BaseOptions
+struct Options : StreeOptions
 {
     typedef std::string             TString;
     typedef std::vector<TString>    TList;
@@ -133,7 +133,7 @@ struct Options : BaseOptions
     TString         qgramsShape;
 
     Options() :
-        BaseOptions(),
+        StreeOptions(),
         algorithmType(ALGO_SEEDS),
         errorRate(0.0),
         editDistance(false),

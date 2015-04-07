@@ -19,6 +19,7 @@ function vars_dna_common
     VISIT_DEPTH=$(seq 1 20) #30
 
     # query
+    QGRAM_LENGTHS=$(seq 5 5 30)
     PATTERN_LENGTHS=$(seq 5 5 50)
     PATTERN_COUNT=1000000
     QUERY_ERRORS=$(seq 0 1)
@@ -110,7 +111,7 @@ function vars_protein_uniprot
 # cmd_prepare input output alphabet count sum length [plength] [pcount]
 function cmd_prepare
 {
-    CMD="$BIN/bench_dump $1 $2 -a $3 -tc $4 -ts $5 -tl $6"
+    CMD="$BIN/bench_io_dump $1 $2 -a $3 -tc $4 -ts $5 -tl $6"
     if [ $# -ge 7 ]
     then
         CMD+=" -ll $7"
@@ -124,28 +125,40 @@ function cmd_prepare
     fi
 }
 
-# cmd_construct input output alphabet count sum length index
-function cmd_construct
+# cmd_stree_construct input output alphabet count sum length index
+function cmd_stree_construct
 {
-    CMD="$BIN/bench_construct --tsv $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7"
+    CMD="$BIN/bench_stree_construct --tsv $1 $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7"
+}
+
+# cmd_qgrams_construct input output alphabet count sum length index weight
+function cmd_qgrams_construct
+{
+    CMD="$BIN/bench_qgrams_construct --tsv $1 $2.$7.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -q $8"
 }
 
 # cmd_visit depth input alphabet count sum length index
 function cmd_visit
 {
-    CMD="$BIN/bench_visit --tsv $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -d $1"
+    CMD="$BIN/bench_stree_visit --tsv $2.$7 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -d $1"
 }
 
-# cmd_query text pattern alphabet count sum length index plength errors algo
-function cmd_query
+# cmd_stree_find index pattern alphabet count sum length index plength errors algo
+function cmd_stree_find
 {
-    CMD="$BIN/bench_query --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
+    CMD="$BIN/bench_stree_find --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g ${10}"
+}
+
+# cmd_qgrams_find index pattern alphabet count sum length index plength pcount
+function cmd_qgrams_find
+{
+    CMD="$BIN/bench_qgrams_find --tsv $1.$7.$8 $2.$8.$9 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -q $8"
 }
 
 # cmd_filter_seeds text pattern alphabet count sum length index plength errors distance verify rdup seederr
 function cmd_filter_seeds
 {
-    CMD="$BIN/bench_filter --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g seeds -se ${13}"
+    CMD="$BIN/bench_asm_filter --tsv $1.$7 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -i $7 -e $9 -g seeds -se ${13}"
     if [[ ${10} = 'edit' ]]; then
         CMD+=" -ed"
     fi
@@ -160,7 +173,7 @@ function cmd_filter_seeds
 # cmd_filter_qgrams text pattern alphabet count sum length NONE plength errors distance verify rdup weight threshold
 function cmd_filter_qgrams
 {
-    CMD="$BIN/bench_filter --tsv $1 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -e $9 -g qgrams -qw ${13} -qt ${14}" # -se ${13} -so
+    CMD="$BIN/bench_asm_filter --tsv $1 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -e $9 -g qgrams -qw ${13} -qt ${14}" # -se ${13} -so
     if [[ ${10} = 'edit' ]]; then
         CMD+=" -ed"
     fi
@@ -253,12 +266,35 @@ function exec_construct_text
     fi
     for index_type in $INDEX_TYPE;
     do
-        cmd_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type
+        cmd_stree_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type
         echo $CMD
         output=$($CMD)
         if [ $? -eq 0 ]; then
             echo -e "$ALPHABET\t$DATASET\t$index_type\t$output" >> $filename
         fi
+    done
+}
+
+# exec_construct_text_qgrams filename.tsv
+function exec_construct_text_qgrams
+{
+    filename=$1
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tindex\tsymbols\ttime" > $filename
+    fi
+
+    for index_type in direct open;
+    do
+        for pattern_length in $QGRAM_LENGTHS;
+        do
+            cmd_qgrams_construct $DIR/$TEXT_NAME $DIR/$INDEX_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length
+            echo $CMD
+            output=$($CMD)
+            if [ $? -eq 0 ]; then
+                echo -e "$ALPHABET\t$DATASET\t$index_type\t$output" >> $filename
+            fi
+        done
     done
 }
 
@@ -298,13 +334,37 @@ function exec_query
         do
             for pattern_length in $PATTERN_LENGTHS;
             do
-                cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length.$PATTERN_COUNT $errors single
+                cmd_stree_find $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length.$PATTERN_COUNT $errors single
                 echo $CMD
                 output=$($CMD)
                 if [ $? -eq 0 ]; then
                     echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$pattern_length\t$output" >> $filename
                 fi
             done
+        done
+    done
+}
+
+# exec_query_qgrams filename.tsv
+function exec_query_qgrams
+{
+    filename=$1
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tindex\terrors\tplength\toccurrences\ttime\tpreprocessing" > $filename
+    fi
+
+    errors=0
+    for index_type in direct open;
+    do
+        for pattern_length in $QGRAM_LENGTHS;
+        do
+            cmd_qgrams_find $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $pattern_length $PATTERN_COUNT
+            echo $CMD
+            output=$($CMD)
+            if [ $? -eq 0 ]; then
+                echo -e "$ALPHABET\t$DATASET\t$index_type\t$errors\t$pattern_length\t$output" >> $filename
+            fi
         done
     done
 }
@@ -328,7 +388,7 @@ function exec_query_multi
 
                 for algo in single sort dfs bfs;
                 do
-                    cmd_query $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
+                    cmd_stree_find $DIR/$INDEX_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT $index_type $multi_length.$multi_count $errors $algo
                     echo $CMD
                     output=$($CMD)
                     if [ $? -eq 0 ]; then
@@ -441,14 +501,17 @@ vars_$ALPHABET\_$DATASET
 
 #exec_prepare_text
 #exec_construct_text $TSV/construct.tsv
+exec_construct_text_qgrams $TSV/construct.tsv
 
 # ======================================================================================================================
 
 #exec_visit_text $TSV/visit.tsv
 #exec_prepare_patterns "${PATTERN_LENGTHS}" "${PATTERN_COUNT}" true
 #exec_query $TSV/query.tsv
+exec_query_qgrams $TSV/query.tsv
 #exec_prepare_patterns "${MULTI_LENGTHS} ${MULTI_COUNTS}" true
 #exec_query_multi $TSV/multi.tsv
+
 
 # ======================================================================================================================
 

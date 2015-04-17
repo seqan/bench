@@ -15,13 +15,13 @@ FONT_SIZE=10
 POINT_SIZE=2
 FONT_FAMILY='Cambria'
 
-FILTER_NAMES=c("seeds_0","seeds_1","seeds_2","qgrams_0","qgrams_1","qgrams_gapped")
+FILTER_NAMES=c("seeds_0","seeds_1","seeds_2","qgrams_0","qgrams_1","gapped_0")
 FILTER_LABELS=c("Exact seeds",
                 "1-Apx seeds",
                 "2-Apx seeds",
                 "q-Grams, t \u2265 1",
                 "q-Grams, t \u2265 4",
-                "Gapped q-grams")
+                "Q-Grams")
 FILTER_COLORS <- c("#D62728", "#FF7F0E", "#8C564B", "#9467BD", "#1F77B4", "#2CA02C")
 names(FILTER_COLORS) <- FILTER_NAMES
 FILTER_SHAPES <- c(0,1,2,3,4,5)

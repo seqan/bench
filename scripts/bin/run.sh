@@ -185,6 +185,21 @@ function cmd_filter_qgrams
     fi
 }
 
+# cmd_filter_qgrams text pattern alphabet count sum length NONE plength errors distance verify rdup shape threshold
+function cmd_filter_gapped
+{
+    CMD="$BIN/bench_filter --tsv $1 $2.$8 -a $3 -tc $4 -ts $5 -tl $6 -e $9 -g qgrams -qs ${13} -qt ${14}"
+    if [[ ${10} = 'edit' ]]; then
+        CMD+=" -ed"
+    fi
+    if [[ ${11} = 'true' ]]; then
+        CMD+=" -vy"
+    fi
+    if [[ ${12} = 'true' ]]; then
+        CMD+=" -rd"
+    fi
+}
+
 # ======================================================================================================================
 
 # param_filter_seeds plength errors distance
@@ -229,6 +244,28 @@ function param_filter_qgrams
         qgrams_threshold=$(python -c "import math; print ${plength} - (${errors}+1) * ${qgrams_weight} + 1")
         QGRAMS_WEIGHT+=" ${qgrams_weight}"
         QGRAMS_THRESHOLD+=" ${qgrams_threshold}"
+    fi
+}
+
+# param_filter_gapped plength errors
+function param_filter_gapped
+{
+    plength=$1
+    errors=$2
+
+    if [[ $errors -eq 8 ]]; then
+        GAPPED_SHAPE="1010100010000010101000100000101010001 1101010001100000000010110100011"
+        GAPPED_THRESHOLD="4 5"
+    fi
+
+    if [[ $errors -eq 9 ]]; then
+        GAPPED_SHAPE="1010100010000010101000100000101010001 111010010000001000000101010011"
+        GAPPED_THRESHOLD="3 5"
+    fi
+
+    if [[ $errors -eq 10 ]]; then
+        GAPPED_SHAPE="1010100010000010101000100000101010001"
+        GAPPED_THRESHOLD="2"
     fi
 }
 
@@ -480,6 +517,45 @@ function exec_filter_qgrams
     done
 }
 
+# exec_filter_qgrams filename.tsv distance verify remove-duplicates
+function exec_filter_gapped
+{
+    filename=$1
+    distance=$2
+    verify=$3
+    rdup=$4
+    patterns_length=$FILTER_LENGTHS
+
+    if [[ ! -e $filename ]]; then
+        echo -e "alphabet\tdataset\tpcount\tplength\terrors\tdistance\tfilter\tverifications\tduplicates\toccurrences\ttime" > $filename
+    fi
+
+    for errors in 8 9 10;
+    do
+        for patterns_count in $FILTER_COUNTS;
+        do
+            param_filter_gapped $patterns_length $errors
+            qgrams_thresholds=($GAPPED_THRESHOLD)
+            param_idx=0
+            for qgrams_shape in $GAPPED_SHAPE;
+            do
+                qgrams_threshold=${qgrams_thresholds[$param_idx]}
+
+                cmd_filter_gapped $DIR/$TEXT_NAME $DIR/$PATTERN_NAME $ALPHABET $TEXT_COUNT_BIT $TEXT_SUM_BIT $TEXT_LENGTH_BIT 'NONE' $patterns_length.$patterns_count $errors $distance $verify $rdup $qgrams_shape $qgrams_threshold
+                filter_name="gapped_${param_idx}"
+
+                echo $CMD
+                output=$($CMD)
+                if [ $? -eq 0 ]; then
+                    echo -e "${ALPHABET}\t${DATASET}\t${patterns_count}\t${patterns_length}\t${errors}\t${distance}\t${filter_name}\t${output}" >> $filename
+                fi
+
+                param_idx=$(($param_idx+1))
+            done
+        done
+    done
+}
+
 # ======================================================================================================================
 
 if [ ! $# -eq 2 ]
@@ -526,3 +602,6 @@ exec_query_qgrams $TSV/query.tsv
 #        exec_filter_$filter $TSV/filter_only.tsv $distance false false
 #    done
 #done
+
+exec_filter_gapped $TSV/filter_verify.tsv hamming true false
+exec_filter_gapped $TSV/filter_only.tsv hamming false false

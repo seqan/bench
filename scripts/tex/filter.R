@@ -4,6 +4,7 @@ library("ggthemes")
 library("scales")
 library("sitools")
 library("Cairo")
+library("MASS")
 
 INPUT="/Volumes/barracuda/Code/seqan/apps/bench/scripts/resources"
 OUTPUT="/Users/esiragusa/Documents/Dissertation/plots"
@@ -146,7 +147,7 @@ for (DISTANCE in DISTANCES)
     xlab(ERROR_LABELS[[DISTANCE]]) +
     ylab("PPV [matches/verifications]") +
     scale_x_discrete(breaks=c(2,4,6,8,10)) +
-    scale_y_log10() +
+    scale_y_log10(breaks=c(1/10, 1/100, 1/1000), labels=fractions) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
   ggsave(file=PLOT_PPV, width=PDF_WIDTH, height=PDF_HEIGHT, scale=PDF_SCALE, device=cairo_pdf) 
@@ -168,9 +169,9 @@ for (DISTANCE in DISTANCES)
     scale_shape_manual(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS, values=FILTER_SHAPES) +
     scale_color_manual(name="Filter", breaks=FILTER_NAMES, labels=FILTER_LABELS, values=FILTER_COLORS) +
     xlab(ERROR_LABELS[[DISTANCE]]) +
-    ylab("Verification/filtration time [s]") +
+    ylab("Verification/filtration time") +
     scale_x_discrete(breaks=c(2,4,6,8,10)) +
-    scale_y_log10(labels=f2si) +
+    scale_y_log10(labels=fractions) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
   ggsave(file=PLOT_RATIO, width=PDF_WIDTH, height=PDF_HEIGHT, scale=PDF_SCALE, device=cairo_pdf) 
@@ -196,7 +197,7 @@ for (DISTANCE in DISTANCES)
     xlab(ERROR_LABELS[[DISTANCE]]) +
     ylab("Average time per pattern [s]") +
     scale_x_discrete(breaks=c(2,4,6,8,10)) +
-    scale_y_log10(labels=f2si) +
+    scale_y_log10(breaks=c(0.01, 0.001, 0.0001, 0.00001), labels=f2si) +
     theme_bw(base_size=FONT_SIZE, base_family=FONT_FAMILY)
   
   ggsave(file=PLOT_RUNTIME, width=PDF_WIDTH, height=PDF_HEIGHT, scale=PDF_SCALE, device=cairo_pdf) 

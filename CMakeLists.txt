@@ -23,7 +23,7 @@ if (NOT CXX11_FOUND)
 endif (NOT CXX11_FOUND)
 
 # Search SeqAn and select dependencies.
-set (SEQAN_FIND_DEPENDENCIES ZLIB BZIP2)
+set (SEQAN_FIND_DEPENDENCIES ZLIB BZip2)
 find_package (SeqAn REQUIRED)
 
 # Warn if Zlib was not found.

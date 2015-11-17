@@ -67,12 +67,14 @@ using namespace seqan;
 struct Options : StreeOptions // BaseOptions
 {
     CharString      outputFile;
+    unsigned        minimumLength;
     unsigned        limitLength;
     unsigned        limitCount;
     bool            limitOne;
 
     Options() :
         StreeOptions(), // BaseOptions(),
+        minimumLength(0),
         limitLength(0),
         limitCount(0),
         limitOne(false)
@@ -104,6 +106,10 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setAlphabetType(parser, options);
     setTextLimits(parser, options);
 
+    addSection(parser, "Filter Options");
+    addOption(parser, ArgParseOption("ml", "minimum-length", "Filter out sequences shorter than minimum length.", ArgParseOption::INTEGER));
+    setDefaultValue(parser, "minimum-length", options.minimumLength);
+
     addSection(parser, "Dump Options");
     addOption(parser, ArgParseOption("ll", "limit-length", "Limit the length of the texts.", ArgParseOption::INTEGER));
     setDefaultValue(parser, "limit-length", options.limitLength);
@@ -130,6 +136,7 @@ inline parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, c
 
     getAlphabetType(options, parser);
     getTextLimits(options, parser);
+    getOptionValue(options.minimumLength, parser, "minimum-length");
     getOptionValue(options.limitLength, parser, "limit-length");
     getOptionValue(options.limitCount, parser, "limit-count");
     getOptionValue(options.limitOne, parser, "limit-one");
@@ -184,6 +191,9 @@ inline void run(Options & options)
     while (!atEnd(seqFile))
     {
         readRecord(id, seq, seqFile);
+
+        if (options.minimumLength > 0 && length(seq) < options.minimumLength)
+            continue;
 
         if (options.limitLength <= 0)
         {

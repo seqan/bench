@@ -239,8 +239,8 @@ inline void run(Options & options)
 
     if (!options.tsv)
     {
-        std::cout << length(text) << " sequences" << std::endl;
-        std::cout << lengthSum(text) << " symbols" << std::endl;
+        std::cout << (unsigned long)length(text) << " sequences" << std::endl;
+        std::cout << (unsigned long)lengthSum(text) << " symbols" << std::endl;
     }
 }
 

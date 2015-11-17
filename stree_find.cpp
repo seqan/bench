@@ -370,8 +370,8 @@ inline unsigned long countOccurrences(Options const & options, TIndex & index, T
     case Options::ALGO_SORT:
         return findOccurrences(options, index, queries, TLocate(), Backtracking<TDistance>(), SortedList());
 
-    case Options::ALGO_DFS:
-        return findOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
+//    case Options::ALGO_DFS:
+//        return findOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
 
 //    case Options::ALGO_BFS:
 //        switch (options.errors)

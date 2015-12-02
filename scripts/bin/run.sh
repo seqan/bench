@@ -71,6 +71,20 @@ function vars_dna_celegans
     INDEX_NAME=celegans #.$INDEX_TYPE
 }
 
+function vars_dna_drosophila_common
+{
+    SRC=~/Datasets/drosophila
+    vars_dna_common
+
+    # pattern
+    PATTERN_INPUT="SRR065390_10M_1.fastq"
+    PATTERN_NAME=drosophila.pat #.$PATTERN_LENGTHS[i]
+
+    TEXT_INPUT="drosophila_\$SEQCOUNT.fasta.gz"
+    TEXT_NAME=drosophila_\$SEQCOUNT.txt
+    INDEX_NAME=drosophila_\$SEQCOUNT
+}
+
 function vars_protein_uniprot
 {
     SRC=~/Datasets/uniprot
@@ -569,22 +583,23 @@ TSV=~/Datasets/ibench/tsv
 
 ALPHABET=$1
 DATASET=$2
+SEQCOUNT=$3 # for drosophila dataset
 
 # configure vars
 vars_$ALPHABET\_$DATASET
 
 # ======================================================================================================================
 
-#exec_prepare_text
-#exec_construct_text $TSV/construct.tsv
-exec_construct_text_qgrams $TSV/construct.tsv
+exec_prepare_text
+exec_construct_text $TSV/construct.tsv
+#exec_construct_text_qgrams $TSV/construct.tsv
 
 # ======================================================================================================================
 
-#exec_visit_text $TSV/visit.tsv
+exec_visit_text $TSV/visit.tsv
 #exec_prepare_patterns "${PATTERN_LENGTHS}" "${PATTERN_COUNT}" true
 #exec_query $TSV/query.tsv
-exec_query_qgrams $TSV/query.tsv
+#exec_query_qgrams $TSV/query.tsv
 #exec_prepare_patterns "${MULTI_LENGTHS} ${MULTI_COUNTS}" true
 #exec_query_multi $TSV/multi.tsv
 
@@ -603,5 +618,5 @@ exec_query_qgrams $TSV/query.tsv
 #    done
 #done
 
-exec_filter_gapped $TSV/filter_verify.tsv hamming true false
-exec_filter_gapped $TSV/filter_only.tsv hamming false false
+#exec_filter_gapped $TSV/filter_verify.tsv hamming true false
+#exec_filter_gapped $TSV/filter_only.tsv hamming false false

@@ -113,3 +113,5 @@ if (SEQAN_BUILD_SYSTEM STREQUAL "APP:bench")
 
   seqan_configure_cpack_app (bench "bench")
 endif (SEQAN_BUILD_SYSTEM STREQUAL "APP:bench")
+
+add_subdirectory(integrated_interface)

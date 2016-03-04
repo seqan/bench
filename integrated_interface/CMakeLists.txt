@@ -7,20 +7,12 @@
 # ===========================================================================
 
 cmake_minimum_required (VERSION 2.8.9)
-project (seqan_apps_bench)
-message (STATUS "Configuring apps/bench/Interface")
+project (seqan_apps_bench CXX)
+message (STATUS "Configuring apps/bench/Integrated_Interface/std_bench")
 
 # ----------------------------------------------------------------------------
 # Dependencies
 # ----------------------------------------------------------------------------
-
-# Search C++11.
-find_package(CXX11 REQUIRED)
-
-if (NOT CXX11_FOUND)
-    message (STATUS "  C++11 compiler required to build bench.")
-    return ()
-endif (NOT CXX11_FOUND)
 
 # Search SeqAn and select dependencies.
 find_package (SeqAn REQUIRED)

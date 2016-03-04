@@ -7,8 +7,8 @@ This application provides a integrated interface for Seqan benchmarks.
 Support
 -------
 Linux
-Windows
 OSX
+Windows
 
 Installation
 -------------

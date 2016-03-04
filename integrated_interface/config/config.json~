@@ -1,0 +1,57 @@
+{ 
+        "pw_global_dna_1M":{ 
+            "name":"pa_global",
+            "category":["Pairwise_Alignment","Dna_Reads","global_NW_Alignment"],
+            "categoryName":"Dna global_NW",
+            "infoFile":"./Info/configInfo/pw_global_dna_1M_help.json",
+            "programName":"pa_global",
+            "checker":"",
+            "checked":true, 
+            "runCmd":"./std_bench/demo_seq_dev_pa_global ./bench/reads3.1.fa ./bench/result1.txt -tc 4",
+            "time":50
+        },
+		"pw_local_dna_1M":{
+			"name":"p",
+			"category":["Pairwise_Alignment", "Dna_Reads", "local_SW_Alignment"],
+            "categoryName":"Dna local_SW",
+			"infoFile":"./Info/configInfo/pw_local_dna_1M_help.json",
+			"programName":"",
+			"checker":"",
+			"checked":true,
+			"runCmd":"./std_bench/demo_seq_dev_pa_local ./bench/reads3.1.fa ./bench/result1.txt -tc 4",
+            "time":60
+		},
+		"pw_global_protein_1M":{
+			"name":"pa",
+			"category":["Pairwise_Alignment", "Protein_Reads", "global_NW_Alignment"],	
+            "categoryName":"Protein global_NW",
+			"infoFile":"./Info/configInfo/pw_global_dna_1M_protein_help.json",
+			"programName":"",
+			"checker":"",
+			"checked":true,
+			"runCmd":"./std_bench/demo_seq_dev_pa_global_protein",
+            "time":50
+		},
+        "pw_local_protein_1M":{
+            "name":"pairwise local protein alignment",
+            "category":["Pairwise_Alignment", "Protein_Reads", "local_SW_Alignment"],
+            "categoryName":"Proteine local_NW",
+            "infoFile":"./Info/configInfo/pw_local_dna_1M_protein_help.json",
+            "programName":"",
+            "checker":"",
+            "checked":true,
+            "runCmd":"./std_bench/demo_seq_dev_pa_local_protein",
+            "time":50
+        },
+		"genome-index":{
+            "name":"genome_index",
+	        "category":["Index","Rna_Reads"],
+            "categoryName":"Rna",
+	 		"infoFile":"./Info/configInfo/pw_global_dna_1M_protein_help.json",
+			"programName":"",
+			"checker":"",
+            "checked":true,
+            "runCmd":"./std_bench/genome_index",
+            "time":40
+        }  
+}

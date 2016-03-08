@@ -1,3 +1,0 @@
-{
-    "helpContent":"<b>DEFAULT</b><p><p>./bench/demo_seq_dev_pa_local ./bench/reads3.1.fa ./bench/result1.txt -tc 4<p><b>SYNOPSIS</b><p><b>Local Pairwise Alignment benchmark demo</b> [OPTIONS] IN OUT <p><b>DESCRIPTION</b><p>IN is a .fa / fasta input file. OUT is a txt output file.<p><b>Settings:</b><p><b>-tc, --threads</b> INT<p>Number of threads Default: 4.<p><b>VERSION</b><p>Last update: Nov 2015<p>Local Pairwise Alignment benchmark demo version: 0.1<p>SeqAn version: 2.1.0<p>"
-}

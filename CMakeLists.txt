@@ -94,7 +94,7 @@ endif (NOT SEQAN_PREFIX_SHARE_DOC)
 
 # Install bench in ${PREFIX}/bin directory
 install (TARGETS bench_dump bench_construct bench_visit bench_query bench_filter
-         DESTINATION apps)
+         DESTINATION bin)
 
 # Install non-binary files for the package to "." for app builds and
 # ${PREFIX}/share/doc/bench for SeqAn release builds.
@@ -114,4 +114,4 @@ if (SEQAN_BUILD_SYSTEM STREQUAL "APP:bench")
   seqan_configure_cpack_app (bench "bench")
 endif (SEQAN_BUILD_SYSTEM STREQUAL "APP:bench")
 
-add_subdirectory(integrated_interface/src)
+add_subdirectory(integrated_interface)

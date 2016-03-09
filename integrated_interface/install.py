@@ -46,14 +46,16 @@ if platform.system() == "Windows":
 elif platform.system() == "Linux":
     if (not os.path.exists(_exeDir)): 
         os.mkdir(_exeDir)
-    shutil.copytree(os.path.join(sys.path[0],'config'), _exeDir)
-    shutil.copytree(os.path.join(sys.path[0],'resources'), _exeDir)
-    shutil.mkdir(os.path.join(_exeDir, 'std_bench'))
-    shutil.copytree(os.path.join(sys.path[0],'Info'), _exeDir)
-    shutil.copyfile(os.path.join(sys.path[0],'controller.js'), _exeDir)
-    shutil.copyfile(os.path.join(sys.path[0],'gui.js'), _exeDir)
-    shutil.copyfile(os.path.join(sys.path[0],'package.json'), _exeDir)
-    shutil.copyfile(os.path.join(sys.path[0],'index.html'), _exeDir)
+    else:
+        shutil.rmtree(_exeDir)
+    shutil.copytree(os.path.join(sys.path[0],'config'), os.path.join(_exeDir,'config'))
+    shutil.copytree(os.path.join(sys.path[0],'resources'), os.path.join(_exeDir,'resources'))
+    os.mkdir(os.path.join(_exeDir, 'std_bench'))
+    shutil.copytree(os.path.join(sys.path[0],'Info'), os.path.join(_exeDir, 'Info'))
+    shutil.copyfile(os.path.join(sys.path[0],'controller.js'), os.path.join(_exeDir, 'controller.js'))
+    shutil.copyfile(os.path.join(sys.path[0],'gui.js'), os.path.join(_exeDir, 'gui.js'))
+    shutil.copyfile(os.path.join(sys.path[0],'package.json'), os.path.join(_exeDir, 'package.json'))
+    shutil.copyfile(os.path.join(sys.path[0],'index.html'), os.path.join(_exeDir, 'index.html'))
 
     #compile benchmark programs
     _tmpCmd = ' '.join(['make -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
@@ -74,8 +76,8 @@ elif platform.system() == "Linux":
         zipf = zipfile.ZipFile(_zipFile, 'w', zipfile.ZIP_DEFLATED)
         zipdir(_zipSrc, zipf)
         zipf.close()
-    shutil.copytree(os.path.join(_nwjsDir, localesDir), _exeDir)
-    shutil.copyfile(os.path.join(_nwjsDir, icudtlFile), _exeDir)
+    shutil.copytree(os.path.join(_nwjsDir, localesDir), os.path.join(_exeDir, localesDir))
+    shutil.copyfile(os.path.join(_nwjsDir, icudtlFile), os.path.join(_exeDir, icudtlFile))
 
     _tmpCmd = ' '.join(['cat', os.path.join(_nwjsDir, 'nw'), 
                        _zipFile, '>', os.path.join(_exeDir, App)])

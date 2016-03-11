@@ -1,0 +1,39 @@
+{ 
+        "pw_global_dna_1M":{ 
+            "name":"",
+            "category":["Pairwise_Alignment","Dna_Reads","global_NW_Alignment"],
+            "categoryName":"Dna global_NW",
+            "infofile":"./Info/configInfo/pw_global_dna_1M_help.json",
+            "programName":"",
+            "checker":"",
+            "checked":"true", 
+            "argv":{},
+            "runCmd":"./bench/demo_seq_dev_pa_global",
+            "time":3
+        },
+        "pw_local_protein_1M":{
+            "name":"pairwise local protein alignment",
+            "category":["Pairwise_Alignment", "Protein_Reads", "local_SW_Alignment"],
+            "categoryName":"Proteine local_NW",
+            "infofile":"",
+            "programName":"",
+            "checker":"",
+            "checked":"false",
+            "argv":{},
+            "runCmd":"./bench/pa_C",
+            "time":3
+        },
+        "genome-index":{
+            "name":"genome_index",
+	    	"category":["Index","Rna_Reads"],
+            "categoryName":"Rna",
+			"inforfile":"",
+			"programName":"",
+			"checker":"",
+            "checked":true,
+            "runCmd":"./bench/genome_index",
+			"argv":"",
+            "time":4
+        }   
+}
+

@@ -1,6 +1,6 @@
 {
   "name": "Seqan BenchMark Graphical Interface",
-  "main": "index.html",
+  "main": "resources/js/index.html",
   "description": "Program for integrated benchmarks",
   "window": {
     "title": "Seqan Benchmark",

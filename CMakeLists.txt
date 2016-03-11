@@ -23,8 +23,13 @@ if (NOT CXX11_FOUND)
 endif (NOT CXX11_FOUND)
 
 # Search SeqAn and select dependencies.
-set (SEQAN_FIND_DEPENDENCIES ZLIB BZIP2)
+set (SEQAN_FIND_DEPENDENCIES OpenMP ZLIB BZIP2)
 find_package (SeqAn REQUIRED)
+
+# Warn if Zlib was not found.
+if (NOT SEQAN_HAS_OPENMP)
+  message (STATUS "  OpenMP not found: building bench without multithreading.")
+endif (NOT SEQAN_HAS_OPENMP)
 
 # Warn if Zlib was not found.
 if (NOT SEQAN_HAS_ZLIB)
@@ -101,6 +106,9 @@ install (TARGETS bench_dump bench_construct bench_visit bench_query bench_filter
 install (FILES LICENSE README
          DESTINATION ${SEQAN_PREFIX_SHARE_DOC})
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+add_subdirectory(integrated_interface)
 # ----------------------------------------------------------------------------
 # CPack Install
 # ----------------------------------------------------------------------------
@@ -113,5 +121,3 @@ if (SEQAN_BUILD_SYSTEM STREQUAL "APP:bench")
 
   seqan_configure_cpack_app (bench "bench")
 endif (SEQAN_BUILD_SYSTEM STREQUAL "APP:bench")
-
-add_subdirectory(integrated_interface)

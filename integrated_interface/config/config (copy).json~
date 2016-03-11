@@ -1,0 +1,14 @@
+{ 
+        "pw_g":{
+            "name":"",
+            "category":["Pairwise_Alignment","Dna_Reads","global_NW_Alignment"],
+            "infofile":"",
+            "programName":"",
+            "checker":"",
+            "checked":"true", 
+            "argv":{},
+            "runCmd":"./bench/demo_seq_dev_pa_local",
+            "time":3
+        } 
+}
+

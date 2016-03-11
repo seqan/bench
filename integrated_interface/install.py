@@ -47,15 +47,18 @@ elif platform.system() == "Linux":
     if (not os.path.exists(_exeDir)): 
         os.mkdir(_exeDir)
     else:
-        shutil.rmtree(_exeDir)
+        print 'please remove ' + _exeDir 
+        #shutil.rmtree(_exeDir)
+    shutil.rmtree(_exeDir)
     shutil.copytree(os.path.join(sys.path[0],'config'), os.path.join(_exeDir,'config'))
     shutil.copytree(os.path.join(sys.path[0],'resources'), os.path.join(_exeDir,'resources'))
-    os.mkdir(os.path.join(_exeDir, 'std_bench'))
+    shutil.copytree(os.path.join(sys.path[0], 'std_bench', 'data'), os.path.join(_exeDir, 'std_bench', 'data'))
     shutil.copytree(os.path.join(sys.path[0],'Info'), os.path.join(_exeDir, 'Info'))
-    shutil.copyfile(os.path.join(sys.path[0],'controller.js'), os.path.join(_exeDir, 'controller.js'))
-    shutil.copyfile(os.path.join(sys.path[0],'gui.js'), os.path.join(_exeDir, 'gui.js'))
+    #shutil.copyfile(os.path.join(sys.path[0],'controller.js'), os.path.join(_exeDir, 'controller.js'))
+    #shutil.copyfile(os.path.join(sys.path[0],'gui.js'), os.path.join(_exeDir, 'gui.js'))
     shutil.copyfile(os.path.join(sys.path[0],'package.json'), os.path.join(_exeDir, 'package.json'))
-    shutil.copyfile(os.path.join(sys.path[0],'index.html'), os.path.join(_exeDir, 'index.html'))
+    #shutil.copyfile(os.path.join(sys.path[0],'index.html'), os.path.join(_exeDir, 'index.html'))
+
 
     #compile benchmark programs
     _tmpCmd = ' '.join(['make -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
@@ -78,13 +81,21 @@ elif platform.system() == "Linux":
         zipf.close()
     shutil.copytree(os.path.join(_nwjsDir, localesDir), os.path.join(_exeDir, localesDir))
     shutil.copyfile(os.path.join(_nwjsDir, icudtlFile), os.path.join(_exeDir, icudtlFile))
-
+    shutil.copyfile(os.path.join(_nwjsDir, 'nw.pak'), os.path.join(_exeDir, 'nw.pak'))
     _tmpCmd = ' '.join(['cat', os.path.join(_nwjsDir, 'nw'), 
                        _zipFile, '>', os.path.join(_exeDir, App)])
     os.system(_tmpCmd)
     _tmpCmd = ' '.join(['chmod a+x', os.path.join(_exeDir, App)])
     os.system(_tmpCmd)
     os.remove(os.path.join(_exeDir, 'app.nw'))
+    #os.remove(os.path.join(_exeDir, 'gui.js'))
+    os.remove(os.path.join(_exeDir, 'package.json'))
+    #os.remove(os.path.join(_exeDir, 'index.html'))
+    #os.remove(os.path.join(_exeDir, 'controller.js'))
+    shutil.rmtree(os.path.join(_exeDir, 'Info'))
+    shutil.rmtree(os.path.join(_exeDir, 'resources'))
+    shutil.rmtree(os.path.join(_exeDir, 'config'))
+    shutil.rmtree(os.path.join(_exeDir, 'std_bench'))
 else:
     print 3
 

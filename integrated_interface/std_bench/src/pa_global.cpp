@@ -1,4 +1,3 @@
-//![main]
 #include <iostream>
 #include <seqan/align.h>
 #include <seqan/seq_io.h>
@@ -7,9 +6,9 @@
 using namespace seqan;
 
 struct Options{
-    unsigned threads = 0;
+    unsigned threads;
     CharString input;
-    CharString output = "result.txt";
+    CharString output;
 };
 
 seqan::ArgumentParser::ParseResult parseCommandLine(Options & options, int argc, char** const argv){
@@ -30,6 +29,7 @@ seqan::ArgumentParser::ParseResult parseCommandLine(Options & options, int argc,
     
     addSection(parser, "Settings");
     addOption(parser, seqan::ArgParseOption("tc", "threads", "Number of threads", seqan::ArgParseArgument::INTEGER, "INT"));
+
     #ifdef _OPENMP
     setDefaultValue(parser, "threads", omp_get_max_threads());
     #else
@@ -52,9 +52,8 @@ int main(int argc, char **argv)
     ArgumentParser::ParseResult res = parseCommandLine(options, argc, argv);
     if (res != seqan::ArgumentParser::PARSE_OK)
         return res == seqan::ArgumentParser::PARSE_ERROR; 
-    //std::cout << options.input << options.threads << options.output << std::endl;
     #ifdef _OPENMP
-        omp_set_num_threads(options.threads);
+    omp_set_num_threads(options.threads);      
     #endif
    
     StringSet<CharString> id;
@@ -63,8 +62,6 @@ int main(int argc, char **argv)
     readRecords(id, seq, seqFileIn);
 
     Align<String<char>, ArrayGaps > ali;
-    //StringSet<Align<String<char> > > ali_mn;
-    //resize(ali_mn, length(id) * length(id));
     resize(rows(ali), 2);
     String<int> score;
     resize(score, length(id)*length(id));
@@ -74,15 +71,11 @@ int main(int argc, char **argv)
     for (unsigned m = 0; m < length(id); m++)  
     for (unsigned n = m + 1; n < length(id); n++)
     { 
-        //resize(rows(ali_mn[m*length(id)+n]), 2);
-        //assignSource(row(ali_mn[m*length(id) + n], 0), seq[m]);
-        //assignSource(row(ali_mn[m*length(id) + n], 1), seq[n]);
-
         assignSource(row(ali, 0), seq[m]);
         assignSource(row(ali, 1), seq[n]);
          
         score[m*length(id) + n] = globalAlignment(ali, Score<int>(2, -3, -2));
-        
+    
     }
     //serial output 
     for (unsigned m = 0; m < length(id); m++)  

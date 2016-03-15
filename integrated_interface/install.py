@@ -87,7 +87,7 @@ elif platform.system() == "Linux":
     os.system(_tmpCmd)
     _tmpCmd = ' '.join(['chmod a+x', os.path.join(_exeDir, App)])
     os.system(_tmpCmd)
-    os.remove(os.path.join(_exeDir, 'app.nw'))
+    #os.remove(os.path.join(_exeDir, 'app.nw'))
     #os.remove(os.path.join(_exeDir, 'gui.js'))
     os.remove(os.path.join(_exeDir, 'package.json'))
     #os.remove(os.path.join(_exeDir, 'index.html'))
@@ -96,6 +96,6 @@ elif platform.system() == "Linux":
     shutil.rmtree(os.path.join(_exeDir, 'resources'))
     shutil.rmtree(os.path.join(_exeDir, 'config'))
     shutil.rmtree(os.path.join(_exeDir, 'std_bench'))
-else:
+if platform.system == "Darwin"
     print 3
 

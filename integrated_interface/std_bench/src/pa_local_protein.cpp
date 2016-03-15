@@ -24,7 +24,7 @@ seqan::ArgumentParser::ParseResult parseCommandLine(Options & options, int argc,
     
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE, "IN"));
     addArgument(parser, ArgParseArgument(ArgParseArgument::OUTPUT_FILE, "OUT"));
-    setValidValues(parser, 0, "FASTS, fa");
+    setValidValues(parser, 0, "FASTS, fa, fasta");
     setValidValues(parser, 1, "txt");
     
     addSection(parser, "Settings");
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
         assignSource(row(ali, 0), seq[m]);
         assignSource(row(ali, 1), seq[n]);
          
-        score[m * length(id) + n] = globalAlignment(ali, Blosum62(-3, -1));
+        score[m * length(id) + n] = localAlignment(ali, Blosum62(-3, -1));
     }
 
     //serial output score

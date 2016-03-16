@@ -181,3 +181,12 @@ h6{
     margin: 0px;
 }
 
+.modal-backdrop{
+    position:absolut;
+    left: 10px;
+    top: 10px;
+    height: 600px;
+    width: 750px
+    
+}
+

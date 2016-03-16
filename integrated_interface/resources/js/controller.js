@@ -73,7 +73,8 @@ var _SIGNAL = {
 var _EVENTS = {
     "INIT": 'INIT',
     "BLOCKED": 'BLOCKED',
-    "CANCEL":'CANCEL'
+    "CANCEL":'CANCEL',
+    "FAILED": 'FAILED'
 }
 
 var GenericOptions = {
@@ -324,16 +325,26 @@ function _runEach(opts,funcs){
             _SIGNAL.RUN = false
         }
     }
-    
     var _run = function(opts, funcs){
         if (_SIGNAL.CANCEL)
             return _EVENTS.CANCEL
         var spawnCmd = _2SpawnCmd(opts.cmd[opts.count])
         var spawnArgv = _2SpawnArgv(opts.cmd[opts.count]) 
         if (require('os').platform() == 'linux')
+        try{
             require('fs').chmodSync(spawnCmd.prg, 764)
+        }
+        catch(err){
+            _SIGNAL.NORM = false
+            errMsg = err
+        } 
         time=process.hrtime()
+        try{
         free = spawn(spawnCmd.prg, spawnCmd.arg, {detached: true})
+        }
+        catch(err){
+            alert("error")
+        }
         proc.setPid(free.pid)
         _SIGNAL.NORM = true    
         free.on('close', _onCloseFunc)
@@ -341,10 +352,12 @@ function _runEach(opts,funcs){
             _SIGNAL.NORM = false
             errMsg = error 
             opts.st[opts.count] = false
+            eventEmitter.emit(_EVENTS.FAILED)
         })
         free.on('error', function(){
             _SIGNAL.NORM = false 
             errMsg = "Starting program failed"
+            eventEmitter.emit(_EVENTS.FAILED)
         })
     } 
     

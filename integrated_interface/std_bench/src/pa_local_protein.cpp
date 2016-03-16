@@ -24,7 +24,7 @@ seqan::ArgumentParser::ParseResult parseCommandLine(Options & options, int argc,
     
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE, "IN"));
     addArgument(parser, ArgParseArgument(ArgParseArgument::OUTPUT_FILE, "OUT"));
-    setValidValues(parser, 0, "FASTS, fa, fasta");
+    setValidValues(parser, 0, "fasta, fa");
     setValidValues(parser, 1, "txt");
     
     addSection(parser, "Settings");

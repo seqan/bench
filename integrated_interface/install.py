@@ -64,6 +64,11 @@ elif platform.system() == "Linux":
     _tmpCmd = ' '.join(['make -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
     os.system(_tmpCmd)
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_global_alignment_dna'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_dna'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_global_alignment_protein'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_protein'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_create'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_approximate'), os.path.join(_exeDir, 'std_bench'))
 
     #package source
     def zipdir(path, ziph):
@@ -96,6 +101,6 @@ elif platform.system() == "Linux":
     shutil.rmtree(os.path.join(_exeDir, 'resources'))
     shutil.rmtree(os.path.join(_exeDir, 'config'))
     shutil.rmtree(os.path.join(_exeDir, 'std_bench'))
-if platform.system == "Darwin"
+if platform.system() == "Darwin":
     print 3
 

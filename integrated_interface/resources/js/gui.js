@@ -92,8 +92,7 @@ function g_createCategory(){
             else
             {
                 cmp.setChecked($(this).attr("prg"), false)
-            }
-            
+            }  
         }
         $("#" + id + "Checkbox").on("click", checkCallback)
         $("#" + id + "Input").change(function(){
@@ -108,7 +107,6 @@ function g_createCategory(){
         $("#" + id + "Saved").click(function(){
             $("[name=saved][prg=" + $(this).attr("prg") + "]").css('color', 'green')  
             cmp.setRunCmd($(this).attr("prg"), cmp.getRunCmdPrg($(this).attr("prg")) + " " + $("[name=gInput][prg=" + $(this).attr("prg") + "]").val())
-            alert(cmp.getRunCmd($(this).attr("prg")))
         })
     }
 }
@@ -131,12 +129,13 @@ function g_run(){
         'cmd': [],
         'time': [],
         'count': 0,                   //current running bench program
-        'weight': [0.1,0.2,0.7],      //weight for each program
-        'runtime': [0, 0],            //running time
+        'weight': [],      //weight for each program
+        'runtime': [],            //running time
         'results': {'time': []}
     }
     var timeSum = 0
     var timePercent = 0
+    var statMax = 0
     var stat = 0
     var _P = 1
     var _2Time = function(hrtime, tag){
@@ -150,8 +149,8 @@ function g_run(){
         timeSum += opts.time[opts.count]
         timePercent = timeSum / _Total_Time
         stat = opts.weight[opts.count]
-        
-        //NProgress.set(stat)
+
+        NProgress.set(stat)
         if(_SIGNAL.NORM){
        	    if(opts.st[opts.count])
                 $('#result_table').append("<tr><td><h6>" + (opts.count+1) + "</h6></td><td><h6>"+opts.list[opts.count]+"</h6></td><td><h6><span class='glyphicon glyphicon-ok' style='color:#5cb85c' aria-hidden='true'></span>&nbsp complete</h6></td><td><h6>" + Math.floor( _2Time(opts.runtime, "sec") * 10000 ) / 10000 + " Sec</h6></td></tr>")
@@ -162,6 +161,8 @@ function g_run(){
             else
                 $('#result_table').append("<tr><td><h6>"+(opts.count+1)+"</h6></td><td><h6>"+opts.list[opts.count]+"</h6></td><td><h6><span class='glyphicon glyphicon-remove' style='color:#d9534f' aria-hidden='true'></span>&nbsp " + data + "</h6></td><td><h6>NULL</h6></td></tr>")
         }
+        statMax += opts.weight[opts.count]
+        NProgress.set(statMax)
     }
 
     run(opts,_showResults)
@@ -172,7 +173,7 @@ function g_run(){
         NProgress.configure({showSpinner: false, parent:'#progressbar'})
         setTimeout(function(){
             if(_SIGNAL.CANCEL){
-                NProgress.set(1)
+                NProgress.set(_END)
                 $('#progressbar_text').html("<p><h6>&nbsp</h6></p>")
                 return _EVENTS.CANCEL
             }
@@ -181,11 +182,12 @@ function g_run(){
                 $('#progressbar_text').html("<p><h6 style='color: #428bca '><b>complete</b></h6></p>")
                 return _EVENTS.DONE
             }
+            
             if(stat < opts.weight[opts.count] * _P){
-                $('#progressbar_text').html("<p><h6 style='color: #428bca '><b> running " + opts.list[opts.count] + " " + Math.floor(stat * 100) + "% " + _str[Math.floor((_k++ * _deltaTime / 1000)) % _str.length]+ "</b></h6></p>" )
                 stat += _deltaTime / _Total_Time / 1000  
-                NProgress.inc(_deltaTime / _Total_Time / 1000)
+                NProgress.set(stat)
             }
+            $('#progressbar_text').html("<p><h6 style='color: #428bca '><b> running " + opts.list[opts.count] + " " + Math.floor(stat * 100) + "% " + _str[Math.floor((_k++ * _deltaTime / 1000)) % _str.length]+ "</b></h6></p>" )
             _showProgress()
         }, _deltaTime)
     }

@@ -61,7 +61,8 @@ elif platform.system() == "Linux":
 
 
     #compile benchmark programs
-    _tmpCmd = ' '.join(['make -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
+    print "Compiling benchmark programs..."
+    _tmpCmd = ' '.join(['make --silent -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
     os.system(_tmpCmd)
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_global_alignment_dna'), os.path.join(_exeDir, 'std_bench'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_dna'), os.path.join(_exeDir, 'std_bench'))
@@ -92,6 +93,7 @@ elif platform.system() == "Linux":
     os.system(_tmpCmd)
     _tmpCmd = ' '.join(['chmod a+x', os.path.join(_exeDir, App)])
     os.system(_tmpCmd)
+    print "Deleting files..."
     #os.remove(os.path.join(_exeDir, 'app.nw'))
     #os.remove(os.path.join(_exeDir, 'gui.js'))
     os.remove(os.path.join(_exeDir, 'package.json'))
@@ -101,6 +103,7 @@ elif platform.system() == "Linux":
     shutil.rmtree(os.path.join(_exeDir, 'resources'))
     shutil.rmtree(os.path.join(_exeDir, 'config'))
     shutil.rmtree(os.path.join(_exeDir, 'std_bench'))
+    print "Complete."
 if platform.system() == "Darwin":
     print 3
 

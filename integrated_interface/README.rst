@@ -13,6 +13,7 @@ required libraries:
 On Linux/OSX:
 
 1. Download SeqAn 
+
     ``mkdir seqan``
 
     ``cd seqan``
@@ -20,6 +21,7 @@ On Linux/OSX:
     ``git clone https://github.com/seqan/seqan.git``
     
 2. Download bench
+
     ``cd seqan/apps``
 
     ``git clone https://github.com/xp3i4/bench.git seqan/apps/bench seqan/apps/bench``
@@ -28,7 +30,7 @@ On Linux/OSX:
     
     ``git checkout integrated-interface``
 
-3. Create a Makefile project:
+3. Create a Makefile project
 
     ``mkdir -p seqan_build/release``
     

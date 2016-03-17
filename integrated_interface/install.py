@@ -19,46 +19,41 @@ icudtlFile = 'icudtl.dat'
 benchBuildDir = 'apps/bench/integrated_interface/'
 binDir = 'bin/BenchMark_interface_' + platform.system()
 App = 'app'
-
-if args.n is None:
-    print 'Please specify path to nw.js'
-    #sys.exit()
-else:
-    if os.path.isfile(os.path.join(args.n, nwFile)) \
-       and os.path.isdir(os.path.join(args.n, localesDir)) \
-       and os.path.isfile(os.path.join(args.n, icudtlFile)):
-        _nwjsDir = args.n      
-    else:
-        print 'can\'t find nw.js'
-        sys.exit()
-if args.s is None:
-    print 'Please specify path to SeqAn build directory'
-    sys.exit()
-else:
-    if os.path.isdir(os.path.join(args.s, benchBuildDir)):
-        _exeDir = os.path.join(args.s, binDir)
-        _seqBuildDir = args.s
-    else:
-        print 'can\'t find SeqAn Bench build directory'
-
 if platform.system() == "Windows":
     print 1
-elif platform.system() == "Linux":
-    if (not os.path.exists(_exeDir)): 
-        os.mkdir(_exeDir)
+if platform.system() == "Linux":
+    if args.n is None:
+        print 'Please specify path to nw.js'
+        sys.exit()
     else:
-        print 'please remove ' + _exeDir 
+        if os.path.isfile(os.path.join(args.n, nwFile)) \
+           and os.path.isdir(os.path.join(args.n, localesDir)) \
+           and os.path.isfile(os.path.join(args.n, icudtlFile)):
+            _nwjsDir = args.n      
+        else:
+            print 'can\'t find nw.js'
+            sys.exit()
+    if args.s is None:
+        print 'Please specify path to SeqAn build directory'
+        sys.exit()
+    else:
+        if os.path.isdir(os.path.join(args.s, benchBuildDir)):
+            _exeDir = os.path.join(args.s, binDir)
+            _seqBuildDir = args.s
+        else:
+            print 'can\'t find SeqAn Bench build directory'
+
+        if (not os.path.exists(_exeDir)): 
+            os.mkdir(_exeDir)
+        else:
+            print 'please remove ' + _exeDir 
         #shutil.rmtree(_exeDir)
     shutil.rmtree(_exeDir)
     shutil.copytree(os.path.join(sys.path[0],'config'), os.path.join(_exeDir,'config'))
     shutil.copytree(os.path.join(sys.path[0],'resources'), os.path.join(_exeDir,'resources'))
     shutil.copytree(os.path.join(sys.path[0], 'std_bench', 'data'), os.path.join(_exeDir, 'std_bench', 'data'))
     shutil.copytree(os.path.join(sys.path[0],'Info'), os.path.join(_exeDir, 'Info'))
-    #shutil.copyfile(os.path.join(sys.path[0],'controller.js'), os.path.join(_exeDir, 'controller.js'))
-    #shutil.copyfile(os.path.join(sys.path[0],'gui.js'), os.path.join(_exeDir, 'gui.js'))
     shutil.copyfile(os.path.join(sys.path[0],'package.json'), os.path.join(_exeDir, 'package.json'))
-    #shutil.copyfile(os.path.join(sys.path[0],'index.html'), os.path.join(_exeDir, 'index.html'))
-
 
     #compile benchmark programs
     print "Compiling benchmark programs..."
@@ -94,16 +89,50 @@ elif platform.system() == "Linux":
     _tmpCmd = ' '.join(['chmod a+x', os.path.join(_exeDir, App)])
     os.system(_tmpCmd)
     print "Deleting files..."
-    #os.remove(os.path.join(_exeDir, 'app.nw'))
-    #os.remove(os.path.join(_exeDir, 'gui.js'))
     os.remove(os.path.join(_exeDir, 'package.json'))
-    #os.remove(os.path.join(_exeDir, 'index.html'))
-    #os.remove(os.path.join(_exeDir, 'controller.js'))
     shutil.rmtree(os.path.join(_exeDir, 'Info'))
     shutil.rmtree(os.path.join(_exeDir, 'resources'))
     shutil.rmtree(os.path.join(_exeDir, 'config'))
     shutil.rmtree(os.path.join(_exeDir, 'std_bench'))
     print "Complete."
 if platform.system() == "Darwin":
-    print 3
+    if args.n is None:
+        print 'Please specify path to nw.js'
+        sys.exit()
+    else:
+        if os.path.isdir(os.path.join(args.n, 'nwjs.app')): 
+            _nwjsDir = args.n      
+        else:
+            print 'can\'t find nwjs.app'
+            sys.exit()
+    if args.s is None:
+        print 'Please specify path to SeqAn build directory'
+        sys.exit()
+    else:
+        if os.path.isdir(os.path.join(args.s, benchBuildDir)):
+            _exeDir = os.path.join(args.s, binDir + '.app')
+            _seqBuildDir = args.s
+        else:
+            print 'can\'t find SeqAn Bench build directory'
+
+        if (not os.path.exists(_exeDir)): 
+            print 3
+        else:
+            shutil.rmtree(_exeDir) 
+    shutil.copytree(os.path.join(_nwjsDir,'nwjs.app'), _exeDir)
+    _appDir = os.path.join(_exeDir, 'Contents', 'Resources', 'app.nw')
+    os.mkdir(_appDir)
+    shutil.copytree(os.path.join(sys.path[0],'config'), os.path.join(_appDir,'config'))
+    shutil.copytree(os.path.join(sys.path[0],'resources'), os.path.join(_appDir,'resources'))
+    shutil.copytree(os.path.join(sys.path[0], 'std_bench', 'data'), os.path.join(_appDir, 'std_bench', 'data'))
+    shutil.copytree(os.path.join(sys.path[0],'Info'), os.path.join(_appDir, 'Info'))
+    shutil.copyfile(os.path.join(sys.path[0],'package.json'), os.path.join(_appDir, 'package.json'))
+    _iconPath = os.path.join(_exeDir, 'Contents', 'Resources', 'nw.icns')
+    os.remove(_iconPath)
+    shutil.copyfile(os.path.join(_appDir, 'resources', 'icons', 'nw.icns'), _iconPath)
+
+    #_tmpCmd = ' '.join(['make --silent -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
+    #os.system(_tmpCmd)
+    #shutil.copytree()
+    #os.remove()
 

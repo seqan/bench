@@ -131,8 +131,17 @@ if platform.system() == "Darwin":
     os.remove(_iconPath)
     shutil.copyfile(os.path.join(_appDir, 'resources', 'icons', 'nw.icns'), _iconPath)
 
-    #_tmpCmd = ' '.join(['make --silent -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
-    #os.system(_tmpCmd)
+    _tmpCmd = ' '.join(['make --silent -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
+    os.system(_tmpCmd)
+    _appStdProDir = os.path.join(_appDir, 'std_bench')
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_global_alignment_dna'), os.path.join(_appStdProDir, 'std_bench_global_alignment_dna'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_dna'), os.path.join(_appStdProDir, 'std_bench_local_alignment_dna'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_global_alignment_protein'), os.path.join(_appStdProDir, 'std_bench_global_alignment_protei'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_protein'), os.path.join(_appStdProDir, 'std_bench_local_alignment_protein'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_create'), os.path.join(_appStdProDir, 'std_bench_index_create'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_approximate'), os.path.join(_appStdProDir, 'std_bench_index_approximate'))
+
+
     #shutil.copytree()
     #os.remove()
 

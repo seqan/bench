@@ -22,9 +22,9 @@ find_package (SeqAn REQUIRED)
 # Arch Setup
 # ----------------------------------------------------------------------------
 
-if (CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG)
-  set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -march=native")
-endif (CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG)
+#if (CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG)
+#  set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -march=native")
+#endif (CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
   set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -mpopcnt")

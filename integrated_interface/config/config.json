@@ -7,7 +7,7 @@
             "programName":"pa_global",
             "checker":"",
             "checked":true, 
-            "runCmd":"./std_bench/std_bench_global_alignment_dna ./std_bench/data/chr1_sim_reads_5000.fa ./std_bench/data/result_pw_global_dna.txt -tc 4",
+            "runCmd":"./std_bench/global_alignment_dna ./std_bench/data/chr1_sim_reads_5000.fa ./std_bench/data/result_pw_global_dna.txt -tc 4",
             "time":120.2
         },
 		"pw_local_dna":{
@@ -18,7 +18,7 @@
 			"programName":"",
 			"checker":"",
 			"checked":true,
-			"runCmd":"./std_bench/std_bench_local_alignment_dna ./std_bench/data/chr1_sim_reads_5000.fa ./std_bench/data/result_pw_local_dna.txt -tc 4",
+			"runCmd":"./std_bench/local_alignment_dna ./std_bench/data/chr1_sim_reads_5000.fa ./std_bench/data/result_pw_local_dna.txt -tc 4",
             "time":137.9
 		},
 		"pw_global_protein":{
@@ -29,7 +29,7 @@
 			"programName":"",
 			"checker":"",
 			"checked":true,
-			"runCmd":"./std_bench/std_bench_global_alignment_protein ./std_bench/data/uniprot_1000.fa std_bench/data/result_pw_global_protein.txt",
+			"runCmd":"./std_bench/global_alignment_protein ./std_bench/data/uniprot_1000.fa std_bench/data/result_pw_global_protein.txt",
             "time":125.4
 		},
         "pw_local_protein":{
@@ -40,7 +40,7 @@
             "programName":"",
             "checker":"",
             "checked":true,
-            "runCmd":"./std_bench/std_bench_local_alignment_protein ./std_bench/data/uniprot_1000.fa std_bench/data/result_pw_local_protein.txt",
+            "runCmd":"./std_bench/local_alignment_protein ./std_bench/data/uniprot_1000.fa std_bench/data/result_pw_local_protein.txt",
             "time":179.4
         },
 		"genome-index":{

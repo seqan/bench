@@ -10,26 +10,38 @@ required libraries:
      SeqAn
      NW.js
 
-On Linux:
+On Linux/OSX:
 
-1. Download SeqAn
+1. Download SeqAn 
+   ``mkdir seqan``
 
-     ``git clone https://github.com/seqan/seqan.git``
+   ``cd seqan``
+
+   ``git clone https://github.com/seqan/seqan.git``
     
-2. Download the bench into the SeqAn apps folder
+2. Download bench
+   ``cd seqan/apps``
 
-     ``git clone https://github.com/xp3i4/bench.git seqan/apps/bench seqan/apps/bench``
+   ``git clone https://github.com/xp3i4/bench.git seqan/apps/bench seqan/apps/bench``
+
+   ``cd bench`` 
     
+   ``git checkout integrated-interface``
+
 3. Create a Makefile project:
 
-     ``mkdir -p seqan_build/release``
+   ``mkdir -p seqan_build/release``
     
-     ``cd seqan-build/release``
+   ``cd seqan-build/release``
     
-     ``cmake ../../seqan  -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc-4.8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-4.8``
+   ``cmake ../../seqan  -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++``
     
-4. Download NW.js http://nwjs.io/ then extract it to seqan/apps/bench/integerated_interface
-5. run pack.py
+4. Download NW.js http://nwjs.io/  and extract the folders to somewhere
+
+5. run install.py
+  ``python install.python -n [path to nw.js folder] -s [path to seqan build directory] ...seqan_build/release``
+
+Done
 
 Download binary
 ---------------

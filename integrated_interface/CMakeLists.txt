@@ -52,27 +52,27 @@ add_definitions (-DSEQAN_DATE="${SEQAN_DATE}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SEQAN_CXX_FLAGS} ")
 
 # Update the list of file names below if you add source files to your application.
-add_executable(std_bench_global_alignment_dna std_bench/src/pa_global.cpp)
-add_executable(std_bench_global_alignment_protein std_bench/src/pa_global_protein.cpp)
-add_executable(std_bench_index_approximate std_bench/src/index_approximate.cpp)
-add_executable(std_bench_index_create std_bench/src/index_create.cpp)
-add_executable(std_bench_local_alignment_dna std_bench/src/pa_local.cpp)
-add_executable(std_bench_local_alignment_protein std_bench/src/pa_local_protein.cpp)
+add_executable(global_alignment_dna std_bench/src/pa_global.cpp)
+add_executable(global_alignment_protein std_bench/src/pa_global_protein.cpp)
+add_executable(index_approximate std_bench/src/index_approximate.cpp)
+add_executable(index_create std_bench/src/index_create.cpp)
+add_executable(local_alignment_dna std_bench/src/pa_local.cpp)
+add_executable(local_alignment_protein std_bench/src/pa_local_protein.cpp)
 
 # Add dependencies found by find_package (SeqAn).
-target_link_libraries (std_bench_global_alignment_dna ${SEQAN_LIBRARIES})
-target_link_libraries (std_bench_global_alignment_protein ${SEQAN_LIBRARIES})
-target_link_libraries (std_bench_index_approximate ${SEQAN_LIBRARIES})
-target_link_libraries (std_bench_index_create ${SEQAN_LIBRARIES})
-target_link_libraries (std_bench_local_alignment_dna ${SEQAN_LIBRARIES})
-target_link_libraries (std_bench_local_alignment_protein ${SEQAN_LIBRARIES})
+target_link_libraries (global_alignment_dna ${SEQAN_LIBRARIES})
+target_link_libraries (global_alignment_protein ${SEQAN_LIBRARIES})
+target_link_libraries (index_approximate ${SEQAN_LIBRARIES})
+target_link_libraries (index_create ${SEQAN_LIBRARIES})
+target_link_libraries (local_alignment_dna ${SEQAN_LIBRARIES})
+target_link_libraries (local_alignment_protein ${SEQAN_LIBRARIES})
 
 # ----------------------------------------------------------------------------
 # Installation
 # ----------------------------------------------------------------------------
 
 # Install bench in ${PREFIX}/bin directory
-install (TARGETS std_bench_global_alignment_dna
+install (TARGETS global_alignment_dna
          DESTINATION app )
 
 # ----------------------------------------------------------------------------

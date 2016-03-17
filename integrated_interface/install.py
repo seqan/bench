@@ -59,12 +59,12 @@ if platform.system() == "Linux":
     print "Compiling benchmark programs..."
     _tmpCmd = ' '.join(['make --silent -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
     os.system(_tmpCmd)
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_global_alignment_dna'), os.path.join(_exeDir, 'std_bench'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_dna'), os.path.join(_exeDir, 'std_bench'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_global_alignment_protein'), os.path.join(_exeDir, 'std_bench'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_protein'), os.path.join(_exeDir, 'std_bench'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_create'), os.path.join(_exeDir, 'std_bench'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_approximate'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'global_alignment_dna'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'local_alignment_dna'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'global_alignment_protein'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'local_alignment_protein'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_create'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_approximate'), os.path.join(_exeDir, 'std_bench'))
 
     #package source
     def zipdir(path, ziph):
@@ -114,11 +114,9 @@ if platform.system() == "Darwin":
             _seqBuildDir = args.s
         else:
             print 'can\'t find SeqAn Bench build directory'
-
-        if (not os.path.exists(_exeDir)): 
-            print 3
-        else:
+        if (os.path.exists(_exeDir)): 
             shutil.rmtree(_exeDir) 
+    print 'Compiling benchmarks'
     shutil.copytree(os.path.join(sys.path[0], 'resources', 'icons', 'osx', 'SeqanBench.app'), _exeDir)
     shutil.copytree(os.path.join(_nwjsDir,'nwjs.app', 'Contents'), os.path.join(_exeDir, 'Contents'))
     _appDir = os.path.join(_exeDir, 'Contents', 'Resources', 'app.nw')
@@ -135,15 +133,17 @@ if platform.system() == "Darwin":
     _tmpCmd = ' '.join(['make --silent -C', os.path.join(_seqBuildDir, benchBuildDir), 'all'])
     os.system(_tmpCmd)
     _appStdProDir = os.path.join(_appDir, 'std_bench')
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_global_alignment_dna'), os.path.join(_appStdProDir, 'std_bench_global_alignment_dna'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_dna'), os.path.join(_appStdProDir, 'std_bench_local_alignment_dna'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_global_alignment_protein'), os.path.join(_appStdProDir, 'std_bench_global_alignment_protei'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_protein'), os.path.join(_appStdProDir, 'std_bench_local_alignment_protein'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_create'), os.path.join(_appStdProDir, 'std_bench_index_create'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_approximate'), os.path.join(_appStdProDir, 'std_bench_index_approximate'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'global_alignment_dna'), os.path.join(_appStdProDir, 'global_alignment_dna'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'local_alignment_dna'), os.path.join(_appStdProDir, 'local_alignment_dna'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'global_alignment_protein'), os.path.join(_appStdProDir, 'global_alignment_protei'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'local_alignment_protein'), os.path.join(_appStdProDir, 'local_alignment_protein'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_create'), os.path.join(_appStdProDir, 'index_create'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_approximate'), os.path.join(_appStdProDir, 'index_approximate'))
     _installPath = os.path.join('/','Applications', 'SeqanBench.app')
     if os.path.isdir(_installPath):
         shutil.rmtree(_installPath)
     shutil.copytree(_exeDir, _installPath)
     shutil.rmtree(_exeDir)
+    print 'Complete'
+    print 'Check SeqanBench in /Applications folder'
 

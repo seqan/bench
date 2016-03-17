@@ -24,14 +24,15 @@
                     <tr>
                         <td width="33.3%" align="left" style="border-radius:5px">
 
-                            <button align="left" class="btn btn-xs btn-primary _btn-noborder" aria-label="remove" id="close-btn">
+                            <button align="left" class="btn btn-sm btn-primary _btn-noborder" aria-label="remove" id="close-btn">
                                     <span class="glyphicon glyphicon-remove" aria-hidden="true">
                                     </span>
                             </button>
-                            <button align="left" class="btn btn-xs btn-primary _btn-noborder" aria-label="remove" id="resize-btn">
-                                    <span class="glyphicon glyphicon-resize-small" aria-hidden="true">
+                            <button align="left" class="btn btn-sm btn-primary _btn-noborder" aria-label="minus" id="minus-btn">
+                                    <span class="glyphicon glyphicon-minus" aria-hidden="true">
                                     </span>
                             </button>
+                            
                             <script>
                                 $("#resize-btn").click(function(){
                                     var gui = require('nw.gui')
@@ -56,7 +57,7 @@
                             <p align="center" style="color:white; margin:0"><b>SeqanBenchTest</b></p>
                         </td>
                         <td width="33.3%" align="right" style="border-radius:5px">
-                            <button class="btn btn-default btn-sm btn-primary _btn-noborder" aria-label="cog" id="configure" data-toggle="drop">
+                            <button class="btn btn-sm btn-primary _btn-noborder" aria-label="cog" id="configure" data-toggle="drop">
                                 <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
                             </button>          
                         </td>

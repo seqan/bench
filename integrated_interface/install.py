@@ -17,7 +17,7 @@ nwFile = 'nw'
 localesDir = 'locales'
 icudtlFile = 'icudtl.dat'
 benchBuildDir = 'apps/bench/integrated_interface/'
-binDir = 'bin/BenchMark_interface_' + platform.system()
+binDir = 'bin/SeqanBench' + platform.system()
 App = 'app'
 if platform.system() == "Windows":
     print 1
@@ -119,7 +119,8 @@ if platform.system() == "Darwin":
             print 3
         else:
             shutil.rmtree(_exeDir) 
-    shutil.copytree(os.path.join(_nwjsDir,'nwjs.app'), _exeDir)
+    shutil.copytree(os.path.join(sys.path[0], 'resources', 'icons', 'osx', 'SeqanBench.app'), _exeDir)
+    shutil.copytree(os.path.join(_nwjsDir,'nwjs.app', 'Contents'), os.path.join(_exeDir, 'Contents'))
     _appDir = os.path.join(_exeDir, 'Contents', 'Resources', 'app.nw')
     os.mkdir(_appDir)
     shutil.copytree(os.path.join(sys.path[0],'config'), os.path.join(_appDir,'config'))
@@ -140,8 +141,9 @@ if platform.system() == "Darwin":
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_local_alignment_protein'), os.path.join(_appStdProDir, 'std_bench_local_alignment_protein'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_create'), os.path.join(_appStdProDir, 'std_bench_index_create'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'std_bench_index_approximate'), os.path.join(_appStdProDir, 'std_bench_index_approximate'))
-
-
-    #shutil.copytree()
-    #os.remove()
+    _installPath = os.path.join('/','Applications', 'SeqanBench.app')
+    if os.path.isdir(_installPath):
+        shutil.rmtree(_installPath)
+    shutil.copytree(_exeDir, _installPath)
+    shutil.rmtree(_exeDir)
 

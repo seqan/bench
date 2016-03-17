@@ -135,7 +135,7 @@ if platform.system() == "Darwin":
     _appStdProDir = os.path.join(_appDir, 'std_bench')
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'global_alignment_dna'), os.path.join(_appStdProDir, 'global_alignment_dna'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'local_alignment_dna'), os.path.join(_appStdProDir, 'local_alignment_dna'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'global_alignment_protein'), os.path.join(_appStdProDir, 'global_alignment_protei'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'global_alignment_protein'), os.path.join(_appStdProDir, 'global_alignment_protein'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'local_alignment_protein'), os.path.join(_appStdProDir, 'local_alignment_protein'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_create'), os.path.join(_appStdProDir, 'index_create'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_approximate'), os.path.join(_appStdProDir, 'index_approximate'))

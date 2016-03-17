@@ -7,8 +7,8 @@ This application provides a integrated interface for Seqan benchmarks.
 Installation
 -------------
 required libraries:
-     SeqAn
-     NW.js
+    SeqAn
+    NW.js
 
 On Linux/OSX:
 
@@ -34,24 +34,26 @@ On Linux/OSX:
     
    ``cd seqan-build/release``
     
-   ``cmake ../../seqan  -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++``
+   ``cmake ../../seqan  -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++``
     
 4. Download NW.js http://nwjs.io/  and extract the folders to somewhere
 
 5. run install.py
+
   ``python install.python -n [path to nw.js folder] -s [path to seqan build directory] ...seqan_build/release``
 
 Done
 
 Download binary
 ---------------
-    Linux 
-    Windows
-    Mac OSX
+Linux 
+Windows
+Mac OSX
 
 Usage
 -----
-click the executable binary "app" to start
+linux start the program from seqan_build/release/bin/SeqanBench
+OSX start from the /Applications or launchpad
 
 Contact
 -------

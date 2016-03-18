@@ -376,8 +376,8 @@ function run(opts,funcs){
         {
             opts.list.push(prg);
             opts.st.push(true);
-            opts.cmd.push(cmp.getRunCmd(prg));
-            opts.time.push(cmp.getTime(prg));
+            opts.cmd.push(cmp.getRunCmd(prg))
+            opts.time.push(cmp.getTime(prg))
             _Total_Time += cmp.getTime(prg)
         }
     }

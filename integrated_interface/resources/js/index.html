@@ -79,10 +79,14 @@
                             <td style="padding-top:10px">
                                 <input id="choosefile" type="file" accept=".json">
 
-                                <div id = "chooseFileContent" style="height:150px; width: 350px; overflow: auto"></div>
-                                <button type="button" id = "chooseFileSave" class="btn btn-primary btn-xs" style="position: absolute; right:15px; bottom:30px">
-                                    &nbsp Save &nbsp
-                                </button>
+                                <div class="btn-group" role="group" aria-label="..." style= "position: absolute; right:15px; bottom:30px">
+                                    <button type="button" id = "chooseFileReset" class="btn btn-default btn-xs">
+                                        &nbsp Reset &nbsp
+                                    </button>
+                                    <button type="button" id = "chooseFileSave" class="btn btn-primary btn-xs">
+                                        &nbsp Save &nbsp
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -106,6 +110,20 @@
                                     }
 
                         })
+
+                        $("#chooseFileReset").click(function(){
+                                _SIGNAL.INIT = false
+                                //var tmp = Options.init($("#choosefile").val())
+                                    if (confirm("This will overwrite all the settings")){
+                                        Init()
+                                        waitExec("INIT", function(){g_createCategory()})
+                                        //g_createCategory()
+                                        //gConfObject.writeConfFilePath($("#choosfile").val())
+                                        $("#gconfdiv").toggle('fast')
+                                    }
+
+                        })
+
                     </script>
                 </div>        
             </div>

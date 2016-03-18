@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_BENCH_CONSTRUCT_CPP_
+#define APP_BENCH_STREE_CONSTRUCT_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -62,7 +62,7 @@ using namespace seqan;
 // Class Options
 // ----------------------------------------------------------------------------
 
-struct Options : BaseOptions {};
+struct Options : StreeOptions {};
 
 // ============================================================================
 // Functions

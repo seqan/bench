@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_BENCH_VISIT_CPP_
+#define APP_BENCH_QGRAMS_CONSTRUCT_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -62,15 +62,7 @@ using namespace seqan;
 // Class Options
 // ----------------------------------------------------------------------------
 
-struct Options : BaseOptions
-{
-    unsigned        depth;
-
-    Options() :
-        BaseOptions(),
-        depth(0)
-    {}
-};
+struct Options : QGramOptions {};
 
 // ============================================================================
 // Functions
@@ -83,12 +75,13 @@ struct Options : BaseOptions
 template <typename TOptions>
 inline void setupArgumentParser(ArgumentParser & parser, TOptions const & options)
 {
-    setAppName(parser, "SeqAn Benchmark - Index Visit");
-    setShortDescription(parser, "Benchmark top-down traversal of full-text indices");
+    setAppName(parser, "SeqAn Benchmark - q-Gram Index Construction");
+    setShortDescription(parser, "Benchmark construction of q-gram indices");
     setCategory(parser, "Benchmarking");
 
-    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fIINDEX FILE\\fP>");
+    addUsageLine(parser, "[\\fIOPTIONS\\fP] <\\fITEXT FILE\\fP> <\\fIINDEX FILE\\fP>");
 
+    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE));
     addOption(parser, ArgParseOption("v", "tsv", "Tab separated value output."));
 
@@ -96,10 +89,12 @@ inline void setupArgumentParser(ArgumentParser & parser, TOptions const & option
     setAlphabetType(parser, options);
     setIndexType(parser, options);
     setTextLimits(parser, options);
+//    setTmpFolder(parser);
 
-    addSection(parser, "Visit Options");
-    addOption(parser, ArgParseOption("d", "depth", "Limit the visit to this depth.", ArgParseOption::INTEGER));
-    setDefaultValue(parser, "depth", options.depth);
+    addSection(parser, "q-Gram Options");
+    addOption(parser, ArgParseOption("q", "qgram", "Fix the q-gram weight.", ArgParseOption::INTEGER));
+    setDefaultValue(parser, "q", options.q);
+//    setValidValues(parser, "q", { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 });
 }
 
 // ----------------------------------------------------------------------------
@@ -115,15 +110,28 @@ parseCommandLine(TOptions & options, ArgumentParser & parser, int argc, char con
     if (res != ArgumentParser::PARSE_OK)
         return res;
 
-    getArgumentValue(options.textIndexFile, parser, 0);
+    getArgumentValue(options.textFile, parser, 0);
+    getArgumentValue(options.textIndexFile, parser, 1);
     getOptionValue(options.tsv, parser, "tsv");
 
     getAlphabetType(options, parser);
     getIndexType(options, parser);
     getTextLimits(options, parser);
-    getOptionValue(options.depth, parser, "depth");
+//    getTmpFolder(options, parser);
+
+    getOptionValue(options.q, parser, "q");
 
     return ArgumentParser::PARSE_OK;
+}
+
+// ----------------------------------------------------------------------------
+// Function construct()
+// ----------------------------------------------------------------------------
+
+template <typename TIndex>
+inline void construct(TIndex & index)
+{
+    indexCreate(index, FibreSADir());
 }
 
 // ----------------------------------------------------------------------------
@@ -136,24 +144,30 @@ inline void run(Options & options)
     typedef typename TextCollection<TAlphabet, TLimits, TSetLimits>::Type   TText;
     typedef Index<TText, TIndexSpec>                                        TIndex;
 
-    TIndex index;
+    TText text;
 
-    if (!open(index, toCString(options.textIndexFile)))
-        throw RuntimeError("Error while loading full-text index");
+    if (!open(text, toCString(options.textFile)))
+        throw RuntimeError("Error while loading text");
+
+    TIndex index(text);
 
     double start = sysTime();
-    unsigned long substrings = countSubstrings(index, options.depth);
+    construct(index);
     double finish = sysTime();
 
     if (options.tsv)
     {
-        std::cout << substrings << '\t' << std::fixed << finish - start << std::endl;
+        std::cout << lengthSum(text) << '\t' << std::fixed << finish - start << std::endl;
     }
     else
     {
-        std::cout << substrings << " nodes" << std::endl;
+        std::cout << (unsigned long)length(text) << " texts" << std::endl;
+        std::cout << lengthSum(text) << " symbols" << std::endl;
         std::cout << std::fixed << finish - start << " sec" << std::endl;
     }
+
+    if (!save(index, toCString(options.textIndexFile)))
+        throw RuntimeError("Error while saving full-text index");
 }
 
 int main(int argc, char const ** argv)

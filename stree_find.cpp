@@ -32,7 +32,7 @@
 // Author: Enrico Siragusa <enrico.siragusa@fu-berlin.de>
 // ==========================================================================
 
-#define APP_BENCH_QUERY_CPP_
+#define APP_BENCH_STREE_FIND_CPP_
 
 // ============================================================================
 // Prerequisites
@@ -77,14 +77,14 @@ double Stats::locateTime = 0;
 // Class Options
 // ----------------------------------------------------------------------------
 
-struct Options : BaseOptions
+struct Options : StreeOptions
 {
     typedef std::string             TString;
     typedef std::vector<TString>    TList;
 
     enum AlgorithmType
     {
-        ALGO_SINGLE, ALGO_SORT, ALGO_DFS, ALGO_BFS
+        ALGO_SINGLE, ALGO_SORT, ALGO_DFS//, ALGO_BFS
     };
 
     CharString      queryFile;
@@ -97,7 +97,7 @@ struct Options : BaseOptions
     bool            locate;
 
     Options() :
-        BaseOptions(),
+        StreeOptions(),
         algorithmType(ALGO_SINGLE),
         edit(false),
         errors(0),
@@ -106,7 +106,7 @@ struct Options : BaseOptions
         algorithmTypeList.push_back("single");
         algorithmTypeList.push_back("sort");
         algorithmTypeList.push_back("dfs");
-        algorithmTypeList.push_back("bfs");
+//        algorithmTypeList.push_back("bfs");
     }
 };
 
@@ -307,68 +307,52 @@ inline unsigned long findOccurrences(Options const & options, TIndex & index, TQ
 // ----------------------------------------------------------------------------
 // Multiple search (BFS).
 
-template <typename TIndex, typename TQueries, typename TLocate, unsigned THRESHOLD>
-inline unsigned long findOccurrences(Options const & /* options */, TIndex & index, TQueries & queries,
-                                     TLocate, Backtracking<HammingDistance, Threshold<THRESHOLD> >, BfsIterator)
-{
-    typedef typename Value<TQueries>::Type                          TQuery;
-    typedef typename Value<TQuery>::Type                            TAlphabet;
-    typedef typename DefaultShape<TAlphabet, Nothing>::Type         TShape;
-    typedef Index<TQueries, IndexQGram<TShape> >                    TPattern;
-    typedef Backtracking<HammingDistance, Threshold<THRESHOLD> >    TAlgorithm;
-    typedef typename Iterator<TIndex, TopDown<> >::Type             TIndexIt;
-    typedef typename Iterator<TQueries const, Standard>::Type       TQueriesIt;
-
-    double timer;
-
-    timer = sysTime();
-    TPattern pattern(queries);
-    indexCreate(pattern, FibreSADir(), Trie());
-    indexBuild(pattern);
-    Stats::preprocessingTime = sysTime() - timer;
-
-    unsigned long count = 0;
-
-    timer = sysTime();
-    find(index, pattern, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
-    {
-        count += countOccurrences(indexIt);
-        locateOccurrences(indexIt, TLocate());
-    },
-    TAlgorithm());
-    Stats::countTime = sysTime() - timer;
-
-    return count;
-}
+//template <typename TIndex, typename TQueries, typename TLocate, unsigned THRESHOLD>
+//inline unsigned long findOccurrences(Options const & /* options */, TIndex & index, TQueries & queries,
+//                                     TLocate, Backtracking<HammingDistance, Threshold<THRESHOLD> >, BfsIterator)
+//{
+//    typedef typename Value<TQueries>::Type                          TQuery;
+//    typedef typename Value<TQuery>::Type                            TAlphabet;
+//    typedef typename DefaultShape<TAlphabet, Nothing>::Type         TShape;
+//    typedef Index<TQueries, IndexQGram<TShape> >                    TPattern;
+//    typedef Backtracking<HammingDistance, Threshold<THRESHOLD> >    TAlgorithm;
+//    typedef typename Iterator<TIndex, TopDown<> >::Type             TIndexIt;
+//    typedef typename Iterator<TQueries const, Standard>::Type       TQueriesIt;
+//
+//    double timer;
+//
+//    timer = sysTime();
+//    TPattern pattern(queries);
+//    indexCreate(pattern, FibreSADir(), Trie());
+//    indexBuild(pattern);
+//    Stats::preprocessingTime = sysTime() - timer;
+//
+//    unsigned long count = 0;
+//
+//    timer = sysTime();
+//    find(index, pattern, [&](TIndexIt const & indexIt, TQueriesIt const &, unsigned)
+//    {
+//        count += countOccurrences(indexIt);
+//        locateOccurrences(indexIt, TLocate());
+//    },
+//    TAlgorithm());
+//    Stats::countTime = sysTime() - timer;
+//
+//    return count;
+//}
 
 // ----------------------------------------------------------------------------
 // Function findOccurrences()
 // ----------------------------------------------------------------------------
 // Disable HammingDistance search on tree indices lacking trie-like iterator.
 
-template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TAlgoSpec>
-inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<HammingDistance, TAlgoSpec>, Nothing)
-{
-    throw RuntimeError("Unsupported index type");
-    return 0;
-}
-
-template <typename TText, typename TSpec, typename TQueries, typename TLocate, typename TAlgoSpec>
-inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<HammingDistance, TAlgoSpec>, SortedList)
-{
-    throw RuntimeError("Unsupported index type");
-    return 0;
-}
-
-template <typename TText, typename TSpec, typename TQueries, typename TLocate, unsigned THRESHOLD>
-inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
-                                     TLocate, Backtracking<HammingDistance, Threshold<THRESHOLD> >, BfsIterator)
-{
-    throw RuntimeError("Unsupported index type");
-    return 0;
-}
+//template <typename TText, typename TSpec, typename TQueries, typename TLocate, unsigned THRESHOLD>
+//inline unsigned long findOccurrences(Options const &, Index<TText, IndexEsa<TSpec> > &, TQueries &,
+//                                     TLocate, Backtracking<HammingDistance, Threshold<THRESHOLD> >, BfsIterator)
+//{
+//    throw RuntimeError("Unsupported index type");
+//    return 0;
+//}
 
 // ----------------------------------------------------------------------------
 // Function countOccurrences()
@@ -389,14 +373,14 @@ inline unsigned long countOccurrences(Options const & options, TIndex & index, T
     case Options::ALGO_DFS:
         return findOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance>(), DfsPreorder());
 
-    case Options::ALGO_BFS:
-        switch (options.errors)
-        {
-        case 1:
-            return findOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance, Threshold<1> >(), BfsIterator());
-        case 2:
-            return findOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance, Threshold<2> >(), BfsIterator());
-        }
+//    case Options::ALGO_BFS:
+//        switch (options.errors)
+//        {
+//        case 1:
+//            return findOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance, Threshold<1> >(), BfsIterator());
+//        case 2:
+//            return findOccurrences(options, index, queries, TLocate(), Backtracking<HammingDistance, Threshold<2> >(), BfsIterator());
+//        }
 
     default:
         throw RuntimeError("Unsupported search algorithm");

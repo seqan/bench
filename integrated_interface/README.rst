@@ -28,7 +28,7 @@ SeqAn and NW.js
 
     ``cd bench`` 
     
-    ``git checkout develop``
+    ``git checkout integrated-interface``
 
 3. Create a Makefile project
 

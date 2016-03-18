@@ -80,6 +80,7 @@ int main(int argc, char **argv)
     //serial output 
     for (unsigned m = 0; m < length(id); m++)  
     for (unsigned n = m + 1; n < length(id); n++)
+
         ofs << m << " " << n << " " << score[m*length(id) + n] << std::endl; 
 
     return 0;

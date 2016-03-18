@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     open(index, toCString(options.indexFile));
     Finder<Index<String<Dna5>, IndexEsa<> > > esaFinder(index);
     
-    SEQAN_OMP_PRAGMA(parallel for firstprivate(esaFinder))   
+    //SEQAN_OMP_PRAGMA(parallel for firstprivate(esaFinder))   
     for (unsigned m = 0; m < length(id); m++)  
     {   
         

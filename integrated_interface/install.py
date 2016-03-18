@@ -64,7 +64,7 @@ if platform.system() == "Linux":
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'global_alignment_protein'), os.path.join(_exeDir, 'std_bench'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'local_alignment_protein'), os.path.join(_exeDir, 'std_bench'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_create'), os.path.join(_exeDir, 'std_bench'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_approximate'), os.path.join(_exeDir, 'std_bench'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_search'), os.path.join(_exeDir, 'std_bench'))
 
     #package source
     def zipdir(path, ziph):
@@ -90,6 +90,7 @@ if platform.system() == "Linux":
     os.system(_tmpCmd)
     print "Deleting files..."
     os.remove(os.path.join(_exeDir, 'package.json'))
+    os.remove(os.path.join(_exeDir, 'app.nw'))
     shutil.rmtree(os.path.join(_exeDir, 'Info'))
     shutil.rmtree(os.path.join(_exeDir, 'resources'))
     shutil.rmtree(os.path.join(_exeDir, 'config'))
@@ -138,7 +139,7 @@ if platform.system() == "Darwin":
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'global_alignment_protein'), os.path.join(_appStdProDir, 'global_alignment_protein'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'local_alignment_protein'), os.path.join(_appStdProDir, 'local_alignment_protein'))
     shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_create'), os.path.join(_appStdProDir, 'index_create'))
-    shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_approximate'), os.path.join(_appStdProDir, 'index_approximate'))
+    shutil.move(os.path.join(_seqBuildDir, 'bin', 'index_search'), os.path.join(_appStdProDir, 'index_search'))
     _installPath = os.path.join('/','Applications', 'SeqanBench.app')
     if os.path.isdir(_installPath):
         shutil.rmtree(_installPath)

@@ -261,6 +261,7 @@ function Init(){
     if (GCmp != false){
         try{
             cmp = Options.init(GCmp.getConfFile())
+            cmpConfig = Options.init(GCmp.getConfFile())
         }
         catch(err){
             return err

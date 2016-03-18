@@ -99,10 +99,9 @@ function g_createCategory(){
             $("[name=saved][prg=" + $(this).attr("prg") + "]").css('color', '#d9534f')  
         })
         $("#" + id + "Reset").click(function(){
-            cmp.setRunCmd($(this).attr("prg"), cmpCopy.getRunCmdArgv($(this).attr("prg")))
+            cmp.setRunCmd($(this).attr("prg"), cmpConfig.getRunCmd($(this).attr("prg")))
             $("[name=saved][prg=" + $(this).attr("prg") + "]").css('color', 'green')
             $("[name=gInput][prg=" + $(this).attr("prg") + "]").val(cmp.getRunCmd($(this).attr("prg")))
-
         })
         $("#" + id + "Saved").click(function(){
             $("[name=saved][prg=" + $(this).attr("prg") + "]").css('color', 'green')  

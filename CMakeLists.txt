@@ -23,8 +23,17 @@ if (NOT CXX11_FOUND)
 endif (NOT CXX11_FOUND)
 
 # Search SeqAn and select dependencies.
+<<<<<<< HEAD
+set (SEQAN_FIND_DEPENDENCIES OpenMP ZLIB BZIP2)
+=======
 set (SEQAN_FIND_DEPENDENCIES ZLIB BZip2)
+>>>>>>> origin/develop
 find_package (SeqAn REQUIRED)
+
+# Warn if Zlib was not found.
+if (NOT SEQAN_HAS_OPENMP)
+  message (STATUS "  OpenMP not found: building bench without multithreading.")
+endif (NOT SEQAN_HAS_OPENMP)
 
 # Warn if Zlib was not found.
 if (NOT SEQAN_HAS_ZLIB)
@@ -40,9 +49,9 @@ endif (NOT SEQAN_HAS_BZIP2)
 # Arch Setup
 # ----------------------------------------------------------------------------
 
-if (CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG)
-  set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -march=native")
-endif (CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG)
+#if (CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG)
+#  set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -march=native")
+#endif (CMAKE_COMPILER_IS_GNUCXX OR COMPILER_IS_CLANG)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
   set (SEQAN_CXX_FLAGS "${SEQAN_CXX_FLAGS} -mpopcnt")
@@ -77,6 +86,7 @@ add_executable(bench_stree_find stree_find.cpp options.h types.h run.h misc.h fi
 add_executable(bench_qgrams_construct qgrams_construct.cpp options.h types.h run.h misc.h)
 add_executable(bench_qgrams_find qgrams_find.cpp options.h types.h run.h misc.h)
 add_executable(bench_asm_filter asm_filter.cpp options.h types.h run.h misc.h verifier.h)
+add_executable(bench_minimizer minimizer.cpp)
 
 # Add dependencies found by find_package (SeqAn).
 target_link_libraries (bench_io_dump ${SEQAN_LIBRARIES})
@@ -86,6 +96,7 @@ target_link_libraries (bench_stree_find ${SEQAN_LIBRARIES})
 target_link_libraries (bench_qgrams_construct ${SEQAN_LIBRARIES})
 target_link_libraries (bench_qgrams_find ${SEQAN_LIBRARIES})
 target_link_libraries (bench_asm_filter ${SEQAN_LIBRARIES})
+target_link_libraries (bench_minimizer ${SEQAN_LIBRARIES})
 
 # ----------------------------------------------------------------------------
 # Installation
@@ -117,6 +128,9 @@ install (TARGETS bench_io_dump
 install (FILES LICENSE README
          DESTINATION ${SEQAN_PREFIX_SHARE_DOC})
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+add_subdirectory(integrated_interface)
 # ----------------------------------------------------------------------------
 # CPack Install
 # ----------------------------------------------------------------------------

@@ -200,6 +200,9 @@ function g_cancel(){
             cancel()
             removeEventListener(_EVENTS.CANCEL, enableRunBtn)
             removeEventListener(_EVENTS.DONE, enableRunBtn)
+    
         }
     }
+    var fileList = ['~/1.txt','~/2.txt','~/3.txt']
+    clearResult(fileList)
 }

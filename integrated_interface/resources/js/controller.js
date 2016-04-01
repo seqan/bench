@@ -403,6 +403,14 @@ function cancel(){
     return _EVENTS.CANCEL
 }
 
+function clearResult(fileList){
+    for (file in fileList){
+        require('fs').exists(file, function(file){
+            require('fs').unlink("~/1.txt")
+        })
+    }
+}
+
 function sendResult(_url, _data){
     $.ajax({
         method: "POST",

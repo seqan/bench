@@ -49,7 +49,7 @@ Done
 Download binary
 ---------------
 
-Linux Windows OS X
+Available executables for Linux OS X and Windows is `here <https://github.com/xp3i4/bench/releases>`_
 
 Usage
 -----

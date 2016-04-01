@@ -46,14 +46,14 @@ SeqAn and NW.js
 
 Done
 
-Download binary
+Download
 ---------------
 
-Available executables for Linux OS X and Windows is `here <https://github.com/xp3i4/bench/releases>`_
+Executables for Linux OS X and Windows are `Here <https://github.com/xp3i4/bench/releases>`_.
 
 Usage
 -----
-Linux run the program from seqan_build/release/bin/SeqanBench
+Linux run the program from seqan_build/release/bin/SeqanBench/
 
 OS X run from the launchpad
 

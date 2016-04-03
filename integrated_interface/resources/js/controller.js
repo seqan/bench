@@ -1,6 +1,7 @@
-var path = require("path")
-var process = require('process')
-var events = require('events')
+const path = require('path')
+const pro = require('process')
+const events = require('events')
+const fs = require('fs')
 
 var eventEmitter = new events.EventEmitter()
 var _GENERAL_CONFIG_FILE = path.resolve("./config/gconfig.json")
@@ -307,6 +308,15 @@ function _2SpawnArgv(argv){
     return spawnArgv    
 }
 
+function clearResult(file){
+    file.forEach(function(filename){
+        fs.exists(filename, function(exists){
+            if (exists)
+                fs.unlink(path.resolve(filename))
+        })
+    })
+}
+
 function _runEach(opts,funcs){
     var path = require("path")
     var spawn = require('child_process').spawn
@@ -315,7 +325,7 @@ function _runEach(opts,funcs){
     var errMsg
     
     var _onCloseFunc = function(){
-        opts.runtime = process.hrtime(time)
+        opts.runtime = pro.hrtime(time)
         funcs(errMsg)   
         if(++opts.count < opts.list.length){
             _run(opts,funcs)
@@ -324,6 +334,7 @@ function _runEach(opts,funcs){
             _SIGNAL.DONE = true
             eventEmitter.emit(_EVENTS.DONE)
             _SIGNAL.RUN = false
+            clearResult(opts.resultFiles)
         }
     }
     var _run = function(opts, funcs){
@@ -339,9 +350,9 @@ function _runEach(opts,funcs){
             _SIGNAL.NORM = false
             errMsg = err
         } 
-        time=process.hrtime()
+        time=pro.hrtime()
         try{
-        free = spawn(spawnCmd.prg, spawnCmd.arg, {detached: true})
+            free = spawn(spawnCmd.prg, spawnCmd.arg, {detached: true})
         }
         catch(err){
             alert("error")
@@ -391,7 +402,7 @@ function run(opts,funcs){
 
 function cancel(){
     try{
-        process.kill("-" + proc.getPid())
+        pro.kill("-" + proc.getPid())
     }
     catch(err){
         return err
@@ -401,14 +412,6 @@ function cancel(){
     _SIGNAL.RUN = false
     _SIGNAL.NORM = false
     return _EVENTS.CANCEL
-}
-
-function clearResult(fileList){
-    for (file in fileList){
-        require('fs').exists(file, function(file){
-            require('fs').unlink("~/1.txt")
-        })
-    }
 }
 
 function sendResult(_url, _data){

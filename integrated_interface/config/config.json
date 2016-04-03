@@ -51,7 +51,7 @@
 			"programName":"",
 			"checker":"",
             "checked":true,
-            "runCmd":"./std_bench/index_search ./std_bench/data/chr1_sim_reads_5000.fa ./std_bench/data/chr1_gl000192.inx 1.txt",
+            "runCmd":"./std_bench/index_search ./std_bench/data/chr1_sim_reads_5000.fa ./std_bench/data/chr1_gl000192.inx std_bench/data/result_index.txt",
             "time":4
         }  
 }

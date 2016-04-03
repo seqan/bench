@@ -1,3 +1,11 @@
+const resultFiles = [
+        'std_bench/data/result_pw_global_dna.txt',  
+        'std_bench/data/result_pw_local_dna.txt',
+        'std_bench/data/result_pw_global_protein.txt',
+        'std_bench/data/result_pw_local_protein.txt',
+        'std_bench/data/result_index.txt'
+        ]
+
 function g_showSysInfo(){
     os=require("os")    
     var mem=Math.floor(os.totalmem()/1024/1024/1024*10)/10
@@ -131,7 +139,8 @@ function g_run(){
         'count': 0,                   //current running bench program
         'weight': [],      //weight for each program
         'runtime': [],            //running time
-        'results': {'time': []}
+        'results': {'time': []},
+        'resultFiles': resultFiles
     }
     var timeSum = 0
     var timePercent = 0
@@ -203,6 +212,5 @@ function g_cancel(){
     
         }
     }
-    var fileList = ['~/1.txt','~/2.txt','~/3.txt']
-    clearResult(fileList)
+    clearResult(resultFiles)
 }

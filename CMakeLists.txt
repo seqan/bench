@@ -24,11 +24,9 @@ endif (NOT CXX11_FOUND)
 
 # Search SeqAn and select dependencies.
 set (SEQAN_FIND_DEPENDENCIES OpenMP ZLIB BZIP2)
-set (SEQAN_FIND_DEPENDENCIES OpenMP ZLIB BZIP2)
-set (SEQAN_FIND_DEPENDENCIES ZLIB BZip2)
 find_package (SeqAn REQUIRED)
 
-# Warn if Zlib was not found.
+# Warn if OpenMap was not found.
 if (NOT SEQAN_HAS_OPENMP)
   message (STATUS "  OpenMP not found: building bench without multithreading.")
 endif (NOT SEQAN_HAS_OPENMP)

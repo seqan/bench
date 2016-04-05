@@ -1,7 +1,7 @@
 #include <iostream>
 #include <seqan/align.h>
 #include <seqan/seq_io.h>
-#include <seqan/arg_parse.h>
+#include <seqan/arg_parse.h> 
 
 using namespace seqan;
 

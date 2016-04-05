@@ -7,8 +7,8 @@
             "programName":"pa_global",
             "checker":"",
             "checked":true, 
-            "runCmd":"./std_bench/global_alignment_dna ./std_bench/data/chr1_sim_reads_5000.fa ./std_bench/data/result_pw_global_dna.txt",
-            "time":120.2
+            "runCmd":"./std_bench/global_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_global_dna.txt",
+            "time":27.2
         },
 		"pw_local_dna":{
 			"name":"p",
@@ -18,8 +18,8 @@
 			"programName":"",
 			"checker":"",
 			"checked":true,
-			"runCmd":"./std_bench/local_alignment_dna ./std_bench/data/chr1_sim_reads_5000.fa ./std_bench/data/result_pw_local_dna.txt",
-            "time":137.9
+			"runCmd":"./std_bench/local_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_local_dna.txt",
+            "time":33.9
 		},
 		"pw_global_protein":{
 			"name":"pa",
@@ -29,8 +29,8 @@
 			"programName":"",
 			"checker":"",
 			"checked":true,
-			"runCmd":"./std_bench/global_alignment_protein ./std_bench/data/uniprot_1000.fa std_bench/data/result_pw_global_protein.txt",
-            "time":125.4
+			"runCmd":"./std_bench/global_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_global_protein.txt",
+            "time":179.4
 		},
         "pw_local_protein":{
             "name":"pairwise local protein alignment",
@@ -40,8 +40,8 @@
             "programName":"",
             "checker":"",
             "checked":true,
-            "runCmd":"./std_bench/local_alignment_protein ./std_bench/data/uniprot_1000.fa std_bench/data/result_pw_local_protein.txt",
-            "time":179.4
+            "runCmd":"./std_bench/local_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_local_protein.txt",
+            "time":330.4
         },
 		"genome-index":{
             "name":"genome_index",
@@ -51,7 +51,7 @@
 			"programName":"",
 			"checker":"",
             "checked":true,
-            "runCmd":"./std_bench/index_search ./std_bench/data/chr1_sim_reads_5000.fa ./std_bench/data/chr1_gl000192.inx std_bench/data/result_index.txt",
-            "time":4
+            "runCmd":"./std_bench/index_search ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/chr1_gl000192.inx std_bench/data/result_index.txt",
+            "time":160.0
         }  
 }

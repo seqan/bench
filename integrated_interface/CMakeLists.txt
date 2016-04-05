@@ -54,7 +54,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SEQAN_CXX_FLAGS} ")
 # Update the list of file names below if you add source files to your application.
 add_executable(global_alignment_dna std_bench/src/pa_global.cpp)
 add_executable(global_alignment_protein std_bench/src/pa_global_protein.cpp)
-add_executable(index_search std_bench/src/index_approximate.cpp)
+add_executable(index_search std_bench/src/index_search.cpp)
 add_executable(index_create std_bench/src/index_create.cpp)
 add_executable(local_alignment_dna std_bench/src/pa_local.cpp)
 add_executable(local_alignment_protein std_bench/src/pa_local_protein.cpp)

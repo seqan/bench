@@ -100,15 +100,15 @@
                         $("#chooseFileSave").click(function(){
                                 _SIGNAL.INIT = false
                                 var tmp = Options.init($("#choosefile").val())
-                                    if (confirm("This will overwrite all the settings")){
-                                        cmp = tmp
-                                        waitExec("INIT", function(){g_createCategory()})
-                                        //g_createCategory()
-                                        //gConfObject.writeConfFilePath($("#choosfile").val())
-
-                                        $("#gconfdiv").toggle('fast')
-                                    }
-
+                                if (_SIGNAL.ERROR)  {
+                                    alert("ConfigFile Format Error")
+                                    return false
+                                }
+                                else{
+                                    cmp = tmp
+                                    waitExec("INIT", function(){g_createCategory()})
+                                    $("#gconfdiv").toggle('fast')
+                                }
                         })
 
                         $("#chooseFileReset").click(function(){
@@ -206,10 +206,10 @@
                                 <button class="btn btn-default  btn-sm" data-toggle="modal" data-target="#HelpInfo">&nbsp Help &nbsp
                                 </button>
                                 <script>
-                                    var fs = require(GCmp.getHelpFilePath())
-                                    $("#HelpInfoHeader").html(fs.header)
-                                    $("#HelpInfoBody").html(fs.body)
-                                    $("#HelpInfoFooter").html(fs.footer)
+                                    var helpFile = require(GCmp.getHelpFilePath())
+                                    $("#HelpInfoHeader").html(helpFile.header)
+                                    $("#HelpInfoBody").html(helpFile.body)
+                                    $("#HelpInfoFooter").html(helpFile.footer)
                                 </script>
                                 <button id="cancelbtn" class="btn btn-default btn-sm"  data-dismiss="alert" onclick = g_cancel()>
                                     Cancel

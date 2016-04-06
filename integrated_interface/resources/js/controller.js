@@ -68,7 +68,8 @@ var _SIGNAL = {
     "_LOCK": 0,
     "CANCEL": false,
     "NORM": true,
-    "DONE": false
+    "DONE": false,
+    "ERROR": false
 }
 
 var _EVENTS = {
@@ -147,24 +148,41 @@ function _loadJson(file, TAG){
 var Options = {
     init: function(_path){
         var options = {}
+        _SIGNAL.ERROR = false
         try{
-            $.getJSON(path.resolve(_path), function(data){
+            var jqxhr = $.getJSON(path.resolve(_path), function(data){
                 $.each(data, function(key,val){
                    options[key] = val
                 })
-                for (var prg in options){
-                    if (typeof options[prg] == 'object'){
-                        if (! _KEY.checkPrimary(options[prg]))
-                            return false
-                    }
-                    else
-                    return false            
-                }         
-                _SIGNAL.INIT = true 
+                         
+                //_SIGNAL.INIT = true 
             })           
+           .fail(function(){
+                _SIGNAL.ERROR = true
+                return false
+            })
+           .success(function(){
+               for (var prg in options){
+                   if (typeof options[prg] == 'object'){
+                       if (! _KEY.checkPrimary(options[prg])){
+                            _SIGNAL.ERROR = true     
+                            return false
+                       } 
+                   }
+                   else{
+                       _SIGNAL.ERROR = true 
+                       return false            
+                    }
+               }
+            })
+           .always(function(){
+                _SIGNAL.INIT = true
+            })
+           if (_SIGNAL.ERROR)
+                return false
         }
         catch(err){
-            return err
+            return false 
         }
          
         var funcs = {}

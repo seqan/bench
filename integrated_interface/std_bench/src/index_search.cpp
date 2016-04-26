@@ -1,20 +1,21 @@
 #include <iostream>
 #include <seqan/align.h>
 #include <seqan/seq_io.h>
-#include <seqan/arg_parse.h> 
+#include <seqan/arg_parse.h>
 #include <seqan/index.h>
 #include <seqan/find.h>
 
 using namespace seqan;
 
-struct Options{
+struct Options {
     unsigned threads;
     CharString readFile;
     CharString indexFile;
     CharString output;
 };
 
-seqan::ArgumentParser::ParseResult parseCommandLine(Options & options, int argc, char** const argv){
+seqan::ArgumentParser::ParseResult parseCommandLine(Options & options, int argc, char** const argv)
+{
     seqan::ArgumentParser parser("Global Pairwise Alignment benchmark demo");
     setCategory(parser, "Demo");
     setVersion(parser, "0.1");
@@ -40,7 +41,7 @@ seqan::ArgumentParser::ParseResult parseCommandLine(Options & options, int argc,
     #else
     setDefaultValue(parser, "threads", 1);
     #endif
-    
+
     seqan::ArgumentParser::ParseResult res = seqan::parse(parser, argc, argv);
     if(res == seqan::ArgumentParser::PARSE_OK)
     {
@@ -103,33 +104,33 @@ int main(int argc, char **argv)
                             if (Base[n3] == seq[k][j3])
                                 count++;
                            // if (Base[n4] == seq[k][j4])
-                                count++; 
+                                count++;
 
                             while(find(esaFinder, tmpSeq))
                                 ofs << position(esaFinder) << std::endl;
                             clear(esaFinder);
-                            
+
                         }
-                        
-                    } 
-         
+
+                    }
+
     }
-    
+
     //SEQAN_OMP_PRAGMA(parallel for firstprivate(ali))
-    //for (unsigned m = 0; m < length(id); m++)  
+    //for (unsigned m = 0; m < length(id); m++)
     //for (unsigned n = m + 1; n < length(id); n++)
-    //{ 
+    //{
     //    assignSource(row(ali, 0), seq[m]);
     //    assignSource(row(ali, 1), seq[n]);
-    //     
+    //
     //    score[m*length(id) + n] = globalAlignment(ali, Score<int>(2, -3, -2));
     //
     //}
-    ////serial output 
-    //for (unsigned m = 0; m < length(id); m++)  
+    ////serial output
+    //for (unsigned m = 0; m < length(id); m++)
     //for (unsigned n = m + 1; n < length(id); n++)
 
-    //    ofs << m << " " << n << " " << score[m*length(id) + n] << std::endl; 
+    //    ofs << m << " " << n << " " << score[m*length(id) + n] << std::endl;
 
     return 0;
 }

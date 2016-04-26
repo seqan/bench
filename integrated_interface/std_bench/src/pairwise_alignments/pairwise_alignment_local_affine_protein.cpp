@@ -62,7 +62,6 @@ int main(int argc, char **argv)
     SeqFileIn seqFileIn(toCString(options.input));
     readRecords(id, seq, seqFileIn);
 
-    //Align<String<char>, ArrayGaps > ali;
     Align<String<AminoAcid> > ali;
     resize(rows(ali), 2);
     String<int> score;

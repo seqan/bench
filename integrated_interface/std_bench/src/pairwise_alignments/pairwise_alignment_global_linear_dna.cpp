@@ -25,7 +25,7 @@ seqan::ArgumentParser::ParseResult parseCommandLine(Options & options, int argc,
 
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE, "IN"));
     addArgument(parser, ArgParseArgument(ArgParseArgument::OUTPUT_FILE, "OUT"));
-    setValidValues(parser, 0, "FASTS, fa");
+    setValidValues(parser, 0, "fasta, fa");
     setValidValues(parser, 1, "txt");
 
     addSection(parser, "Settings");
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     SeqFileIn seqFileIn(toCString(options.input));
     readRecords(id, seq, seqFileIn);
 
-    Align<String<char>, ArrayGaps > ali;
+    Align<Dna5String> ali;
     resize(rows(ali), 2);
     String<int> score;
     resize(score, length(id)*length(id));
@@ -75,12 +75,12 @@ int main(int argc, char **argv)
         assignSource(row(ali, 0), seq[m]);
         assignSource(row(ali, 1), seq[n]);
 
-        score[m*length(id) + n] = globalAlignment(ali, Score<int>(2, -3, -2));
+        score[m * length(id) + n] = globalAlignment(ali, Score<int>(2, -3, -2));
     }
-    //serial output
+
+    //serial output score
     for (unsigned m = 0; m < length(id); m++)
     for (unsigned n = m + 1; n < length(id); n++)
-
         ofs << m << " " << n << " " << score[m*length(id) + n] << std::endl;
 
     return 0;

@@ -14,14 +14,6 @@ message (STATUS "Configuring apps/bench")
 # Dependencies
 # ----------------------------------------------------------------------------
 
-# Search C++11.
-find_package(CXX11 REQUIRED)
-
-if (NOT CXX11_FOUND)
-    message (STATUS "  C++11 compiler required to build bench.")
-    return ()
-endif (NOT CXX11_FOUND)
-
 # Search SeqAn and select dependencies.
 set (SEQAN_FIND_DEPENDENCIES OpenMP ZLIB BZIP2)
 find_package (SeqAn REQUIRED)

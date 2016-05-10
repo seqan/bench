@@ -89,10 +89,6 @@ target_link_libraries (pairwise_alignment_local_linear_protein  ${SEQAN_LIBRARIE
 # Installation
 # ----------------------------------------------------------------------------
 
-# Install bench in ${PREFIX}/bin directory
-install (TARGETS pairwise_alignment_global_linear_dna
-         DESTINATION app )
-
 # ----------------------------------------------------------------------------
 # CPack Install
 # ----------------------------------------------------------------------------

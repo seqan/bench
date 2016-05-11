@@ -52,6 +52,9 @@ add_definitions (-DSEQAN_DATE="${SEQAN_DATE}")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SEQAN_CXX_FLAGS} ")
 
 # Update the list of file names below if you add source files to your application.
+add_executable(kmers_10mer_counting                        std_bench/src/kmers/kmers_10mer_counting.cpp)
+add_executable(kmers_15mer_counting                        std_bench/src/kmers/kmers_15mer_counting.cpp)
+add_executable(kmers_50mer_counting                        std_bench/src/kmers/kmers_50mer_counting.cpp)
 add_executable(index_create                                std_bench/src/indices/index_create.cpp)
 add_executable(index_exact_search_sa                       std_bench/src/indices/index_exact_search_sa.cpp)
 add_executable(index_exact_search_esa                      std_bench/src/indices/index_exact_search_esa.cpp)
@@ -72,6 +75,9 @@ add_executable(pairwise_alignment_local_linear_dna         std_bench/src/pairwis
 add_executable(pairwise_alignment_local_linear_protein     std_bench/src/pairwise_alignments/pairwise_alignment_local_linear_protein.cpp)
 
 # Add dependencies found by find_package (SeqAn).
+target_link_libraries (kmers_10mer_counting                     ${SEQAN_LIBRARIES})
+target_link_libraries (kmers_15mer_counting                     ${SEQAN_LIBRARIES})
+target_link_libraries (kmers_50mer_counting                     ${SEQAN_LIBRARIES})
 target_link_libraries (index_create                             ${SEQAN_LIBRARIES})
 target_link_libraries (index_exact_search_sa                    ${SEQAN_LIBRARIES})
 target_link_libraries (index_exact_search_esa                   ${SEQAN_LIBRARIES})

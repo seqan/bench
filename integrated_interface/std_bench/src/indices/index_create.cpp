@@ -79,6 +79,12 @@ int main(int argc, char **argv)
     // create dfi index
     create_index<IndexWotd<Dfi<> > >(genome, options.outputFile + "_wotd_dfi.inx");
 
-    // create qgram index
-    create_index<IndexQGram<UngappedShape<50>, OpenAddressing > >(genome, options.outputFile + "_qgram.inx");
+    // create 10gram index
+    create_index<IndexQGram<UngappedShape<10> > >(genome, options.outputFile + "_10gram.inx");
+
+    // create 15gram index
+    create_index<IndexQGram<UngappedShape<15>, OpenAddressing> >(genome, options.outputFile + "_15gram.inx");
+
+    // create 50gram index
+    create_index<IndexQGram<UngappedShape<50>, OpenAddressing > >(genome, options.outputFile + "_50gram.inx");
 }

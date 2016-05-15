@@ -1,57 +1,243 @@
 {
-        "pw_global_dna":{
-            "name":"pa_global",
-            "category":["Pairwise_Alignment","Dna_Reads","global_NW_Alignment"],
-            "categoryName":"Dna global_NW",
-            "infoFile":"./Info/configInfo/pw_global_dna_1M_help.json",
-            "programName":"pa_global",
-            "checker":"",
-            "checked":true,
-            "runCmd":"./std_bench/global_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_global_dna.txt",
-            "time":25.2
-        },
-        "pw_local_dna":{
-            "name":"p",
-            "category":["Pairwise_Alignment", "Dna_Reads", "local_SW_Alignment"],
-            "categoryName":"Dna local_SW",
-            "infoFile":"./Info/configInfo/pw_local_dna_1M_help.json",
-            "programName":"",
-            "checker":"",
-            "checked":true,
-            "runCmd":"./std_bench/local_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_local_dna.txt",
-            "time":32.9
-        },
-        "pw_global_protein":{
-            "name":"pa",
-            "category":["Pairwise_Alignment", "Protein_Reads", "global_NW_Alignment"],
-            "categoryName":"Protein global_NW",
-            "infoFile":"./Info/configInfo/pw_global_dna_1M_protein_help.json",
-            "programName":"",
-            "checker":"",
-            "checked":true,
-            "runCmd":"./std_bench/global_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_global_protein.txt",
-            "time":167.4
-        },
-        "pw_local_protein":{
-            "name":"pairwise local protein alignment",
-            "category":["Pairwise_Alignment", "Protein_Reads", "local_SW_Alignment"],
-            "categoryName":"Proteine local_NW",
-            "infoFile":"./Info/configInfo/pw_local_dna_1M_protein_help.json",
-            "programName":"",
-            "checker":"",
-            "checked":true,
-            "runCmd":"./std_bench/local_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_local_protein.txt",
-            "time":225.4
-        },
-        "genome-index":{
-            "name":"genome_index",
-            "category":["Index","Rna_Reads"],
-            "categoryName":"Rna",
-            "infoFile":"./Info/configInfo/pw_global_dna_1M_protein_help.json",
-            "programName":"",
-            "checker":"",
-            "checked":true,
-            "runCmd":"./std_bench/index_search ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/chr1_gl000192.inx std_bench/data/result_index.txt",
-            "time":145.0
-        }
+    "index_exact_search": {
+        "name": "index_exact_search",
+        "categories": ["Index based exact/approximate search", "Index based exact search", "0 errors"],
+        "help_file": "./Info/configInfo/index_exact_search.help.json",
+        "execute": false,
+        "command": "./benchmarks/index_exact_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa ./results/index_exact_search.result.txt",
+        "expected_runtime": 0.2,
+        "repeats": 3,
+
+        "programName": "index_exact_search",
+        "checker": "",
+        "categoryName": "index_search",
+
+        "title": "Index based exact search",
+        "subtitle": "0 errors",
+        "base_time": 15.908
+    },
+    "index_one_error_approximate_search": {
+        "name": "index_one_error_approximate_search",
+        "categories": ["Index based exact/approximate search", "Index based approximate search", "1 error in hamming distance"],
+        "help_file": "./Info/configInfo/index_one_error_approximate_search.help.json",
+        "execute": true,
+        "command": "./benchmarks/index_one_error_approximate_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa ./results/index_one_error_approximate_search.result.txt",
+        "expected_runtime": 0.6,
+
+        "programName": "index_one_error_approximate_search",
+        "checker": "",
+        "categoryName": "index_search",
+
+        "title": "Index based approximate search",
+        "subtitle": "1 error in hamming distance",
+        "base_time": 15.908
+    },
+    "index_two_errors_approximate_search": {
+        "name": "index_two_errors_approximate_search",
+        "categories": ["Index based exact/approximate search", "Index based approximate search", "2 errors in hamming distance"],
+        "help_file": "./Info/configInfo/index_two_errors_approximate_search.help.json",
+        "execute": true,
+        "command": "./benchmarks/index_two_errors_approximate_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa ./results/index_two_errors_approximate_search.result.txt",
+        "expected_runtime": 2.3,
+
+        "programName": "index_two_errors_approximate_search",
+        "checker": "",
+        "categoryName": "index_search",
+
+        "title": "Index based approximate search",
+        "subtitle": "2 errors in hamming distance",
+        "base_time": 15.908
+    },
+    "index_three_errors_approximate_search": {
+        "name": "index_three_errors_approximate_search",
+        "categories": ["Index based exact/approximate search", "Index based approximate search", "3 errors in hamming distance"],
+        "help_file": "./Info/configInfo/index_three_errors_approximate_search.help.json",
+        "execute": true,
+        "command": "./benchmarks/index_three_errors_approximate_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa ./results/index_three_errors_approximate_search.result.txt",
+        "expected_runtime": 11.7,
+
+        "programName": "index_three_errors_approximate_search",
+        "checker": "",
+        "categoryName": "index_search",
+
+        "title": "Index based approximate search",
+        "subtitle": "3 errors in hamming distance",
+        "base_time": 15.908
+    },
+    "kmers_10mer_counting": {
+        "name": "kmers_10mer_counting",
+        "categories": ["Counting k-mers", "Counting 10-mers"],
+        "help_file": "./Info/configInfo/kmers_10mer_counting.help.json",
+        "execute": true,
+        "command": "./benchmarks/kmers_10mer_counting ./data/indices/index_10gram.inx ./data/chr1_sim_reads_2000.fa ./results/kmers_10mer_counting.result.txt",
+        "expected_runtime": 0.4,
+
+        "programName": "kmers_10mer_counting",
+        "checker": "",
+        "categoryName": "kmer_counting",
+
+        "title": "Counting 10-mers",
+        "subtitle": "",
+        "base_time": 15.908
+    },
+    "kmers_15mer_counting": {
+        "name": "kmers_15mer_counting",
+        "categories": ["Counting k-mers", "Counting 15-mers"],
+        "help_file": "./Info/configInfo/kmers_15mer_counting.help.json",
+        "execute": true,
+        "command": "./benchmarks/kmers_15mer_counting ./data/indices/index_15gram.inx ./data/chr1_sim_reads_2000.fa ./results/kmers_15mer_counting.result.txt",
+        "expected_runtime": 0.2,
+
+        "programName": "kmers_15mer_counting",
+        "checker": "",
+        "categoryName": "kmer_counting",
+
+        "title": "Counting 15-mers",
+        "subtitle": "",
+        "base_time": 15.908
+    },
+    "kmers_50mer_counting": {
+        "name": "kmers_50mer_counting",
+        "categories": ["Counting k-mers", "Counting 50-mers"],
+        "help_file": "./Info/configInfo/kmers_50mer_counting.help.json",
+        "execute": true,
+        "command": "./benchmarks/kmers_50mer_counting ./data/indices/index_50gram.inx ./data/chr1_sim_reads_2000.fa ./results/kmers_50mer_counting.result.txt",
+        "expected_runtime": 0.2,
+
+        "programName": "kmers_50mer_counting",
+        "checker": "",
+        "categoryName": "kmer_counting",
+
+        "title": "Counting 50-mers",
+        "subtitle": "",
+        "base_time": 15.908
+    },
+    "pairwise_alignment_global_affine_dna": {
+        "name": "pairwise_alignment_global_affine_dna",
+        "categories": ["Pairwise Alignment", "DNA global Alignment, affine gap costs", "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1"],
+        "help_file": "./Info/configInfo/pairwise_alignment_global_affine_dna.help.json",
+        "execute": true,
+        "command": "./benchmarks/pairwise_alignment_global_affine_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_affine_dna.result.txt",
+        "expected_runtime": 1.5,
+
+        "programName": "pairwise_alignment_global_affine_dna",
+        "checker": "",
+        "categoryName": "pairwise_alignment",
+
+        "title": "DNA global Alignment, affine gap costs",
+        "subtitle": "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1",
+        "base_time": 780
+    },
+    "pairwise_alignment_global_affine_protein": {
+        "name": "pairwise_alignment_global_affine_protein",
+        "categories": ["Pairwise Alignment", "Protein global Alignment, affine gap costs", "BLOSUM62, gap_extend: -3, gap_open: -1"],
+        "help_file": "./Info/configInfo/pairwise_alignment_global_affine_protein.help.json",
+        "execute": true,
+        "command": "./benchmarks/pairwise_alignment_global_affine_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_affine_protein.result.txt",
+        "expected_runtime": 1.6,
+
+        "programName": "pairwise_alignment_global_affine_protein",
+        "checker": "",
+        "categoryName": "pairwise_alignment",
+
+        "title": "Protein global Alignment, affine gap costs",
+        "subtitle": "BLOSUM62, gap_extend: -3, gap_open: -1",
+        "base_time": 15.908
+    },
+    "pairwise_alignment_global_linear_dna": {
+        "name": "pairwise_alignment_global_linear_dna",
+        "categories": ["Pairwise Alignment", "DNA global Alignment, linear gap costs", "match: 2, mismatch: -3, gap: -2"],
+        "help_file": "./Info/configInfo/pairwise_alignment_global_linear_dna.help.json",
+        "execute": true,
+        "command": "./benchmarks/pairwise_alignment_global_linear_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_linear_dna.result.txt",
+        "expected_runtime": 1.3,
+
+        "programName": "pairwise_alignment_global_linear_dna",
+        "checker": "",
+        "categoryName": "pairwise_alignment",
+
+        "title": "DNA global Alignment, linear gap costs",
+        "subtitle": "match: 2, mismatch: -3, gap: -2",
+        "base_time": 15.908
+    },
+    "pairwise_alignment_global_linear_protein": {
+        "name": "pairwise_alignment_global_linear_protein",
+        "categories": ["Pairwise Alignment", "Protein global Alignment, linear gap costs", "BLOSUM62, gap: -1"],
+        "help_file": "./Info/configInfo/pairwise_alignment_global_linear_protein.help.json",
+        "execute": true,
+        "command": "./benchmarks/pairwise_alignment_global_linear_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_linear_protein.result.txt",
+        "expected_runtime": 1.3,
+
+        "programName": "pairwise_alignment_global_linear_protein",
+        "checker": "",
+        "categoryName": "pairwise_alignment",
+
+        "title": "Protein global Alignment, linear gap costs",
+        "subtitle": "BLOSUM62, gap: -1",
+        "base_time": 15.908
+    },
+    "pairwise_alignment_local_affine_dna": {
+        "name": "pairwise_alignment_local_affine_dna",
+        "categories": ["Pairwise Alignment", "DNA local Alignment, affine gap costs", "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1"],
+        "help_file": "./Info/configInfo/pairwise_alignment_local_affine_dna.help.json",
+        "execute": true,
+        "command": "./benchmarks/pairwise_alignment_local_affine_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_affine_dna.result.txt",
+        "expected_runtime": 1.6,
+
+        "programName": "pairwise_alignment_local_affine_dna",
+        "checker": "",
+        "categoryName": "pairwise_alignment",
+
+        "title": "DNA local Alignment, affine gap costs",
+        "subtitle": "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1",
+        "base_time": 15.908
+    },
+    "pairwise_alignment_local_affine_protein": {
+        "name": "pairwise_alignment_local_affine_protein",
+        "categories": ["Pairwise Alignment", "Protein local Alignment, affine gap costs", "BLOSUM62, gap_extend: -3, gap_open: -1"],
+        "help_file": "./Info/configInfo/pairwise_alignment_local_affine_protein.help.json",
+        "execute": true,
+        "command": "./benchmarks/pairwise_alignment_local_affine_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_affine_protein.result.txt",
+        "expected_runtime": 1.6,
+
+        "programName": "pairwise_alignment_local_affine_protein",
+        "checker": "",
+        "categoryName": "pairwise_alignment",
+
+        "title": "Protein local Alignment, affine gap costs",
+        "subtitle": "BLOSUM62, gap_extend: -3, gap_open: -1",
+        "base_time": 15.908
+    },
+    "pairwise_alignment_local_linear_dna": {
+        "name": "pairwise_alignment_local_linear_dna",
+        "categories": ["Pairwise Alignment", "DNA local Alignment, linear gap costs", "match: 2, mismatch: -3, gap: -2"],
+        "help_file": "./Info/configInfo/pairwise_alignment_local_linear_dna.help.json",
+        "execute": true,
+        "command": "./benchmarks/pairwise_alignment_local_linear_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_linear_dna.result.txt",
+        "expected_runtime": 1.4,
+
+        "programName": "pairwise_alignment_local_linear_dna",
+        "checker": "",
+        "categoryName": "pairwise_alignment",
+
+        "title": "DNA local Alignment, linear gap costs",
+        "subtitle": "match: 2, mismatch: -3, gap: -2",
+        "base_time": 15.908
+    },
+    "pairwise_alignment_local_linear_protein": {
+        "name": "pairwise_alignment_local_linear_protein",
+        "categories": ["Pairwise Alignment", "Protein local Alignment, linear gap costs", "BLOSUM62, gap: -1"],
+        "help_file": "./Info/configInfo/pairwise_alignment_local_linear_protein.help.json",
+        "execute": true,
+        "command": "./benchmarks/pairwise_alignment_local_linear_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_linear_protein.result.txt",
+        "expected_runtime": 1.4,
+
+        "programName": "pairwise_alignment_local_linear_protein",
+        "checker": "",
+        "categoryName": "pairwise_alignment",
+
+        "title": "Protein local Alignment, linear gap costs",
+        "subtitle": "BLOSUM62, gap: -1",
+        "base_time": 15.908
+    }
 }

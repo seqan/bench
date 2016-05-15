@@ -1,18 +1,21 @@
 {
   "name": "Seqan BenchMark Graphical Interface",
-  "main": "resources/js/index.html",
+  "main": "resources/js/main.js",
   "description": "Program for integrated benchmarks",
   "window": {
     "title": "Seqan Benchmark",
     "toolbar": false,
-	"frame": false,
-	"width": 770,
-	"height": 615,
-	"min_width": 770,
-	"min_height":615,
-	"max_width":770,
-	"max_height":615,
-	"transparent":true
+    "frame": false,
+    "width": 770,
+    "height": 615,
+    "min_width": 770,
+    "min_height": 615,
+    "transparent": true
   },
-  "chromium-args": "--enable-transparent-visuals --disable-gpu"
+  "chromium-args": "--enable-transparent-visuals --disable-gpu",
+  "dependencies": {
+    "jsrender": "^0.9.75",
+    "shell-quote": "^1.6.0",
+    "strftime": "^0.9.2"
+  }
 }

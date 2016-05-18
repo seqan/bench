@@ -301,9 +301,49 @@ function slugify(text) {
                 .trigger('click');
         });
 
+        $('.btn-save-website:last').click(function(){
+            const benchmark_queue = $(this).data('benchmark_queue');
+            Exporter.save_results("./results/benchmark_results.json", benchmark_queue);
+
+            const spawn = require('child_process').spawn;
+            try {
+                var process = spawn('./website_generator/website_generate.py', [], {detached: true});
+            } catch(error) {
+                console.log('website generator - error spawn');
+                console.error(error);
+            }
+            process.stdout.on('data', function(data) {
+                console.log("stdout: " + data);
+            });
+            process.stderr.on('data', function(data) {
+                console.log("stderr: " + data);
+            });
+
+            process.on('close', function() {
+                console.log('website generator closed');
+            });
+            process.stdout.on('error', function(error) {
+                console.log('website generator stdout error');
+                console.error(error);
+            });
+            process.stderr.on('error', function(error) {
+                console.log('website generator stderr error');
+                console.error(error);
+            });
+            process.on('error', function(error) {
+                console.log('website generator error');
+                console.error(error);
+            });
+        });
+
         eventEmitter.once(_EVENTS.DONE, function() {
             const benchmark_queue = BenchmarkExecutor.benchmark_queue();
+
             $('.btn-save-results:last')
+                .data('benchmark_queue', benchmark_queue)
+                .removeAttr('disabled');
+
+            $('.btn-save-website:last')
                 .data('benchmark_queue', benchmark_queue)
                 .removeAttr('disabled');
         });

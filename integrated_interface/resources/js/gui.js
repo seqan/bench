@@ -297,6 +297,7 @@ function slugify(text) {
                 .change(function() {
                     const filename = $(this).val();
                     Exporter.save_results(filename, benchmark_queue);
+                    $(this).val('');
                 })
                 .trigger('click');
         });
@@ -338,16 +339,32 @@ function slugify(text) {
 
         $('.btn-save-website:last').click(function(){
             const benchmark_queue = $(this).data('benchmark_queue');
-            const website_path = path.resolve('./website_generator/benchmark1');
-            create_website(benchmark_queue, ['-o', website_path], function() {
-                const path = require('path');
+            const strftime = require('strftime');
 
-                if (confirm("View the website?")) {
-                    const file = 'file://' + website_path + '/benchmark.html';
-                    console.log(file);
-                    nw.Shell.openExternal( file );
-                }
-            });
+            $('#save-website-filechooser')
+                .attr('nwsaveas', 'benchmark-' + strftime("%Y%m%d-%H%M%S"))
+                .unbind('change')
+                .change(function() {
+                    const website_path = path.resolve($(this).val());
+                    create_website(benchmark_queue, ['-o', website_path], function() {
+                        const path = require('path');
+                        const fs = require('fs');
+
+                        try{
+                            fs.accessSync(website_path, fs.R_OK);
+                        } catch(err) {
+                            alert(err.message);
+                            return;
+                        }
+
+                        if (confirm("View the website?")) {
+                            const file = 'file://' + website_path + '/benchmark.html';
+                            nw.Shell.openExternal( file );
+                        }
+                    });
+                    $(this).val('');
+                })
+                .trigger('click');
         });
 
         eventEmitter.once(_EVENTS.DONE, function() {

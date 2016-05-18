@@ -1,0 +1,235 @@
+ <!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SeqBench</title>
+
+        <!-- BOOTSTRAP STYLES-->
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <!-- FONTAWESOME STYLES-->
+        <link rel="stylesheet" href="css/font-awesome.css">
+        <!--CUSTOM BASIC STYLES-->
+        <link rel="stylesheet" href="css/basic.css">
+        <!--CUSTOM MAIN STYLES-->
+        <link rel="stylesheet" href="css/custom.css">
+        <link rel="stylesheet" href="css/seqan.css">
+        <!-- GOOGLE FONTS-->
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <div id="wrapper">
+            <!-- /. NAV TOP  -->
+            <nav class="navbar-default navbar-side" role="navigation">
+                <div>
+                    <img src="img/seqan_logo.png" alt="logo" style="width:167px">
+                </div>
+                <div class="sidebar-collapse">
+                    <ul class="nav" id="main-menu">
+
+
+<li>
+    <a href="#"><i class="fa fa-yelp "></i>Scaling Options<span class="fa arrow"></span></a>
+    <ul class="nav nav-second-level">
+    <div class="form-group">
+        <div class="radio">
+            <span style="color:black; padding-left:40px">
+                <input name="scale_by" id="scale_by_subcategory" value="subcategory" onclick='updateBarScaling("subcat")' checked="checked" type="radio">
+                <label for="scale_by_subcategory">Scale bars by subcategory</label>
+            </span>
+        </div>
+        <div class="radio">
+            <span style="color:black; padding-left:40px">
+                <input name="scale_by" id="scale_by_category" value="category" onclick='updateBarScaling("cat")' type="radio">
+                <label for="scale_by_category">Scale bars by category</label>
+            </span>
+        </div>
+    </div>
+    </ul>
+</li>
+
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- /. NAV SIDE  -->
+            <div id="page-wrapper">
+                <div id="page-inner-result">
+
+<div class="row" id="result-chart">
+    <div class="result-header"><h3>Your Benchmark results</h3></div>
+    <div class="result-comparisons">
+        <div id="summary">
+            <!-- insert summary templates here -->
+        </div>
+        <div id="summary-system">
+            <!-- insert system templates here -->
+        </div>
+    </div>
+
+    <div class="result-body col-md-12">
+        <hr style="margin-top: 0">
+    </div>
+
+    <style>
+        #template-category {
+            display: none;
+        }
+        #template-subcategory {
+            display: none;
+        }
+        #template-result {
+            display: none;
+        }
+        #template-summary {
+            display: none;
+        }
+        #template-system {
+            display: none;
+        }
+    </style>
+
+    <!-- template subcategory - start -->
+    <div id="template-subcategory" class="panel-body">
+        <p style="text-align: center; font-size: 14px;" class="subcategory_name">Counting 50-mers</p>
+        <!-- insert template results here -->
+    </div>
+    <!-- template subcategory - end -->
+
+    <!-- template category - start -->
+    <div id="template-category" class="id-category col-md-12">
+        <div style="margin-bottom: 0px;" class="panel panel-default">
+            <div class="panel-heading">
+                <h1 class="panel-title">
+                    <a style="color: black;" class="category_head collapsed" href="#Countingk-mers" data-toggle="collapse">Counting k-mers</a>
+                </h1>
+            </div>
+            <div style="height: 0px;" class="subcategories panel-collapse collapse">
+                <!-- insert template subcategories -->
+            </div>
+        </div>
+    </div>
+    <!-- template category - end -->
+
+    <!-- template result - start -->
+    <div id="template-result" class="col-md-12">
+        <div style="font-size: 10pt;" class="result_filename col-md-3">seqan 1.0</div>
+        <div class="col-md-9">
+            <div style="font-size: 8pt; color: grey;" class="col-md-2 col-xs-12">single-core</div>
+            <div class="col-md-9 col-xs-11">
+                <div class="progress">
+                    <div aria-valuemax="100" aria-valuemin="0" aria-volumenow="23.529411764705884" class="result-bar result_bar_single progress-bar">800</div>
+                </div>
+            </div>
+            <div style="text-align: center; color: red;" class="result_quality_single col-xs-1">
+                quality
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+        <div class="col-md-9">
+            <div style="font-size: 8pt; color: grey;" class="result_threads_multiple col-md-2 col-xs-12">16-Thread</div>
+            <div class="col-md-9 col-xs-11">
+                <div class="progress">
+                    <div aria-valuemax="100" aria-valuemin="0" aria-volumenow="29.41176470588235" class="result-bar result_bar_multiple progress-bar">1000</div>
+                </div>
+            </div>
+            <div style="text-align: center; color: green;" class="result_quality_multiple col-xs-1">
+                quality
+            </div>
+        </div>
+    </div>
+    <!-- template result - end -->
+
+    <!-- template summary - start -->
+    <div id="template-summary" class="result-comparison col-md-6">
+        <h3>seqan 0.9</h3>
+        <div class="result-comparison-text">
+            <span style="white-space: nowrap;">
+                <span class="result-comparison-score result-single-score">4999</span>
+                <span class="result-comparison-cores">SingleCore</span>
+            </span>
+            <span style="white-space: nowrap;">
+                <span class="result-comparison-score result-multi-score">7049</span>
+                <span class="result-comparison-cores">MuliCore</span>
+            </span>
+        </div>
+    </div>
+    <!-- template summary - end -->
+
+    <!-- template system information - start -->
+    <div id="template-system" class="panel-config panel-default-config">
+        <div class="panel-heading-config">
+            <h6 class="panel-title-config">
+                <a class="system-head collapsed" href="#system" data-toggle="collapse">system information...</a>
+            </h6>
+        </div>
+        <div class="system-collapse-id panel-collapse collapse" id="system">
+            <div class="system-body panel-body-config">
+                <table class="table-system">
+                    <tbody>
+                      <tr>
+                        <td>OS</td>
+                        <td class="os">not provided</td>
+                      </tr>
+                      <tr>
+                        <td>CPU</td>
+                        <td class="cpu">not provided</td>
+                      </tr>
+                      <tr>
+                        <td>RAM</td>
+                        <td class="ram">not provided</td>
+                      </tr>
+                      <tr>
+                        <td>Threads</td>
+                        <td class="t">not provided</td>
+                      </tr>
+                      <tr>
+                        <td>Compiler</td>
+                        <td class="compiler">not provided</td>
+                      </tr>
+                      <tr>
+                        <td>Language</td>
+                        <td class="lang">not provided</td>
+                      </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- template system information - end -->
+
+    <div class="col-md-12" id="result-body2"></div>
+
+</div>
+
+<script type="text/javascript">
+var json_file = "files/benchmark.json";
+</script>
+
+
+                </div>
+                <!-- /. PAGE INNER  -->
+            </div>
+            <!-- /. PAGE WRAPPER  -->
+        </div>
+        <!-- /. WRAPPER  -->
+
+        <div id="footer-sec">
+            © 2016 <a href='http://seqan.de'>seqan.de</a> | Design By : <a href="http://www.binarytheme.com/" target="_blank">BinaryTheme.com</a>
+        </div>
+        <!-- /. FOOTER  -->
+        <!-- SCRIPTS -AT THE BOTOM TO REDUCE THE LOAD TIME-->
+        <!-- JQUERY SCRIPTS -->
+        <script src="js/jquery-1.10.2.js"></script>
+        <!-- BOOTSTRAP SCRIPTS -->
+        <script src="js/bootstrap.js"></script>
+        <!-- METISMENU SCRIPTS -->
+        <script src="js/jquery.metisMenu.js"></script>
+        <!-- CUSTOM SCRIPTS -->
+        <script src="js/custom.js"></script>
+
+        <script src="js/dynamic_content.js"></script>
+
+
+
+</body></html>

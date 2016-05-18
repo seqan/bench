@@ -281,10 +281,32 @@ function slugify(text) {
 
         var date = new Date();
 
+        // disable old website save buttons
+        $('.btn-save-website').attr('disabled', 'disabled');
+
         var result_start_run = renderer.templates('./resources/templates/results/result_start_run.html');
         $('#result_table').append(result_start_run.render({
-            start_time: date.toISOString()
+            start_date: date.toISOString()
         }));
+
+        $('.btn-save-results:last').click(function(){
+            const benchmark_queue = $(this).data('benchmark_queue');
+
+            $('#save-results-filechooser')
+                .unbind('change')
+                .change(function() {
+                    const filename = $(this).val();
+                    Exporter.save_results(filename, benchmark_queue);
+                })
+                .trigger('click');
+        });
+
+        eventEmitter.once(_EVENTS.DONE, function() {
+            const benchmark_queue = BenchmarkExecutor.benchmark_queue();
+            $('.btn-save-results:last')
+                .data('benchmark_queue', benchmark_queue)
+                .removeAttr('disabled');
+        });
 
         BenchmarkExecutor.run(Gui.add_result);
     };

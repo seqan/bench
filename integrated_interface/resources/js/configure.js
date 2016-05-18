@@ -26,6 +26,12 @@
         return JSON.parse(fs.readFileSync(json_file, 'utf8'));
     };
 
+    self.save_json = function(json_file, json) {
+        const fs = require('fs');
+        const serialize = JSON.stringify(json, null, 2);
+        return fs.writeFileSync(json_file, serialize, 'utf8');
+    };
+
     self.load_app = function() {
         try{
             self.config.app = self.load_json(self.config.files.app_config);

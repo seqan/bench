@@ -52,5 +52,10 @@
         return benchmark_results;
     };
 
+    self.save_results = function(path, benchmark_queue) {
+        const results = self.generate_results(benchmark_queue);
+        Configure.save_json(path, results);
+    };
+
     return self;
 });

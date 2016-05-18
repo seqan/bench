@@ -301,13 +301,12 @@ function slugify(text) {
                 .trigger('click');
         });
 
-        $('.btn-save-website:last').click(function(){
-            const benchmark_queue = $(this).data('benchmark_queue');
+        var create_website = function(benchmark_queue, args, on_generated) {
             Exporter.save_results("./results/benchmark_results.json", benchmark_queue);
 
             const spawn = require('child_process').spawn;
             try {
-                var process = spawn('./website_generator/website_generate.py', [], {detached: true});
+                var process = spawn('./website_generator/website_generate.py', args, {detached: true});
             } catch(error) {
                 console.log('website generator - error spawn');
                 console.error(error);
@@ -321,6 +320,7 @@ function slugify(text) {
 
             process.on('close', function() {
                 console.log('website generator closed');
+                on_generated();
             });
             process.stdout.on('error', function(error) {
                 console.log('website generator stdout error');
@@ -333,6 +333,20 @@ function slugify(text) {
             process.on('error', function(error) {
                 console.log('website generator error');
                 console.error(error);
+            });
+        };
+
+        $('.btn-save-website:last').click(function(){
+            const benchmark_queue = $(this).data('benchmark_queue');
+            const website_path = path.resolve('./website_generator/benchmark1');
+            create_website(benchmark_queue, ['-o', website_path], function() {
+                const path = require('path');
+
+                if (confirm("View the website?")) {
+                    const file = 'file://' + website_path + '/benchmark.html';
+                    console.log(file);
+                    nw.Shell.openExternal( file );
+                }
             });
         });
 

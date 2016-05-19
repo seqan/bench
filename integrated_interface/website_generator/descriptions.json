@@ -15,91 +15,91 @@
         "index_exact_search": {
             "title": "Index based exact search",
             "subtitle": "0 errors",
-            "base_time": 15.908,
+            "base_time": 0.2,
             "category": "index_search"
         },
         "index_one_error_approximate_search": {
             "title": "Index based approximate search",
             "subtitle": "1 error in hamming distance",
-            "base_time": 15.908,
+            "base_time": 0.6,
             "category": "index_search"
         },
         "index_two_errors_approximate_search": {
             "title": "Index based approximate search",
             "subtitle": "2 errors in hamming distance",
-            "base_time": 15.908,
+            "base_time": 2.3,
             "category": "index_search"
         },
         "index_three_errors_approximate_search": {
             "title": "Index based approximate search",
             "subtitle": "3 errors in hamming distance",
-            "base_time": 15.908,
+            "base_time": 11.7,
             "category": "index_search"
         },
         "kmers_10mer_counting": {
             "title": "Counting 10-mers",
             "subtitle": "",
-            "base_time": 15.908,
+            "base_time": 0.4,
             "category": "kmer_counting"
         },
         "kmers_15mer_counting": {
             "title": "Counting 15-mers",
             "subtitle": "",
-            "base_time": 15.908,
+            "base_time": 0.2,
             "category": "kmer_counting"
         },
         "kmers_50mer_counting": {
             "title": "Counting 50-mers",
             "subtitle": "",
-            "base_time": 15.908,
+            "base_time": 0.2,
             "category": "kmer_counting"
         },
         "pairwise_alignment_global_affine_dna": {
             "title": "DNA global Alignment, affine gap costs",
             "subtitle": "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1",
-            "base_time": 780,
+            "base_time": 3.1,
             "category": "pairwise_alignment"
         },
         "pairwise_alignment_global_affine_protein": {
             "title": "Protein global Alignment, affine gap costs",
             "subtitle": "BLOSUM62, gap_extend: -3, gap_open: -1",
-            "base_time": 15.908,
+            "base_time": 3.1,
             "category": "pairwise_alignment"
         },
         "pairwise_alignment_global_linear_dna": {
             "title": "DNA global Alignment, linear gap costs",
             "subtitle": "match: 2, mismatch: -3, gap: -2",
-            "base_time": 15.908,
+            "base_time": 2.5,
             "category": "pairwise_alignment"
         },
         "pairwise_alignment_global_linear_protein": {
             "title": "Protein global Alignment, linear gap costs",
             "subtitle": "BLOSUM62, gap: -1",
-            "base_time": 15.908,
+            "base_time": 2.7,
             "category": "pairwise_alignment"
         },
         "pairwise_alignment_local_affine_dna": {
             "title": "DNA local Alignment, affine gap costs",
             "subtitle": "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1",
-            "base_time": 15.908,
+            "base_time": 3,
             "category": "pairwise_alignment"
         },
         "pairwise_alignment_local_affine_protein": {
             "title": "Protein local Alignment, affine gap costs",
             "subtitle": "BLOSUM62, gap_extend: -3, gap_open: -1",
-            "base_time": 15.908,
+            "base_time": 3.1,
             "category": "pairwise_alignment"
         },
         "pairwise_alignment_local_linear_dna": {
             "title": "DNA local Alignment, linear gap costs",
             "subtitle": "match: 2, mismatch: -3, gap: -2",
-            "base_time": 15.908,
+            "base_time": 2.8,
             "category": "pairwise_alignment"
         },
         "pairwise_alignment_local_linear_protein": {
             "title": "Protein local Alignment, linear gap costs",
             "subtitle": "BLOSUM62, gap: -1",
-            "base_time": 15.908,
+            "base_time": 2.7,
             "category": "pairwise_alignment"
         }
     }

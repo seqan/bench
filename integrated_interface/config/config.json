@@ -118,7 +118,7 @@
         "help_file": "./Info/configInfo/pairwise_alignment_global_affine_dna.help.json",
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_global_affine_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_affine_dna.result.txt",
-        "expected_runtime": 1.5,
+        "expected_runtime": 3.1,
 
         "programName": "pairwise_alignment_global_affine_dna",
         "checker": "",
@@ -134,7 +134,7 @@
         "help_file": "./Info/configInfo/pairwise_alignment_global_affine_protein.help.json",
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_global_affine_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_affine_protein.result.txt",
-        "expected_runtime": 1.6,
+        "expected_runtime": 3.1,
 
         "programName": "pairwise_alignment_global_affine_protein",
         "checker": "",
@@ -150,7 +150,7 @@
         "help_file": "./Info/configInfo/pairwise_alignment_global_linear_dna.help.json",
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_global_linear_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_linear_dna.result.txt",
-        "expected_runtime": 1.3,
+        "expected_runtime": 2.5,
 
         "programName": "pairwise_alignment_global_linear_dna",
         "checker": "",
@@ -166,7 +166,7 @@
         "help_file": "./Info/configInfo/pairwise_alignment_global_linear_protein.help.json",
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_global_linear_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_linear_protein.result.txt",
-        "expected_runtime": 1.3,
+        "expected_runtime": 2.7,
 
         "programName": "pairwise_alignment_global_linear_protein",
         "checker": "",
@@ -182,7 +182,7 @@
         "help_file": "./Info/configInfo/pairwise_alignment_local_affine_dna.help.json",
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_local_affine_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_affine_dna.result.txt",
-        "expected_runtime": 1.6,
+        "expected_runtime": 3,
 
         "programName": "pairwise_alignment_local_affine_dna",
         "checker": "",
@@ -198,7 +198,7 @@
         "help_file": "./Info/configInfo/pairwise_alignment_local_affine_protein.help.json",
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_local_affine_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_affine_protein.result.txt",
-        "expected_runtime": 1.6,
+        "expected_runtime": 3.1,
 
         "programName": "pairwise_alignment_local_affine_protein",
         "checker": "",
@@ -214,7 +214,7 @@
         "help_file": "./Info/configInfo/pairwise_alignment_local_linear_dna.help.json",
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_local_linear_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_linear_dna.result.txt",
-        "expected_runtime": 1.4,
+        "expected_runtime": 2.8,
 
         "programName": "pairwise_alignment_local_linear_dna",
         "checker": "",
@@ -230,7 +230,7 @@
         "help_file": "./Info/configInfo/pairwise_alignment_local_linear_protein.help.json",
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_local_linear_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_linear_protein.result.txt",
-        "expected_runtime": 1.4,
+        "expected_runtime": 2.7,
 
         "programName": "pairwise_alignment_local_linear_protein",
         "checker": "",

@@ -7,8 +7,7 @@ const resultFiles = [
         ]
 
 function g_showSysInfo(){
-    os=require("os")    
-    var mem=Math.floor(os.totalmem()/1024/1024/1024*10)/10
+    var mem=Math.floor(os.totalmem()/1024/1024/1024*100)/100
     $("#sysInfoBody").html("<table class='table table-hover' style='width:100%;margin-bottom:3px; padding:0; box-shadow:1px 5px 10px #888888'></tr><tr><td><h6>Opearting system:</h6</td><td><h6>"+os.platform()+" "+os.arch()+" "+os.release()+"</h6></td></tr><tr><td><h6>Memory:</h6></td><td><h6>" + mem + " GB</h6></td></tr><tr><td><h6>CPU:</h6></td><td><h6>"+os.cpus()[0].model+"<h6></td></tr><tr><td><h6>Threads:</h6></td><td><h6>" + os.cpus().length + "</h6></td></tr></tbody></table>");
 }
 
@@ -130,14 +129,16 @@ function g_run(){
  
     NProgress.start()
     var date = new Date()
-    $('#result_table').append("<tr><td colspan='3'><h6><b>" + date.toISOString() + "</b><h6><td></td></tr>")
+    $('#result_table').append("<tr><td colspan='4'><h6><b>" + date.toISOString() + "</b><h6><td></td></tr>")
     var opts={
         'list': [],                   //list of running bench programs
-        'st': [],                     //state of running result
+        'st': [],                   //state of running result
         'cmd': [],
         'time': [],
-        'count': 0,                   //current running bench program
-        'weight': [],      //weight for each program
+        'count': 0,                 //current running bench program
+        'cmdCount': 0,              //current running command 
+        'cmdRemark': [],             //current command remark
+        'weight': [],               //weight for each program
         'runtime': [],            //running time
         'results': {'time': []},
         'resultFiles': resultFiles
@@ -147,13 +148,6 @@ function g_run(){
     var statMax = 0
     var stat = 0
     var _P = 1
-    var _2Time = function(hrtime, tag){
-        if (tag == "sec")
-            return hrtime[0] + hrtime[1] * 1e-9
-        else
-            return hrtime[0] * 1000 + hrtime[1] * 1e-6
-    }
-       
     var _showResults = function(data){
         timeSum += opts.time[opts.count]
         timePercent = timeSum / _Total_Time
@@ -162,7 +156,13 @@ function g_run(){
         NProgress.set(stat)
         if(_SIGNAL.NORM){
        	    if(opts.st[opts.count])
-                $('#result_table').append("<tr><td><h6>" + (opts.count+1) + "</h6></td><td><h6>"+opts.list[opts.count]+"</h6></td><td><h6><span class='glyphicon glyphicon-ok' style='color:#5cb85c' aria-hidden='true'></span>&nbsp complete</h6></td><td><h6>" + Math.floor( _2Time(opts.runtime, "sec") * 10000 ) / 10000 + " Sec</h6></td></tr>")
+            {
+                if (opts.cmdCount == 0)
+                    var num = opts.count + 1
+                else
+                    var num = ''
+                $('#result_table').append("<tr><td><h6>" + num + "</h6></td><td><h6>" + opts.cmdRemark[opts.count][opts.cmdCount] + "</h6></td><td><h6>"+opts.list[opts.count]+"</h6></td><td><h6><span class='glyphicon glyphicon-ok' style='color:#5cb85c' aria-hidden='true'></span>&nbsp complete</h6></td><td><h6>" + Math.floor( _2Time(opts.runtime[opts.count][opts.cmdCount], "sec") * 10000 ) / 10000 + " Sec</h6></td></tr>")
+            }
         } 
         else{
             if (_SIGNAL.CANCEL)

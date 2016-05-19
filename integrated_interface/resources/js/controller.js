@@ -2,6 +2,7 @@ const path = require('path')
 const pro = require('process')
 const events = require('events')
 const fs = require('fs')
+const os = require('os')
 
 var eventEmitter = new events.EventEmitter()
 var _GENERAL_CONFIG_FILE = path.resolve("./config/gconfig.json")
@@ -122,6 +123,14 @@ var GenericOptions = {
     }  
 }
 
+var system = {
+    "os": os.platform() + " " + os.arch() + " " + os.release(),
+    "cpu_name": os.cpus()[0].model,
+    "memory": Math.floor(os.totalmem()/1024/1024/1024*100)/100,
+    "date": "",
+    "threads": os.cpus().length
+}
+
 function waitExec(signal, callback){
     if (_SIGNAL[signal])
         callback()
@@ -239,6 +248,12 @@ var Options = {
             else
                 return false
         }
+        funcs.getRunCmdRemark = function(prg){
+            if ("runCmdRemark" in options[prg])
+                return options[prg].runCmdRemark
+            else 
+                return false
+        }
         funcs.getConfig = function(){
             try{
                 return options
@@ -247,6 +262,7 @@ var Options = {
                 return err
             }
         }
+
         funcs.setName = function(prg, name){ //string
             options[prg].name = name
         }
@@ -311,9 +327,25 @@ function _formatCmd(prgName, flag){
 
 function _2SpawnCmd(cmd){   
     var tmp = cmd.split(" ")
-    var spawnCmd = {"prg":tmp[0], "arg":[]}
-    for (var k = 1; k < tmp.length; k++){
-        spawnCmd.arg[k - 1] = tmp[k]
+    var spawnCmd = [] 
+    var _prgFlag = true
+    var count = 0, m = 0
+
+    spawnCmd[0] = {"prg":'', "arg":[]}
+    for (var k = 0; k < tmp.length; k++){
+        if (tmp[k] == '&&'){
+            _prgFlag = true
+            spawnCmd[++count] = {"prg":'', "arg":[]}
+            m = 0
+            continue 
+        }
+        else
+            if (_prgFlag) {
+                _prgFlag = false
+                spawnCmd[count].prg = tmp[k]
+            }
+            else
+                spawnCmd[count].arg[m++] = tmp[k]
     }    
     return spawnCmd    
 }
@@ -326,6 +358,13 @@ function _2SpawnArgv(argv){
     return spawnArgv    
 }
 
+var _2Time = function(hrtime, tag){
+     if (tag == "sec")
+         return hrtime[0] + hrtime[1] * 1e-9
+     else
+         return hrtime[0] * 1000 + hrtime[1] * 1e-6
+ }
+
 function clearResult(file){
     file.forEach(function(filename){
         fs.exists(filename, function(exists){
@@ -335,17 +374,85 @@ function clearResult(file){
     })
 }
 
+//function _runEach(opts,funcs){
+//    var path = require("path")
+//    var spawn = require('child_process').spawn
+//    var time
+//    var free
+//    var errMsg
+//    
+//    var _onCloseFunc = function(){
+//        opts.runtime = pro.hrtime(time)
+//        funcs(errMsg)   
+//        if(++opts.count < opts.list.length){
+//            _run(opts,funcs)
+//        }
+//        else{
+//            _SIGNAL.DONE = true
+//            eventEmitter.emit(_EVENTS.DONE)
+//            _SIGNAL.RUN = false
+//            clearResult(opts.resultFiles)
+//        }
+//    }
+//    var _run = function(opts, funcs){
+//        if (_SIGNAL.CANCEL)
+//            return _EVENTS.CANCEL
+//        var spawnCmd = _2SpawnCmd(opts.cmd[opts.count])
+//        var spawnArgv = _2SpawnArgv(opts.cmd[opts.count]) 
+//        if (require('os').platform() == 'linux')
+//        try{
+//            require('fs').chmodSync(spawnCmd.prg, 764)
+//        }
+//        catch(err){
+//            _SIGNAL.NORM = false
+//            errMsg = err
+//        } 
+//        time=pro.hrtime()
+//        try{
+//            free = spawn(spawnCmd[0].prg, spawnCmd[0].arg, {detached: true})
+//        }
+//        catch(err){
+//            alert(err)
+//        }
+//        proc.setPid(free.pid)
+//        _SIGNAL.NORM = true    
+//        free.on('close', _onCloseFunc)
+//        free.stderr.on('error', function(){
+//            _SIGNAL.NORM = false
+//            errMsg = error 
+//            opts.st[opts.count] = false
+//            eventEmitter.emit(_EVENTS.FAILED)
+//        })
+//        free.on('error', function(){
+//            _SIGNAL.NORM = false 
+//            errMsg = "Starting program failed"
+//            eventEmitter.emit(_EVENTS.FAILED)
+//        })
+//    } 
+//    
+//    _run(opts, funcs)
+//}
+
 function _runEach(opts,funcs){
     var path = require("path")
     var spawn = require('child_process').spawn
     var time
     var free
     var errMsg
-    
+    var _NEXT = true
+    var spawnCmd = []
     var _onCloseFunc = function(){
-        opts.runtime = pro.hrtime(time)
+        opts.runtime[opts.count][opts.cmdCount] = pro.hrtime(time)
         funcs(errMsg)   
-        if(++opts.count < opts.list.length){
+        if (++opts.cmdCount < spawnCmd.length){
+            _NEXT = false 
+        }
+        else{
+            opts.cmdCount = 0
+            _NEXT = true
+            opts.count++ 
+        }
+        if(opts.count < opts.list.length){
             _run(opts,funcs)
         }
         else{
@@ -355,25 +462,31 @@ function _runEach(opts,funcs){
             clearResult(opts.resultFiles)
         }
     }
+
     var _run = function(opts, funcs){
         if (_SIGNAL.CANCEL)
             return _EVENTS.CANCEL
-        var spawnCmd = _2SpawnCmd(opts.cmd[opts.count])
-        var spawnArgv = _2SpawnArgv(opts.cmd[opts.count]) 
+        if (_NEXT){
+            spawnCmd = _2SpawnCmd(opts.cmd[opts.count])
+            
+            //var spawnArgv = _2SpawnArgv(opts.cmd[opts.count]) 
         if (require('os').platform() == 'linux')
-        try{
-            require('fs').chmodSync(spawnCmd.prg, 764)
+            try{
+                require('fs').chmodSync(spawnCmd.prg, 764)
+            }
+            catch(err){
+                _SIGNAL.NORM = false
+                errMsg = err
+            } 
         }
-        catch(err){
-            _SIGNAL.NORM = false
-            errMsg = err
-        } 
         time=pro.hrtime()
         try{
-            free = spawn(spawnCmd.prg, spawnCmd.arg, {detached: true})
+            //free = spawn(spawnCmd[k].prg, spawnCmd[k].arg, {detached: true})
+            free = spawn('ls')
         }
         catch(err){
-            alert("error")
+            errMsg += '\n spawnError: ' + err
+            alert(err)
         }
         proc.setPid(free.pid)
         _SIGNAL.NORM = true    
@@ -390,23 +503,24 @@ function _runEach(opts,funcs){
             eventEmitter.emit(_EVENTS.FAILED)
         })
     } 
-    
     _run(opts, funcs)
 }
 
-function run(opts,funcs){
+function run(opts, funcs){
     proc = Process.init()
     _Total_Time = 0;
     _SIGNAL.CANCEL = false
     _SIGNAL.RUN = true
     _SIGNAL.DONE = false
-    for (prg in cmp.getConfig()){
+    for (var prg in cmp.getConfig()){
         if(cmp.getChecked(prg))
         {
             opts.list.push(prg);
             opts.st.push(true);
             opts.cmd.push(cmp.getRunCmd(prg))
             opts.time.push(cmp.getTime(prg))
+            opts.cmdRemark.push(cmp.getRunCmdRemark(prg))
+            opts.runtime.push([])
             _Total_Time += cmp.getTime(prg)
         }
     }
@@ -415,7 +529,23 @@ function run(opts,funcs){
         opts.weight[k] = opts.time[k] / _Total_Time + opts.weight[k - 1]
     }
     
+            
+    var results = {'informations':{}, 'results':{}}
+    eventEmitter.on(_EVENTS.DONE, function(){
+        for (var k = 0; k < opts.cmd.length; k++ ){
+            results.results[opts.list[k]] = {}
+            for (var j = 0; j < opts.cmdRemark[k].length; j++)
+            {
+                results.results[opts.list[k]][opts.cmdRemark[k][j]] = {'time': [_2Time(opts.runtime[k][j], "sec")]}
+            }
+        }
+    stest(results)
+    })
+    eventEmitter.on(_EVENTS.CANCEL, function(){
+    })
+
     _runEach(opts, funcs)
+
 }
 
 function cancel(){

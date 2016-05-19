@@ -7,7 +7,8 @@
             "programName":"pa_global",
             "checker":"",
             "checked":true, 
-            "runCmd":"./std_bench/global_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_global_dna.txt",
+            "runCmd":"./std_bench/global_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_global_dna.txt -tc 1 && ./std_bench/global_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_global_dna.txt",
+            "runCmdRemark":["Single_core", "Multi_core"],
             "time":25.2
         },
 		"pw_local_dna":{
@@ -18,7 +19,8 @@
 			"programName":"",
 			"checker":"",
 			"checked":true,
-			"runCmd":"./std_bench/local_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_local_dna.txt",
+			"runCmd":"./std_bench/local_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_local_dna.txt -tc 1 && ./std_bench/local_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_local_dna.txt",
+            "runCmdRemark":["Single_core", "Multi_core"],
             "time":32.9
 		},
 		"pw_global_protein":{
@@ -29,7 +31,8 @@
 			"programName":"",
 			"checker":"",
 			"checked":true,
-			"runCmd":"./std_bench/global_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_global_protein.txt",
+			"runCmd":"./std_bench/global_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_global_protein.txt -tc 1 && ./std_bench/global_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_global_protein.txt",
+            "runCmdRemark":["Single_core", "Multi_core"],
             "time":167.4
 		},
         "pw_local_protein":{
@@ -40,7 +43,8 @@
             "programName":"",
             "checker":"",
             "checked":true,
-            "runCmd":"./std_bench/local_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_local_protein.txt",
+            "runCmd":"./std_bench/local_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_local_protein.txt -tc 1 && ./std_bench/local_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_local_protein.txt",
+            "runCmdRemark":["Single_core", "Multi_core"],
             "time":225.4
         },
 		"genome-index":{
@@ -51,7 +55,8 @@
 			"programName":"",
 			"checker":"",
             "checked":true,
-            "runCmd":"./std_bench/index_search ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/chr1_gl000192.inx std_bench/data/result_index.txt",
+            "runCmd":"./std_bench/index_search ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/chr1_gl000192.inx std_bench/data/result_index.txt -tc 1 && ./std_bench/index_search ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/chr1_gl000192.inx std_bench/data/result_index.txt",
+            "runCmdRemark":["Single_core", "Multi_core"],
             "time":145.0
         }  
 }

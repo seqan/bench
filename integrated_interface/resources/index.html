@@ -16,6 +16,11 @@
         <link rel="stylesheet" href="css/main.css" type="text/css"/>
     </head>
 
-    <body>
+    <body style='background-color:rgba(0,0,0,0)'>
+    <script>
+        const renderer = require('jsrender');
+        var tmpl = renderer.templates('./resources/templates/gui/body.html');
+        nw.Window.get().window.document.body.innerHTML = tmpl.render();
+    </script>
     </body>
 </html>

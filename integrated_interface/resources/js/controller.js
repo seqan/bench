@@ -46,7 +46,8 @@ var _KEY = {
     "checked",
     "time",
     "argv",
-    "infoFile"    
+    "infoFile",
+    "runCmdRemark" 
     ],
     checkPrimary: function(opt){
         if (typeof opt == 'object'){
@@ -171,9 +172,9 @@ var Options = {
                 return false
             })
            .success(function(){
-               for (var prg in options){
-                   if (typeof options[prg] == 'object'){
-                       if (! _KEY.checkPrimary(options[prg])){
+               for (var prg in options.benchmarks){
+                   if (typeof options.benchmarks[prg] == 'object'){
+                       if (! _KEY.checkPrimary(options.benchmarks[prg])){
                             _SIGNAL.ERROR = true     
                             return false
                        } 
@@ -187,8 +188,6 @@ var Options = {
            .always(function(){
                 _SIGNAL.INIT = true
             })
-           if (_SIGNAL.ERROR)
-                return false
         }
         catch(err){
             return false 
@@ -196,45 +195,45 @@ var Options = {
          
         var funcs = {}
         funcs.getName = function(prg){
-            if ("name" in options[prg])
-                return options[prg].name
+            if ("name" in options.benchmarks[prg])
+                return options.benchmarks[prg].name
             else
                 return false
         }
         funcs.getCategory = function(prg){
-            if ("category" in options[prg])
-                return options[prg].category
+            if ("category" in options.benchmarks[prg])
+                return options.benchmarks[prg].category
             else
                 return false
         }   
         funcs.getInfoFile = function(prg){
-            if ("infoFile" in options[prg])
-                return options[prg].infoFile
+            if ("infoFile" in options.benchmarks[prg])
+                return options.benchmarks[prg].infoFile
             else
                 return false
         }
         funcs.getChecked = function(prg){
-            if ("checked" in options[prg])
-                return options[prg].checked
+            if ("checked" in options.benchmarks[prg])
+                return options.benchmarks[prg].checked
             else 
                 return false
         }
         funcs.getRunCmd = function(prg){
-            if ("runCmd" in options[prg])
-                return options[prg].runCmd  
+            if ("runCmd" in options.benchmarks[prg])
+                return options.benchmarks[prg].runCmd  
             else
                 return false
         } 
         funcs.getRunCmdPrg = function(prg){
-            if ("runCmd" in options[prg])
-                return options[prg].runCmd.split(" ")[0]
+            if ("runCmd" in options.benchmarks[prg])
+                return options.benchmarks[prg].runCmd.split(" ")[0]
             else
                 return false
         }
         funcs.getRunCmdArgv = function(prg){
-            if ("runCmd" in options[prg]){
+            if ("runCmd" in options.benchmarks[prg]){
                 var runCmdArgv = ""
-                var tmp = options[prg].runCmd.split(" ")
+                var tmp = options.benchmarks[prg].runCmd.split(" ")
                 for (k = 1; k < tmp.length; k++)
                     runCmdArgv += tmp[k] + " "
                 return runCmdArgv
@@ -243,20 +242,28 @@ var Options = {
                 return false
         }
         funcs.getTime = function(prg){
-            if ("time" in options[prg])
-                return options[prg].time
+            if ("time" in options.benchmarks[prg])
+                return options.benchmarks[prg].time
             else
                 return false
         }
         funcs.getRunCmdRemark = function(prg){
-            if ("runCmdRemark" in options[prg])
-                return options[prg].runCmdRemark
+            if ("runCmdRemark" in options.benchmarks[prg])
+                return options.benchmarks[prg].runCmdRemark
             else 
                 return false
         }
         funcs.getConfig = function(){
             try{
-                return options
+                return options.benchmarks
+            }
+            catch(err){
+                return err
+            }
+        }
+        funcs.getProjectTitle = function(){
+            try{
+                return options.project.title
             }
             catch(err){
                 return err
@@ -264,22 +271,22 @@ var Options = {
         }
 
         funcs.setName = function(prg, name){ //string
-            options[prg].name = name
+            options.benchmarks[prg].name = name
         }
         funcs.setCategory = function(prg, category){ //[]
-            options[prg].category = category
+            options.benchmarks[prg].category = category
         }
         funcs.setInfoFile = function(prg, infoFile){ //string
-            options[prg].infoFile = infoFile
+            options.benchmarks[prg].infoFile = infoFile
         }
         funcs.setChecked = function(prg, checked){ //bool
-            options[prg].checked = checked
+            options.benchmarks[prg].checked = checked
         }
         funcs.setRunCmd = function(prg, runCmd){ //string
-            options[prg].runCmd = runCmd 
+            options.benchmarks[prg].runCmd = runCmd 
         }
         funcs.setTime = function(prg, time){ //float second
-            options[prg].time = time
+            options.benchmarks[prg].time = time
         }
         return funcs
     }
@@ -539,11 +546,11 @@ function run(opts, funcs){
                 results.results[opts.list[k]][opts.cmdRemark[k][j]] = {'time': [_2Time(opts.runtime[k][j], "sec")]}
             }
         }
-    stest(results)
     })
     eventEmitter.on(_EVENTS.CANCEL, function(){
     })
 
+    alert(JSON.stringify(cmp.getConfig()))
     _runEach(opts, funcs)
 
 }

@@ -4,8 +4,8 @@
   "description": "Program for integrated benchmarks",
   "window": {
     "title": "Seqan Benchmark",
-    "toolbar": true,
-	"frame": true,
+    "toolbar": false,
+	"frame": false,
 	"width": 770,
 	"height": 615,
 	"min_width": 770,

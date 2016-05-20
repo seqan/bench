@@ -141,26 +141,50 @@
                         </script>
                       </div>
                     </div>
-                <div class="panel panel-danger" style="margin:0" >
-                    <div class="panel-heading" role="tab" id="headingOne">
-                        <span id='ConfigTitle' role="button" data-toggle="collapse" data-parent="#ConfigForm" href="#ConfigForm" aria-controls="ConfigForm">
-                            <b>
-                            Configuration
-                            </b>
-                        </span>
-                        <script>
-                            function scroll(){
-                                $("#ConfigTitle").scrollTop(100)
-                            }
-                            //$("#ConfigTitle").scrollTop(100px)
-                        </script>
+                    <div class="panel panel-info" style="margin:0" >
+                        <div class="panel-heading" role="tab" id="headingOne">
+                            <span id='ConfigTitle' role="button" data-toggle="collapse" data-parent="#Project" href="#Project" aria-controls="Project">
+                                <b>
+                                Project 
+                                </b>
+                        </div>
+                        <div id="Project" class="panel-collapse collapse in" role="tabpanel" arialabelledby="headingOne">
+                            <table style="width:100%; margin:5px;">
+                                <tr>
+                                    <td>
+                                        Title
+                                    </td>
+                                    <td>
+                                        <input id="proTit" type="text">
+                                        <script>
+                                            $("#proTit").val("done")
+                                        </script>
+                                    </td>
+                                </tr>
+                            </table>                      
+                            
+                        </div>
                     </div>
-                    <div id="ConfigForm" class="panel-collapse collapse in" role="tabpanel" arialabelledby="headingOne" style="margin-bottom:3px; box-shadow:1px 5px 10px #888888">
-                        <script>
-                            waitExec("INIT", function(){g_createCategory()})      
-                        </script>
+                    <div class="panel panel-danger" style="margin:0" >
+                        <div class="panel-heading" role="tab" id="headingOne">
+                            <span id='ConfigTitle' role="button" data-toggle="collapse" data-parent="#ConfigForm" href="#ConfigForm" aria-controls="ConfigForm">
+                                <b>
+                                Configuration
+                                </b>
+                            </span>
+                            <script>
+                                function scroll(){
+                                    $("#ConfigTitle").scrollTop(100)
+                                }
+                                //$("#ConfigTitle").scrollTop(100px)
+                            </script>
+                        </div>
+                        <div id="ConfigForm" class="panel-collapse collapse in" role="tabpanel" arialabelledby="headingOne" style="margin-bottom:3px; box-shadow:1px 5px 10px #888888">
+                            <script>
+                                waitExec("INIT", function(){g_createCategory()})      
+                            </script>
+                        </div>
                     </div>
-                </div>
                     <div class="panel panel-success">
                         <div class="panel-heading">
                             <b>

@@ -47,6 +47,7 @@
     const path = require('path');
     const EventEmitter = require('events');
     const extend = require('extend');
+    const ValidatorExecutor = require('./validator_executor');
 
     var self = new EventEmitter();
 
@@ -193,16 +194,16 @@
 
             for (const thread of threads) {
                 const core = (thread == 1 ? 'single_core' : 'multi_core');
-                var result_file = './results/' + benchmark_id + '.' + core + '.result.txt';
-
-                var shell_args = shell_parse(benchmark.command);
-                shell_args.pop();
-                shell_args = shell_args.concat([result_file, '-tc', thread]);
-
                 const repeats = benchmark.repeats ? benchmark.repeats : 1;
+
                 for (var i = 0; i < repeats; i++) {
                     const repeat_name = repeats == 1 ? '' : "." + i;
+                    const result_file = './results/' + benchmark_id + '.' + core + repeat_name + '.result.txt';
                     const thread_name = " -tc " + thread;
+
+                    var shell_args = shell_parse(benchmark.command);
+                    shell_args.pop();
+                    shell_args = shell_args.concat([result_file, '-tc', thread]);
 
                     benchmark_queue.add_process({
                         queue_id: queue_id++,
@@ -325,11 +326,16 @@
                 current_process.state = 'SUCCESS';
             }
 
-            // display successful/failed/aborted execution in the gui
-            self.emit('result', current_process, benchmark_queue);
+            ValidatorExecutor.once('result', (validator) => {
+                current_process.validator = validator;
 
-            // execute next benchmark in the queue
-            self._runEach(queue_id+1);
+                // display successful/failed/aborted execution in the gui
+                self.emit('result', current_process, benchmark_queue);
+
+                // execute next benchmark in the queue
+                self._runEach(queue_id+1);
+            });
+            ValidatorExecutor.validate(current_process);
         });
         child_process.stdout.on('error', error_handler);
         child_process.stderr.on('error', error_handler);

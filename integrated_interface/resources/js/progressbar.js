@@ -10,6 +10,7 @@
 
 })(this, function() {
     const BenchmarkExecutor = require('./modules/benchmark_executor');
+    const ValidatorExecutor = require('./modules/validator_executor');
     var self = {};
 
     const _percent_max = 1;
@@ -110,6 +111,11 @@
     BenchmarkExecutor.on('setup', function(current_process) {
         // update progress bar
         ProgressBar.update_process(current_process);
+    });
+
+    // before a validation will be run
+    ValidatorExecutor.on('setup', function(validator) {
+        _current_benchmark_name = "validator " + validator.id;
     });
 
     return self;

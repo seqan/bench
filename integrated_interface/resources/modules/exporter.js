@@ -30,10 +30,12 @@
             const id = benchmark.benchmark_id;
             benchmark_results.results[id] = {
                 "single_core": {
-                    "time": []
+                    "time": [],
+                    "quality": []
                 },
                 "multi_core": {
-                    "time": []
+                    "time": [],
+                    "quality": []
                 }
             };
         }
@@ -42,12 +44,10 @@
         for(const benchmark of benchmark_queue) {
             const id = benchmark.benchmark_id;
             var result = benchmark_results.results[id];
+            var core = benchmark.threads == 1 ? result.single_core : result.multi_core;
 
-            if (benchmark.threads == 1) {
-                result.single_core.time.push(benchmark.runtime);
-            } else {
-                result.multi_core.time.push(benchmark.runtime);
-            }
+            core.quality.push(benchmark.validator.quality());
+            core.time.push(benchmark.runtime);
         }
 
         return benchmark_results;

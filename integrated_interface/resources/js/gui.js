@@ -248,10 +248,11 @@ function slugify(text) {
 
         if(current_process.state === 'SUCCESS'){
             const result_success = renderer.templates('./resources/templates/results/result_success.html');
+            const quality = ', quality: ' + current_process.validator.quality();
             $('#result_table').append(result_success.render({
                 row_id: row_id,
                 benchmark_name: benchmark_name,
-                message: 'complete',
+                message: 'complete' + quality,
                 runtime: format_secs(current_process.runtime)
             }));
         } else if (current_process.state === 'CANCELED') {

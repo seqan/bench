@@ -379,7 +379,7 @@ function slugify(text) {
                 .removeAttr('disabled');
         });
 
-        BenchmarkExecutor.run(Gui.add_result);
+        BenchmarkExecutor.run();
     };
 
     eventEmitter.on(_EVENTS.DONE, function() {
@@ -427,6 +427,52 @@ function slugify(text) {
         const panels_height = height - titlebar_height - footer_height - 10;
         $('#panels').height(panels_height);
     };
+
+
+
+    // before the benchmarks will be run
+    BenchmarkExecutor.on('initialize', function(benchmark_queue) {
+        _SIGNAL.CANCEL = false;
+        _SIGNAL.RUN = true;
+        _SIGNAL.DONE = false;
+
+        ProgressBar.start(benchmark_queue);
+    });
+
+    // before a benchmark will be run
+    BenchmarkExecutor.on('setup', function(current_process) {
+        // update progress bar
+        ProgressBar.update_process(current_process);
+    });
+
+    // after a benchmark process was spawn
+    BenchmarkExecutor.on('spawned', function() {
+        _SIGNAL.NORM = true;
+    });
+
+    // on a result
+    BenchmarkExecutor.on('result', self.add_result);
+
+    // if a error occured executing the process
+    BenchmarkExecutor.on('error', function() {
+        _SIGNAL.NORM = false;
+        eventEmitter.emit(_EVENTS.FAILED);
+    });
+
+    // after all benchmarks finished
+    BenchmarkExecutor.on('done', function() {
+        _SIGNAL.DONE = true;
+        eventEmitter.emit(_EVENTS.DONE);
+        _SIGNAL.RUN = false;
+    });
+
+    // after the current benchmark was canceled.
+    BenchmarkExecutor.on('canceled', function() {
+        eventEmitter.emit(_EVENTS.CANCEL);
+        _SIGNAL.CANCEL = true;
+        _SIGNAL.RUN = false;
+        _SIGNAL.NORM = false;
+    });
 
     $(function() {
         const win = nw.Window.get();

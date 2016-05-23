@@ -277,7 +277,7 @@ function slugify(text) {
         $('#run-btn').prop({"disabled":"disabled"});
 
         eventEmitter.on(_EVENTS.CANCEL, self.reenable_run_btn);
-        eventEmitter.on(_EVENTS.DONE, self.reenable_run_btn);
+        BenchmarkExecutor.on('done', self.reenable_run_btn);
 
         var date = new Date();
 
@@ -367,36 +367,35 @@ function slugify(text) {
                 .trigger('click');
         });
 
-        eventEmitter.once(_EVENTS.DONE, function() {
-            const benchmark_queue = BenchmarkExecutor.benchmark_queue();
-
-            $('.btn-save-results:last')
-                .data('benchmark_queue', benchmark_queue)
-                .removeAttr('disabled');
-
-            $('.btn-save-website:last')
-                .data('benchmark_queue', benchmark_queue)
-                .removeAttr('disabled');
-        });
-
         BenchmarkExecutor.run();
     };
 
-    eventEmitter.on(_EVENTS.DONE, function() {
+    // add a summary of all executed benchmarks
+    BenchmarkExecutor.on('done', function(benchmark_queue) {
         const renderer = require('jsrender');
-        const queue = BenchmarkExecutor.benchmark_queue();
 
         var result_summary = renderer.templates('./resources/templates/results/result_summary.html');
         $('#result_table').append(result_summary.render({
-            runtime: format_secs(queue.total_runtime())
+            runtime: format_secs(benchmark_queue.total_runtime())
         }));
+    });
+
+    // enable save results and save website buttons
+    BenchmarkExecutor.on('done', function(benchmark_queue) {
+        $('.btn-save-results:last')
+            .data('benchmark_queue', benchmark_queue)
+            .removeAttr('disabled');
+
+        $('.btn-save-website:last')
+            .data('benchmark_queue', benchmark_queue)
+            .removeAttr('disabled');
     });
 
     self.cancel_run = function() {
         if (_SIGNAL.RUN && confirm("This will terminate running process")){
             BenchmarkExecutor.cancel();
             removeEventListener(_EVENTS.CANCEL, self.reenable_run_btn);
-            removeEventListener(_EVENTS.DONE, self.reenable_run_btn);
+            BenchmarkExecutor.removeListener('done', self.reenable_run_btn);
             BenchmarkExecutor.clear_results();
             return true;
         }
@@ -462,7 +461,6 @@ function slugify(text) {
     // after all benchmarks finished
     BenchmarkExecutor.on('done', function() {
         _SIGNAL.DONE = true;
-        eventEmitter.emit(_EVENTS.DONE);
         _SIGNAL.RUN = false;
     });
 

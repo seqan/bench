@@ -76,7 +76,7 @@
             if (_SIGNAL.DONE){
                 NProgress.set(_percent_max);
                 $('#progressbar_text').html("<p><h6 style='color: #428bca '><b>complete</b></h6></p>");
-                return _EVENTS.DONE;
+                return;
             }
 
             if(_progress_percent < _progress_percent_max){

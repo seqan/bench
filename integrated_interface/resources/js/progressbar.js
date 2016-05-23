@@ -67,18 +67,6 @@
 
     self._show_progress = function() {
         timeout_id = setTimeout(function(){
-            if(_SIGNAL.CANCEL){
-                NProgress.set(_percent_max);
-                $('#progressbar_text').html("<p><h6>&nbsp;</h6></p>");
-                return;
-            }
-
-            if (_SIGNAL.DONE){
-                NProgress.set(_percent_max);
-                $('#progressbar_text').html("<p><h6 style='color: #428bca '><b>complete</b></h6></p>");
-                return;
-            }
-
             if(_progress_percent < _progress_percent_max){
                 const delta = _progress_percent + _delta_time / _total_expected_time / 1000;
                 _progress_percent = Math.min(delta, _progress_percent_max)
@@ -93,6 +81,35 @@
             self._show_progress();
         }, _delta_time);
     };
+
+    // before the benchmarks will be run
+    BenchmarkExecutor.on('initialize', function(benchmark_queue) {
+        $('#progressbar_text').html("<p><b><h6 style='color: #428bca; margin: 0px; padding: 0px'>Initializing...</h6></b></p>");
+
+        ProgressBar.start(benchmark_queue);
+    });
+
+    // after all benchmarks run
+    BenchmarkExecutor.on('done', function() {
+        ProgressBar.stop();
+
+        NProgress.set(_percent_max);
+        $('#progressbar_text').html("<p><h6 style='color: #428bca '><b>complete</b></h6></p>");
+    });
+
+    // after benchmark was canceled
+    BenchmarkExecutor.on('canceled', function() {
+        ProgressBar.stop();
+
+        NProgress.set(_percent_max);
+        $('#progressbar_text').html("<p><h6>&nbsp;</h6></p>");
+    });
+
+    // before a benchmark will be run
+    BenchmarkExecutor.on('setup', function(current_process) {
+        // update progress bar
+        ProgressBar.update_process(current_process);
+    });
 
     return self;
 });

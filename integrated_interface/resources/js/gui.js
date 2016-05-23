@@ -273,7 +273,6 @@ function slugify(text) {
         const renderer = require('jsrender');
 
         $("#ConfigForm").collapse('hide');
-        $('#progressbar_text').html("<p><b><h6 style='color: #428bca; margin: 0px; padding: 0px'>Initializing...</h6></b></p>");
         $('#run-btn').prop({"disabled":"disabled"});
 
         BenchmarkExecutor.on('canceled', self.reenable_run_btn);
@@ -434,14 +433,6 @@ function slugify(text) {
         _SIGNAL.CANCEL = false;
         _SIGNAL.RUN = true;
         _SIGNAL.DONE = false;
-
-        ProgressBar.start(benchmark_queue);
-    });
-
-    // before a benchmark will be run
-    BenchmarkExecutor.on('setup', function(current_process) {
-        // update progress bar
-        ProgressBar.update_process(current_process);
     });
 
     // after a benchmark process was spawn

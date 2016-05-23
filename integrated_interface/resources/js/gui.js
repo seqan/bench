@@ -265,6 +265,9 @@ function slugify(text) {
         }
     };
 
+    // on a result
+    BenchmarkExecutor.on('result', self.add_result);
+
     self.reenable_run_btn = function(){
         $("#run-btn").prop("disabled", false);
     };
@@ -427,41 +430,6 @@ function slugify(text) {
         const panels_height = height - titlebar_height - footer_height - 10;
         $('#panels').height(panels_height);
     };
-
-
-
-    // before the benchmarks will be run
-    BenchmarkExecutor.on('initialize', function(benchmark_queue) {
-        _SIGNAL.CANCEL = false;
-        _SIGNAL.RUN = true;
-        _SIGNAL.DONE = false;
-    });
-
-    // after a benchmark process was spawn
-    BenchmarkExecutor.on('spawned', function() {
-        _SIGNAL.NORM = true;
-    });
-
-    // on a result
-    BenchmarkExecutor.on('result', self.add_result);
-
-    // if a error occured executing the process
-    BenchmarkExecutor.on('error', function() {
-        _SIGNAL.NORM = false;
-    });
-
-    // after all benchmarks finished
-    BenchmarkExecutor.on('done', function() {
-        _SIGNAL.DONE = true;
-        _SIGNAL.RUN = false;
-    });
-
-    // after the current benchmark was canceled.
-    BenchmarkExecutor.on('canceled', function() {
-        _SIGNAL.CANCEL = true;
-        _SIGNAL.RUN = false;
-        _SIGNAL.NORM = false;
-    });
 
     $(function() {
         const win = nw.Window.get();

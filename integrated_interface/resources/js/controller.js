@@ -484,7 +484,7 @@ function _runEach(opts,funcs){
             //var spawnArgv = _2SpawnArgv(opts.cmd[opts.count]) 
         if (require('os').platform() == 'linux')
             try{
-                require('fs').chmodSync(spawnCmd.prg, 764)
+                require('fs').chmodSync(spawnCmd[opts.cmdCount].prg, 764)
             }
             catch(err){
                 _SIGNAL.NORM = false

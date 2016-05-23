@@ -390,8 +390,12 @@ function slugify(text) {
             .removeAttr('disabled');
     });
 
+    self.is_running = function() {
+        return !!$("#run-btn").prop("disabled");
+    };
+
     self.cancel_run = function() {
-        if (_SIGNAL.RUN && confirm("This will terminate running process")){
+        if (self.is_running() && confirm("This will terminate running process")){
             BenchmarkExecutor.cancel();
             BenchmarkExecutor.removeListener('canceled', self.reenable_run_btn);
             BenchmarkExecutor.removeListener('done', self.reenable_run_btn);
@@ -402,14 +406,12 @@ function slugify(text) {
     };
 
     self.close_window = function() {
-        if (_SIGNAL.RUN){
+        if (self.is_running()){
             if(self.cancel_run()) {
                 window.close();
             }
         } else {
-            if (confirm("Quit the program?")) {
-                window.close();
-            }
+            window.close();
         }
     };
 

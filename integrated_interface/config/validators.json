@@ -1,0 +1,23 @@
+{
+    "index_search_hamming_distance_validator.py": [
+        "index_exact_search",
+        "index_one_error_approximate_search",
+        "index_two_errors_approximate_search",
+        "index_three_errors_approximate_search"
+    ],
+    "kmer_counting_validator.py": [
+        "kmers_10mer_counting",
+        "kmers_15mer_counting",
+        "kmers_50mer_counting"
+    ],
+    "pairwise_alignment_validator.py": [
+        "pairwise_alignment_global_affine_dna",
+        "pairwise_alignment_global_affine_protein",
+        "pairwise_alignment_global_linear_dna",
+        "pairwise_alignment_global_linear_protein",
+        "pairwise_alignment_local_affine_dna",
+        "pairwise_alignment_local_affine_protein",
+        "pairwise_alignment_local_linear_dna",
+        "pairwise_alignment_local_linear_protein"
+    ]
+}

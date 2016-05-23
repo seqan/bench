@@ -9,6 +9,7 @@
     }
 
 })(this, function() {
+    const Configure = require('./configure');
     var self = {};
 
     self.generate_results = function(benchmark_queue) {

@@ -18,6 +18,8 @@ function slugify(text) {
     }
 
 })(this, function() {
+    const Configure = require('./js/configure');
+    const Exporter = require('./js/exporter');
     const BenchmarkExecutor = require('./js/benchmark_executor');
     var self = {};
 

@@ -21,8 +21,19 @@ function slugify(text) {
     const path = require('path');
     const Configure = require('./modules/configure');
     const Exporter = require('./modules/exporter');
+    const WebsiteGenerator = require('./modules/website_generator');
     const BenchmarkExecutor = require('./modules/benchmark_executor');
     var self = {};
+
+    $.fn.save_as = function(on_save) {
+        $(this).unbind('change')
+        .change(function() {
+            const filename = $(this).val();
+            on_save(filename);
+            $(this).val('');
+        })
+        .trigger('click');
+    };
 
     self.show_system_infos = function() {
         const renderer = require('jsrender');
@@ -293,86 +304,25 @@ function slugify(text) {
             start_date: date.toISOString()
         }));
 
-        $('.btn-save-results:last').click(function(){
-            const benchmark_queue = $(this).data('benchmark_queue');
-
-            $('#save-results-filechooser')
-                .unbind('change')
-                .change(function() {
-                    const filename = $(this).val();
-                    Exporter.save_results(filename, benchmark_queue);
-                    $(this).val('');
-                })
-                .trigger('click');
-        });
-
-        var create_website = function(benchmark_queue, args, on_generated) {
-            Exporter.save_results("./results/benchmark_results.json", benchmark_queue);
-
-            const spawn = require('child_process').spawn;
-            try {
-                var process = spawn('./website_generator/website_generate.py', args, {detached: true});
-            } catch(error) {
-                console.log('website generator - error spawn');
-                console.error(error);
-            }
-            process.stdout.on('data', function(data) {
-                console.log("stdout: " + data);
-            });
-            process.stderr.on('data', function(data) {
-                console.log("stderr: " + data);
-            });
-
-            process.on('close', function() {
-                console.log('website generator closed');
-                on_generated();
-            });
-            process.stdout.on('error', function(error) {
-                console.log('website generator stdout error');
-                console.error(error);
-            });
-            process.stderr.on('error', function(error) {
-                console.log('website generator stderr error');
-                console.error(error);
-            });
-            process.on('error', function(error) {
-                console.log('website generator error');
-                console.error(error);
-            });
-        };
-
-        $('.btn-save-website:last').click(function(){
-            const benchmark_queue = $(this).data('benchmark_queue');
-            const strftime = require('strftime');
-
-            $('#save-website-filechooser')
-                .attr('nwsaveas', 'benchmark-' + strftime("%Y%m%d-%H%M%S"))
-                .unbind('change')
-                .change(function() {
-                    const website_path = path.resolve($(this).val());
-                    create_website(benchmark_queue, ['-o', website_path], function() {
-                        const path = require('path');
-                        const fs = require('fs');
-
-                        try{
-                            fs.accessSync(website_path, fs.R_OK);
-                        } catch(err) {
-                            alert(err.message);
-                            return;
-                        }
-
-                        if (confirm("View the website?")) {
-                            const file = 'file://' + website_path + '/benchmark.html';
-                            nw.Shell.openExternal( file );
-                        }
-                    });
-                    $(this).val('');
-                })
-                .trigger('click');
-        });
-
         BenchmarkExecutor.run();
     };
+
+    WebsiteGenerator.on('done', function(website_path) {
+        const path = require('path');
+        const fs = require('fs');
+
+        try{
+            fs.accessSync(website_path, fs.R_OK);
+        } catch(err) {
+            alert(err.message);
+            return;
+        }
+
+        if (confirm("View the website?")) {
+            const file = 'file://' + website_path + '/benchmark.html';
+            nw.Shell.openExternal( file );
+        }
+    });
 
     // add a summary of all executed benchmarks
     BenchmarkExecutor.on('done', function(benchmark_queue) {
@@ -387,12 +337,29 @@ function slugify(text) {
     // enable save results and save website buttons
     BenchmarkExecutor.on('done', function(benchmark_queue) {
         $('.btn-save-results:last')
-            .data('benchmark_queue', benchmark_queue)
-            .removeAttr('disabled');
+        .data('benchmark_queue', benchmark_queue)
+        .removeAttr('disabled')
+        .click(function(){
+            const benchmark_queue = $(this).data('benchmark_queue');
+
+            $('#save-results-filechooser').save_as((filename) => {
+                Exporter.save_results(filename, benchmark_queue);
+            });
+        });
 
         $('.btn-save-website:last')
-            .data('benchmark_queue', benchmark_queue)
-            .removeAttr('disabled');
+        .data('benchmark_queue', benchmark_queue)
+        .removeAttr('disabled')
+        .click(function(){
+            const benchmark_queue = $(this).data('benchmark_queue');
+            const strftime = require('strftime');
+
+            $('#save-website-filechooser')
+            .attr('nwsaveas', 'benchmark-' + strftime("%Y%m%d-%H%M%S"))
+            .save_as((website_path) => {
+                WebsiteGenerator.generate(benchmark_queue, website_path);
+            });
+        });
     });
 
     self.is_running = function() {

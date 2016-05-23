@@ -46,6 +46,7 @@
     const process = require('process');
     const path = require('path');
     const EventEmitter = require('events');
+    const extend = require('extend');
 
     var self = new EventEmitter();
 
@@ -69,9 +70,9 @@
         return files;
     };
 
-    var BenchmarkQueue = $.extend([], {
+    var BenchmarkQueue = extend([], {
         add_process: function(benchmark_process) {
-            this.push($.extend(Object.create(BenchmarkProcess), benchmark_process));
+            this.push(extend(Object.create(BenchmarkProcess), benchmark_process));
         },
 
         /**

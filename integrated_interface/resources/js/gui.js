@@ -455,7 +455,6 @@ function slugify(text) {
     // if a error occured executing the process
     BenchmarkExecutor.on('error', function() {
         _SIGNAL.NORM = false;
-        eventEmitter.emit(_EVENTS.FAILED);
     });
 
     // after all benchmarks finished

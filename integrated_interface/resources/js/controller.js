@@ -9,8 +9,3 @@ var _SIGNAL = {
     "NORM": true,
     "DONE": false
 };
-
-var _EVENTS = {
-    "INIT": 'INIT',
-    "FAILED": 'FAILED'
-};

@@ -18,9 +18,9 @@ function slugify(text) {
     }
 
 })(this, function() {
-    const Configure = require('./js/configure');
-    const Exporter = require('./js/exporter');
-    const BenchmarkExecutor = require('./js/benchmark_executor');
+    const Configure = require('./modules/configure');
+    const Exporter = require('./modules/exporter');
+    const BenchmarkExecutor = require('./modules/benchmark_executor');
     var self = {};
 
     self.show_system_infos = function() {

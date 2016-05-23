@@ -15,6 +15,7 @@ validator_path = bench_app_path + 'validators/'
 validations_path = bench_app_path + 'data/validations/'
 outputs_path = bench_app_path + 'results/'
 
+
 def copy_template(website_path):
     """
     Copy template to the new location `website_path`
@@ -57,60 +58,6 @@ def descriptions_benchmarks():
         return json.load(data_file)['benchmarks']
 
 
-def execute_validator(validator, output_file, validation_file):
-    """
-    Execute `validator <output_file> <validation_file>` and return the float
-    value of the validator
-    """
-
-    print ("execute:", validator, output_file, validation_file)
-    validation = 0
-
-    args = [validator, output_file, validation_file]
-    p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-    try:
-        for line in p.stdout.readlines():
-            if not line.strip():
-                continue
-            print("\t->", line.strip())
-            validation = float(line)
-            break
-    except:
-        pass
-    print ()
-
-    p.wait()
-
-    return validation
-
-
-def validate_results(results):
-    """
-    Add the validators return values to .results.<benchmark>.single_core.quality
-    and .results.<benchmark>.multi_core.quality
-    """
-
-    for validator, benchmarks in validators().items():
-        validator = validator_path + validator
-
-        for benchmark_id in benchmarks:
-            if benchmark_id not in results['results']:
-                print("skip: %s validation" % (benchmark_id))
-                continue
-
-            for thread_type in ['single_core', 'multi_core']:
-                validation_file = validations_path + benchmark_id + ".validate.txt"
-                output_file = outputs_path + benchmark_id + "." + thread_type + ".result.txt"
-
-                # execute validator
-                validation = execute_validator(validator, output_file, validation_file)
-
-                results['results'][benchmark_id][thread_type]['quality'] = validation
-
-    return results
-
-
 def load_benchmark_results():
     """
     Load benchmark results from the benchmark app.
@@ -138,6 +85,8 @@ def reduce_repeat_measures(results):
 
         single_core['time'] = min(single_core['time'])
         multi_core['time'] = min(multi_core['time'])
+        single_core['quality'] = min(single_core['quality'])
+        multi_core['quality'] = min(multi_core['quality'])
 
     return results
 
@@ -208,8 +157,8 @@ def generate_website_json(results):
     for category_id in categories.keys():
         categories[category_id]['subcategories'] = {}
 
-    # merge benchmark results with the benchmark description and group them into
-    # their category
+    # merge benchmark results with the benchmark description and group them
+    # into their category
     for benchmark_id, description in descriptions.items():
         if benchmark_id not in results['results']:
             continue
@@ -223,7 +172,10 @@ def generate_website_json(results):
         categories[category_id]['subcategories'][benchmark_id] = benchmark
 
     # filter empty categories out
-    categories = { key: category for key, category in categories.items() if category['subcategories'] }
+    categories = {
+        key: category for key, category in categories.items()
+        if category['subcategories']
+    }
 
     # replace the initial benchmark results with the merged and group results
     results['results'] = categories
@@ -240,17 +192,22 @@ def save_website_json(json_file):
     results = reduce_repeat_measures(results)
     results = calculate_scores(results)
 
-    results = validate_results(results)
-
     website_json = generate_website_json(results)
 
     with open(json_file, 'w') as outfile:
-        json.dump(website_json, outfile, sort_keys=True, indent=4, separators=(',', ': '))
+        json.dump(
+            website_json,
+            outfile,
+            sort_keys=True,
+            indent=4,
+            separators=(',', ': ')
+        )
 
 
 def generate_website(args):
     """
-    Generate the static results website out of the output file of the bench app.
+    Generate the static results website out of the output file of the bench
+    app.
     """
     website_path = args.website_path + '/'
     json_file = website_path + 'files/benchmark.json'
@@ -272,8 +229,13 @@ if __name__ == "__main__":
     default = "%sbenchmark-%s" % (root_path, time.strftime("%Y%m%d-%H%M%S"))
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', metavar='OUTPUT_DIR', default=default, dest='website_path',
-                        help='output directory (default: benchmark-YYYYmmdd-HHMMSS)')
+    parser.add_argument(
+        '-o',
+        metavar='OUTPUT_DIR',
+        default=default,
+        dest='website_path',
+        help='output directory (default: benchmark-YYYYmmdd-HHMMSS)'
+    )
     args = parser.parse_args()
 
     generate_website(args)

@@ -6,6 +6,7 @@ const os = require('os')
 
 var eventEmitter = new events.EventEmitter()
 var _GENERAL_CONFIG_FILE = path.resolve("./config/gconfig.json")
+var _RESULT_FILE = path.resolve("/Users/xp/result.json")
 
 var _Total_Time = 0
 var Process = {
@@ -124,7 +125,7 @@ var GenericOptions = {
     }  
 }
 
-var system = {
+var _system = {
     "os": os.platform() + " " + os.arch() + " " + os.release(),
     "cpu_name": os.cpus()[0].model,
     "memory": Math.floor(os.totalmem()/1024/1024/1024*100)/100,
@@ -288,6 +289,9 @@ var Options = {
         funcs.setTime = function(prg, time){ //float second
             options.benchmarks[prg].time = time
         }
+        funcs.setProjectTitle = function(title){
+            options.project.title = title
+        }
         return funcs
     }
 }
@@ -448,6 +452,7 @@ function _runEach(opts,funcs){
     var errMsg
     var _NEXT = true
     var spawnCmd = []
+    var k = 0
     var _onCloseFunc = function(){
         opts.runtime[opts.count][opts.cmdCount] = pro.hrtime(time)
         funcs(errMsg)   
@@ -469,7 +474,7 @@ function _runEach(opts,funcs){
             clearResult(opts.resultFiles)
         }
     }
-
+    
     var _run = function(opts, funcs){
         if (_SIGNAL.CANCEL)
             return _EVENTS.CANCEL
@@ -488,8 +493,8 @@ function _runEach(opts,funcs){
         }
         time=pro.hrtime()
         try{
-            //free = spawn(spawnCmd[k].prg, spawnCmd[k].arg, {detached: true})
-            free = spawn('ls')
+            free = spawn(spawnCmd[opts.cmdCount].prg, spawnCmd[opts.cmdCount].arg, {detached: true})
+            //free = spawn('ls')
         }
         catch(err){
             errMsg += '\n spawnError: ' + err
@@ -537,8 +542,18 @@ function run(opts, funcs){
     }
     
             
-    var results = {'informations':{}, 'results':{}}
+    var results = {
+            "information":{
+                "system": _system,
+                "project": {
+                    "title": "seqan-2.1-gcc"
+                }
+            }, 
+            'results':{}
+        }
     eventEmitter.on(_EVENTS.DONE, function(){
+        var _date = new Date()
+        results.information.system.date = _date.toISOString()
         for (var k = 0; k < opts.cmd.length; k++ ){
             results.results[opts.list[k]] = {}
             for (var j = 0; j < opts.cmdRemark[k].length; j++)
@@ -546,11 +561,11 @@ function run(opts, funcs){
                 results.results[opts.list[k]][opts.cmdRemark[k][j]] = {'time': [_2Time(opts.runtime[k][j], "sec")]}
             }
         }
+    fs.writeFile(_RESULT_FILE, JSON.stringify(results))
     })
     eventEmitter.on(_EVENTS.CANCEL, function(){
     })
 
-    alert(JSON.stringify(cmp.getConfig()))
     _runEach(opts, funcs)
 
 }

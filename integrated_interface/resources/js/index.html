@@ -141,23 +141,24 @@
                         </script>
                       </div>
                     </div>
-                    <div class="panel panel-info" style="margin:0" >
-                        <div class="panel-heading" role="tab" id="headingOne">
+                    <div class="panel panel-info">
+                        <div class="panel-heading" id="headingOne">
                             <span id='ConfigTitle' role="button" data-toggle="collapse" data-parent="#Project" href="#Project" aria-controls="Project">
                                 <b>
                                 Project 
                                 </b>
+							</span>
                         </div>
                         <div id="Project" class="panel-collapse collapse in" role="tabpanel" arialabelledby="headingOne">
-                            <table style="width:100%; margin:5px;">
+                            <table style="width:100%; margin-bottom:5px; margin-top: 5px">
                                 <tr>
                                     <td>
                                         Title
                                     </td>
                                     <td>
-                                        <input id="proTit" type="text">
+                                        <input id="proTit" type="text" style="width:100%">
                                         <script>
-                                            $("#proTit").val("done")
+                                            waitExec("INIT", function(){$("#proTit").val(cmp.getProjectTitle())})
                                         </script>
                                     </td>
                                 </tr>

@@ -9,6 +9,7 @@
     }
 
 })(this, function() {
+    const BenchmarkExecutor = require('./js/benchmark_executor');
     var self = {};
 
     const _percent_max = 1;

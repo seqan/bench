@@ -18,6 +18,7 @@ function slugify(text) {
     }
 
 })(this, function() {
+    const BenchmarkExecutor = require('./js/benchmark_executor');
     var self = {};
 
     self.show_system_infos = function() {

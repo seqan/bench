@@ -170,6 +170,7 @@
     };
 
     self._initialize = function() {
+        const Configure = require('./configure');
         const shell_parse = require('shell-quote').parse;
 
         // reset canceled state

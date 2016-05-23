@@ -12,7 +12,5 @@ var _SIGNAL = {
 
 var _EVENTS = {
     "INIT": 'INIT',
-    "BLOCKED": 'BLOCKED',
-    "CANCEL":'CANCEL',
     "FAILED": 'FAILED'
 };

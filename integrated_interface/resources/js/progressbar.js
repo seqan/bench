@@ -70,7 +70,7 @@
             if(_SIGNAL.CANCEL){
                 NProgress.set(_percent_max);
                 $('#progressbar_text').html("<p><h6>&nbsp;</h6></p>");
-                return _EVENTS.CANCEL;
+                return;
             }
 
             if (_SIGNAL.DONE){

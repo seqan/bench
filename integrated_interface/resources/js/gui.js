@@ -276,7 +276,7 @@ function slugify(text) {
         $('#progressbar_text').html("<p><b><h6 style='color: #428bca; margin: 0px; padding: 0px'>Initializing...</h6></b></p>");
         $('#run-btn').prop({"disabled":"disabled"});
 
-        eventEmitter.on(_EVENTS.CANCEL, self.reenable_run_btn);
+        BenchmarkExecutor.on('canceled', self.reenable_run_btn);
         BenchmarkExecutor.on('done', self.reenable_run_btn);
 
         var date = new Date();
@@ -394,7 +394,7 @@ function slugify(text) {
     self.cancel_run = function() {
         if (_SIGNAL.RUN && confirm("This will terminate running process")){
             BenchmarkExecutor.cancel();
-            removeEventListener(_EVENTS.CANCEL, self.reenable_run_btn);
+            BenchmarkExecutor.removeListener('canceled', self.reenable_run_btn);
             BenchmarkExecutor.removeListener('done', self.reenable_run_btn);
             BenchmarkExecutor.clear_results();
             return true;
@@ -466,7 +466,6 @@ function slugify(text) {
 
     // after the current benchmark was canceled.
     BenchmarkExecutor.on('canceled', function() {
-        eventEmitter.emit(_EVENTS.CANCEL);
         _SIGNAL.CANCEL = true;
         _SIGNAL.RUN = false;
         _SIGNAL.NORM = false;

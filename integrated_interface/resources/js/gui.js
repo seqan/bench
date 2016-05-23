@@ -18,6 +18,7 @@ function slugify(text) {
     }
 
 })(this, function() {
+    const path = require('path');
     const Configure = require('./modules/configure');
     const Exporter = require('./modules/exporter');
     const BenchmarkExecutor = require('./modules/benchmark_executor');
@@ -286,9 +287,6 @@ function slugify(text) {
         BenchmarkExecutor.on('done', self.reenable_run_btn);
 
         var date = new Date();
-
-        // disable old website save buttons
-        $('.btn-save-website').attr('disabled', 'disabled');
 
         var result_start_run = renderer.templates('./resources/templates/results/result_start_run.html');
         $('#result_table').append(result_start_run.render({

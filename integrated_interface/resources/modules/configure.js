@@ -99,7 +99,7 @@
             "max_threads": os.cpus().length
         };
 
-        return self.config.system = extend(infos, extend_infos);
+        return self.config.system = extend(true, infos, extend_infos);
     };
 
     self.app = function() {

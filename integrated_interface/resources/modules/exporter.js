@@ -14,15 +14,10 @@
     var self = {};
 
     self.results = function(benchmark_queue) {
-        const strftime = require('strftime');
         var benchmark_results = {
             informations: {
-                system: Configure.system_infos({
-                    started_at: strftime('%F %T', benchmark_queue.started_at)
-                }),
-                project: {
-                    title: 'seqan-2.1-gcc'
-                }
+                system: benchmark_queue.system,
+                project: benchmark_queue.project
             },
             results: {
             }
@@ -165,7 +160,7 @@
             const category_id = description['category'];
 
             // add title, subtitle and category to the benchmark
-            extend(benchmark, description);
+            extend(true, benchmark, description);
 
             // extend category with subcategories (benchmarks)
             categories[category_id]['subcategories'][benchmark_id] = benchmark;

@@ -72,6 +72,8 @@
     };
 
     var BenchmarkQueue = extend([], {
+        system: undefined,
+        project: undefined,
         started_at: undefined,
 
         add_process: function(benchmark_process) {
@@ -173,6 +175,7 @@
     };
 
     self._initialize = function() {
+        const strftime = require('strftime');
         const Configure = require('./configure');
         const shell_parse = require('shell-quote').parse;
 
@@ -181,8 +184,18 @@
 
         // reset benchmark queue
         var benchmark_queue = self.new_benchmark_queue();
-        benchmark_queue.started_at = new Date();
-        const max_threads = Configure.system_infos().max_threads;
+        var started_at = new Date();
+
+        // make sure that the project and system informations will stay the
+        // same, s.t. multiple saves will result in the same output.
+        extend(true, benchmark_queue, {
+            project: Configure.project_infos(),
+            system: Configure.system_infos({
+                started_at: strftime('%F %T', started_at)
+            }),
+            started_at: started_at
+        });
+        const max_threads = benchmark_queue.system.max_threads;
 
         var queue_id = 0;
         const threads = [1, max_threads];

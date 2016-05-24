@@ -53,6 +53,12 @@
         }
     };
 
+    self.load_benchmark_help_file = function(benchmark_id) {
+        const path = "./resources/help/benchmarks/";
+        const file = path + benchmark_id + ".help.json";
+        return self.load_json(file);
+    };
+
     self.system_infos = function(extend_infos) {
         const os = require("os");
         const strftime = require('strftime');

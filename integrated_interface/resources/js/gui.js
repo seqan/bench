@@ -173,14 +173,15 @@ function slugify(text) {
             // Add the help of a benchmark.
             var tabbox_panel_help_content = renderer.templates("./resources/templates/benchmarks/tabbox_panel_help_content.html");
             var help_content = "No Help Information available";
+
             try{
-                const help_file = benchmark.help_file;
-                const helpFile = require(path.resolve(help_file));
+                const helpFile = Configure.load_benchmark_help_file(benchmark_id);
                 help_content = helpFile.helpContent;
             } catch(err) {
                 // indicate missing help
                 $("#" + panel_id + "Help .glyphicon").css({color: 'DarkRed'});
             }
+
             $("#" + panel_id + "HelpContent").html(tabbox_panel_help_content.render({
                 'text_color': text_color,
                 'help_content': help_content

@@ -83,6 +83,19 @@ function slugify(text) {
         }));
     };
 
+    self.benchmark_categories = function(benchmark_id) {
+        const desc = Configure.benchmarks_description();
+        const benchmark = desc['benchmarks'][benchmark_id];
+        const category_id = benchmark['category'];
+        const category = desc['categories'][category_id];
+
+        var categories_ = [category.title, benchmark.title];
+        if (benchmark.subtitle) {
+            categories_.push(benchmark.subtitle);
+        }
+        return categories_;
+    };
+
     self.create_categories = function() {
         const renderer = require('jsrender');
         const path = require('path');
@@ -101,7 +114,9 @@ function slugify(text) {
         for (var benchmark_id in Configure.benchmarks()){
             const benchmark = Configure.benchmark(benchmark_id);
 
-            var ctg = benchmark.categories
+            const categories = self.benchmark_categories(benchmark_id);
+            const ctg = categories;
+
             var maxk = 0
             var maxn = 0
             var levelBegins = 1
@@ -163,7 +178,7 @@ function slugify(text) {
             // should be run, etc..
             var tabbox_panel_content = renderer.templates("./resources/templates/benchmarks/tabbox_panel_content.html");
             $("#" + panel_id + "TabContent").append(tabbox_panel_content.render({
-                'title': benchmark.categories.slice(1).join(': '),
+                'title': categories.slice(1).join(': '),
                 'text_color': text_color,
                 'tab_panel_id': panel_id,
                 'benchmark': benchmark_id,

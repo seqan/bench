@@ -2,6 +2,12 @@
  * WebsiteGenerator:
  *
  * Events:
+ *
+ *   'done': (website_path, benchmark_queue)
+ *       Will be called after the website was generated.
+ *
+ *   'error': (error)
+ *       Will be called if an error occured during generation.
  */
 ;(function(root, factory) {
 
@@ -20,46 +26,19 @@
 
     var self = new EventEmitter();
 
-    self.on('done', (website_path, benchmark_queue) => {
-        const file = website_path + '/files/benchmark.json';
-        const results = Exporter.website_results(benchmark_queue);
-        Configure.save_json(file, results);
-
-        Exporter.save_results(website_path + "/benchmark_results.json", benchmark_queue);
-    });
-
     self.generate = function(benchmark_queue, website_path) {
-        Exporter.save_results("./results/benchmark_results.json", benchmark_queue);
+        const ncp = require('ncp');
 
-        const spawn = require('child_process').spawn;
-        try {
-            var process = spawn('./website_generator/website_generate.py', ['-o', website_path], {detached: true});
-        } catch(error) {
-            console.log('website generator - error spawn');
-            console.error(error);
-        }
-        process.stdout.on('data', function(data) {
-            console.log("stdout: " + data);
-        });
-        process.stderr.on('data', function(data) {
-            console.log("stderr: " + data);
-        });
+        // copy website template to the given path
+        ncp('./resources/website_template', website_path, function (err) {
+            if (err) {
+                console.error(err);
+                self.emit('error', err);
+            }
 
-        process.on('close', function() {
-            console.log('website generator closed');
+            Exporter.save_results(website_path + "/benchmark_results.json", benchmark_queue);
+            Exporter.save_website_results(website_path + '/files/benchmark.json', benchmark_queue);
             self.emit('done', website_path, benchmark_queue);
-        });
-        process.stdout.on('error', function(error) {
-            console.log('website generator stdout error');
-            console.error(error);
-        });
-        process.stderr.on('error', function(error) {
-            console.log('website generator stderr error');
-            console.error(error);
-        });
-        process.on('error', function(error) {
-            console.log('website generator error');
-            console.error(error);
         });
     }
 

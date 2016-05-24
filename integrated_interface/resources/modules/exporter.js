@@ -13,7 +13,7 @@
     const is_object = require('isobject');
     var self = {};
 
-    self.generate_results = function(benchmark_queue) {
+    self.results = function(benchmark_queue) {
         // TODO benchmark_queue.started_at
         var benchmark_results = {
             informations: {
@@ -186,7 +186,7 @@
     };
 
     self.website_results = function(benchmark_queue) {
-        var results = self.generate_results(benchmark_queue);
+        var results = self.results(benchmark_queue);
         results = self.reduce_repeat_measures(results);
         results = self.calculate_scores(results);
         results = self.deep_array_map(results);
@@ -194,8 +194,13 @@
         return results;
     };
 
+    self.save_website_results = function(path, benchmark_queue) {
+        const results = self.website_results(benchmark_queue);
+        Configure.save_json(path, results);
+    };
+
     self.save_results = function(path, benchmark_queue) {
-        const results = self.generate_results(benchmark_queue);
+        const results = self.results(benchmark_queue);
         Configure.save_json(path, results);
     };
 

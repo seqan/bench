@@ -21,6 +21,7 @@
             },
             app: {},
             system: {},
+            project: {},
             benchmarks: {},
             benchmarks_default: {},
             benchmarks_description: {}
@@ -50,8 +51,12 @@
 
     self.load_benchmarks = function(filepath) {
         try{
-            self.config.benchmarks = self.load_json(filepath);
-            self.config.benchmarks_default = self.load_json(filepath);
+            var json = self.load_json(filepath);
+            self.config.project = json['project'];
+            self.config.benchmarks = json['benchmarks'];
+
+            var json = self.load_json(filepath);
+            self.config.benchmarks_default = json['benchmarks'];
             return true;
         } catch(err){
             console.error(err);
@@ -99,6 +104,10 @@
 
     self.app = function() {
         return self.config.app;
+    };
+
+    self.project_infos = function() {
+        return self.config.project;
     };
 
     self.benchmarks = function() {

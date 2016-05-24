@@ -20,6 +20,14 @@
 
     var self = new EventEmitter();
 
+    self.on('done', (website_path, benchmark_queue) => {
+        const file = website_path + '/files/benchmark.json';
+        const results = Exporter.website_results(benchmark_queue);
+        Configure.save_json(file, results);
+
+        Exporter.save_results(website_path + "/benchmark_results.json", benchmark_queue);
+    });
+
     self.generate = function(benchmark_queue, website_path) {
         Exporter.save_results("./results/benchmark_results.json", benchmark_queue);
 
@@ -39,7 +47,7 @@
 
         process.on('close', function() {
             console.log('website generator closed');
-            self.emit('done', website_path);
+            self.emit('done', website_path, benchmark_queue);
         });
         process.stdout.on('error', function(error) {
             console.log('website generator stdout error');

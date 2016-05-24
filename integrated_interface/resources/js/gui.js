@@ -41,7 +41,7 @@ function slugify(text) {
 
         var template = renderer.templates("./resources/templates/system/informations.html");
         var html = template.render(system);
-        $("#sysInfoBody").html(html);
+        $("#system-panel-body").html(html);
     };
 
     self.show_help = function() {
@@ -67,10 +67,10 @@ function slugify(text) {
         };
 
         var tabbox_tab = renderer.templates("./resources/templates/benchmarks/tabbox_tab.html");
-        $("#ConfigFormTabs").append(tabbox_tab.render(tabbox));
+        $("#benchmark-tabs").append(tabbox_tab.render(tabbox));
 
         var tabbox_panel = renderer.templates("./resources/templates/benchmarks/tabbox_panel.html");
-        $("#ConfigFormTabContent").append(tabbox_panel.render(tabbox));
+        $("#benchmark-tabs-body").append(tabbox_panel.render(tabbox));
     };
 
     var create_new_panel = function(panel) {
@@ -91,7 +91,7 @@ function slugify(text) {
         var colorF=["#777", "#428bca","#5bc0de", "#d9534f","#f0ad4e","#5cb85c"];
 
         var tabbox = renderer.templates("./resources/templates/benchmarks/tabbox.html");
-        $("#ConfigForm").html(tabbox.render());
+        $("#benchmark-panel-body").html(tabbox.render());
 
         var levelList = []
         var levelColorList = []
@@ -292,7 +292,7 @@ function slugify(text) {
     self.start_run = function() {
         const renderer = require('jsrender');
 
-        $("#ConfigForm").collapse('hide');
+        $("#benchmark-panel-body").collapse('hide');
         $('#run-btn').prop({"disabled":"disabled"});
 
         BenchmarkExecutor.on('canceled', self.reenable_run_btn);

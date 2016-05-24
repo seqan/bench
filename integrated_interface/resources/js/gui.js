@@ -46,7 +46,7 @@ function slugify(text) {
 
     self.show_help = function() {
         try{
-            var helpFile = Configure.load_json(Configure.app().HelpFilePath);
+            var helpFile = Configure.load_app_help_file();
         } catch(err) {
             console.error(err);
             return;

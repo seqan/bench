@@ -53,6 +53,12 @@
         }
     };
 
+    self.load_app_help_file = function() {
+        const path = "./resources/help/app/";
+        const file = path + "helpinfo.json";
+        return self.load_json(file);
+    };
+
     self.load_benchmark_help_file = function(benchmark_id) {
         const path = "./resources/help/benchmarks/";
         const file = path + benchmark_id + ".help.json";

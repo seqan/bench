@@ -1,5 +1,3 @@
 {
-    "ConfFilePath":"./config/config.json",
-    "HelpFilePath":"./Info/HelpInfo/helpinfo.json",
-    "Server":""
+    "ConfFilePath":"./config/config.json"
 }

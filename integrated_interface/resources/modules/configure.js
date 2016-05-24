@@ -12,7 +12,8 @@
     var self = {
         config: {
             files: {
-                app_config: "./config/app_config.json"
+                app_config: "./resources/config/app_config.json",
+                benchmarks_config: "./config/config.json"
             },
             app: {},
             system: {},
@@ -32,9 +33,9 @@
         return fs.writeFileSync(json_file, serialize, 'utf8');
     };
 
-    self.load_app = function() {
+    self.load_app = function(filepath) {
         try{
-            self.config.app = self.load_json(self.config.files.app_config);
+            self.config.app = self.load_json(filepath);
             return true;
         } catch(err){
             console.error(err);
@@ -102,8 +103,11 @@
     };
 
     self.init = function() {
-        self.load_app();
-        self.load_benchmarks(self.app().ConfFilePath);
+        const default_app = self.config.files.app_config;
+        const default_benchmarks = self.config.files.benchmarks_config;
+
+        self.load_app(default_app);
+        self.load_benchmarks(default_benchmarks);
     };
 
     self.init();

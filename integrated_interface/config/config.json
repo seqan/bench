@@ -6,15 +6,7 @@
         "execute": false,
         "command": "./benchmarks/index_exact_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa ./results/index_exact_search.result.txt",
         "expected_runtime": 0.2,
-        "repeats": 3,
-
-        "programName": "index_exact_search",
-        "checker": "",
-        "categoryName": "index_search",
-
-        "title": "Index based exact search",
-        "subtitle": "0 errors",
-        "base_time": 15.908
+        "repeats": 3
     },
     "index_one_error_approximate_search": {
         "name": "index_one_error_approximate_search",
@@ -23,14 +15,7 @@
         "execute": true,
         "command": "./benchmarks/index_one_error_approximate_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa ./results/index_one_error_approximate_search.result.txt",
         "expected_runtime": 0.6,
-
-        "programName": "index_one_error_approximate_search",
-        "checker": "",
-        "categoryName": "index_search",
-
-        "title": "Index based approximate search",
-        "subtitle": "1 error in hamming distance",
-        "base_time": 15.908
+        "repeats": 1
     },
     "index_two_errors_approximate_search": {
         "name": "index_two_errors_approximate_search",
@@ -39,14 +24,7 @@
         "execute": true,
         "command": "./benchmarks/index_two_errors_approximate_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa ./results/index_two_errors_approximate_search.result.txt",
         "expected_runtime": 2.3,
-
-        "programName": "index_two_errors_approximate_search",
-        "checker": "",
-        "categoryName": "index_search",
-
-        "title": "Index based approximate search",
-        "subtitle": "2 errors in hamming distance",
-        "base_time": 15.908
+        "repeats": 1
     },
     "index_three_errors_approximate_search": {
         "name": "index_three_errors_approximate_search",
@@ -55,14 +33,7 @@
         "execute": true,
         "command": "./benchmarks/index_three_errors_approximate_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa ./results/index_three_errors_approximate_search.result.txt",
         "expected_runtime": 11.7,
-
-        "programName": "index_three_errors_approximate_search",
-        "checker": "",
-        "categoryName": "index_search",
-
-        "title": "Index based approximate search",
-        "subtitle": "3 errors in hamming distance",
-        "base_time": 15.908
+        "repeats": 1
     },
     "kmers_10mer_counting": {
         "name": "kmers_10mer_counting",
@@ -71,14 +42,7 @@
         "execute": true,
         "command": "./benchmarks/kmers_10mer_counting ./data/indices/index_10gram.inx ./data/chr1_sim_reads_2000.fa ./results/kmers_10mer_counting.result.txt",
         "expected_runtime": 0.4,
-
-        "programName": "kmers_10mer_counting",
-        "checker": "",
-        "categoryName": "kmer_counting",
-
-        "title": "Counting 10-mers",
-        "subtitle": "",
-        "base_time": 15.908
+        "repeats": 1
     },
     "kmers_15mer_counting": {
         "name": "kmers_15mer_counting",
@@ -87,14 +51,7 @@
         "execute": true,
         "command": "./benchmarks/kmers_15mer_counting ./data/indices/index_15gram.inx ./data/chr1_sim_reads_2000.fa ./results/kmers_15mer_counting.result.txt",
         "expected_runtime": 0.2,
-
-        "programName": "kmers_15mer_counting",
-        "checker": "",
-        "categoryName": "kmer_counting",
-
-        "title": "Counting 15-mers",
-        "subtitle": "",
-        "base_time": 15.908
+        "repeats": 1
     },
     "kmers_50mer_counting": {
         "name": "kmers_50mer_counting",
@@ -103,14 +60,7 @@
         "execute": true,
         "command": "./benchmarks/kmers_50mer_counting ./data/indices/index_50gram.inx ./data/chr1_sim_reads_2000.fa ./results/kmers_50mer_counting.result.txt",
         "expected_runtime": 0.2,
-
-        "programName": "kmers_50mer_counting",
-        "checker": "",
-        "categoryName": "kmer_counting",
-
-        "title": "Counting 50-mers",
-        "subtitle": "",
-        "base_time": 15.908
+        "repeats": 1
     },
     "pairwise_alignment_global_affine_dna": {
         "name": "pairwise_alignment_global_affine_dna",
@@ -119,14 +69,7 @@
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_global_affine_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_affine_dna.result.txt",
         "expected_runtime": 3.1,
-
-        "programName": "pairwise_alignment_global_affine_dna",
-        "checker": "",
-        "categoryName": "pairwise_alignment",
-
-        "title": "DNA global Alignment, affine gap costs",
-        "subtitle": "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1",
-        "base_time": 780
+        "repeats": 1
     },
     "pairwise_alignment_global_affine_protein": {
         "name": "pairwise_alignment_global_affine_protein",
@@ -135,14 +78,7 @@
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_global_affine_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_affine_protein.result.txt",
         "expected_runtime": 3.1,
-
-        "programName": "pairwise_alignment_global_affine_protein",
-        "checker": "",
-        "categoryName": "pairwise_alignment",
-
-        "title": "Protein global Alignment, affine gap costs",
-        "subtitle": "BLOSUM62, gap_extend: -3, gap_open: -1",
-        "base_time": 15.908
+        "repeats": 1
     },
     "pairwise_alignment_global_linear_dna": {
         "name": "pairwise_alignment_global_linear_dna",
@@ -151,14 +87,7 @@
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_global_linear_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_linear_dna.result.txt",
         "expected_runtime": 2.5,
-
-        "programName": "pairwise_alignment_global_linear_dna",
-        "checker": "",
-        "categoryName": "pairwise_alignment",
-
-        "title": "DNA global Alignment, linear gap costs",
-        "subtitle": "match: 2, mismatch: -3, gap: -2",
-        "base_time": 15.908
+        "repeats": 1
     },
     "pairwise_alignment_global_linear_protein": {
         "name": "pairwise_alignment_global_linear_protein",
@@ -167,14 +96,7 @@
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_global_linear_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_global_linear_protein.result.txt",
         "expected_runtime": 2.7,
-
-        "programName": "pairwise_alignment_global_linear_protein",
-        "checker": "",
-        "categoryName": "pairwise_alignment",
-
-        "title": "Protein global Alignment, linear gap costs",
-        "subtitle": "BLOSUM62, gap: -1",
-        "base_time": 15.908
+        "repeats": 1
     },
     "pairwise_alignment_local_affine_dna": {
         "name": "pairwise_alignment_local_affine_dna",
@@ -183,14 +105,7 @@
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_local_affine_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_affine_dna.result.txt",
         "expected_runtime": 3,
-
-        "programName": "pairwise_alignment_local_affine_dna",
-        "checker": "",
-        "categoryName": "pairwise_alignment",
-
-        "title": "DNA local Alignment, affine gap costs",
-        "subtitle": "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1",
-        "base_time": 15.908
+        "repeats": 1
     },
     "pairwise_alignment_local_affine_protein": {
         "name": "pairwise_alignment_local_affine_protein",
@@ -199,14 +114,7 @@
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_local_affine_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_affine_protein.result.txt",
         "expected_runtime": 3.1,
-
-        "programName": "pairwise_alignment_local_affine_protein",
-        "checker": "",
-        "categoryName": "pairwise_alignment",
-
-        "title": "Protein local Alignment, affine gap costs",
-        "subtitle": "BLOSUM62, gap_extend: -3, gap_open: -1",
-        "base_time": 15.908
+        "repeats": 1
     },
     "pairwise_alignment_local_linear_dna": {
         "name": "pairwise_alignment_local_linear_dna",
@@ -215,14 +123,7 @@
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_local_linear_dna ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_linear_dna.result.txt",
         "expected_runtime": 2.8,
-
-        "programName": "pairwise_alignment_local_linear_dna",
-        "checker": "",
-        "categoryName": "pairwise_alignment",
-
-        "title": "DNA local Alignment, linear gap costs",
-        "subtitle": "match: 2, mismatch: -3, gap: -2",
-        "base_time": 15.908
+        "repeats": 1
     },
     "pairwise_alignment_local_linear_protein": {
         "name": "pairwise_alignment_local_linear_protein",
@@ -231,13 +132,6 @@
         "execute": true,
         "command": "./benchmarks/pairwise_alignment_local_linear_protein ./data/chr1_sim_reads_100.fa ./results/pairwise_alignment_local_linear_protein.result.txt",
         "expected_runtime": 2.7,
-
-        "programName": "pairwise_alignment_local_linear_protein",
-        "checker": "",
-        "categoryName": "pairwise_alignment",
-
-        "title": "Protein local Alignment, linear gap costs",
-        "subtitle": "BLOSUM62, gap: -1",
-        "base_time": 15.908
+        "repeats": 1
     }
 }

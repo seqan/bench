@@ -15,12 +15,14 @@
                 app_config: "./resources/config/app_config.json",
                 app_help: "./resources/help/app/helpinfo.json",
                 benchmark_help: "./resources/help/benchmarks/%s.help.json",
-                benchmarks_config: "./config/config.json"
+                benchmarks_config: "./config/config.json",
+                benchmarks_description: "./resources/config/descriptions.json"
             },
             app: {},
             system: {},
             benchmarks: {},
-            benchmarks_default: {}
+            benchmarks_default: {},
+            benchmarks_description: {}
         }
     };
 
@@ -67,6 +69,10 @@
         return self.load_json(sprintf(file, benchmark_id));
     };
 
+    self.load_benchmarks_description = function(filepath) {
+        return self.config.benchmarks_description = self.load_json(filepath);
+    };
+
     self.system_infos = function(extend_infos) {
         const os = require("os");
         const strftime = require('strftime');
@@ -97,6 +103,10 @@
         return self.config.benchmarks[benchmark_id];
     };
 
+    self.benchmarks_description = function() {
+        return self.config.benchmarks_description;
+    };
+
     self.reset_benchmark_command = function(benchmark_id) {
         const default_command = self.config.benchmarks_default[benchmark_id].command;
         self.config.benchmarks[benchmark_id].command = default_command;
@@ -106,9 +116,11 @@
     self.init = function() {
         const default_app = self.config.files.app_config;
         const default_benchmarks = self.config.files.benchmarks_config;
+        const default_benchmarks_description = self.config.files.benchmarks_description;
 
         self.load_app(default_app);
         self.load_benchmarks(default_benchmarks);
+        self.load_benchmarks_description(default_benchmarks_description);
     };
 
     self.init();

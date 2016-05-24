@@ -93,7 +93,7 @@
      */
     self.calculate_scores = function (results) {
         const Configure = require('./configure');
-        const descriptions = Configure.load_json('./config/descriptions.json')['benchmarks'];
+        const descriptions = Configure.benchmarks_description()['benchmarks'];
 
         for (const benchmark_id in results['results']) {
             const benchmark = results['results'][benchmark_id];
@@ -138,7 +138,7 @@
         const Configure = require('./configure');
         const extend = require('extend');
 
-        const config = Configure.load_json('./config/descriptions.json');
+        const config = Configure.benchmarks_description();
         const descriptions = config['benchmarks'];
         const categories = config['categories'];
 

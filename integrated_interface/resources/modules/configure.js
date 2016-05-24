@@ -16,7 +16,8 @@
                 app_help: "./resources/help/app/helpinfo.json",
                 benchmark_help: "./resources/help/benchmarks/%s.help.json",
                 benchmarks_config: "./config/config.json",
-                benchmarks_description: "./resources/config/descriptions.json"
+                benchmarks_description: "./resources/config/descriptions.json",
+                validators: "./resources/config/validators.json"
             },
             app: {},
             system: {},
@@ -71,6 +72,11 @@
 
     self.load_benchmarks_description = function(filepath) {
         return self.config.benchmarks_description = self.load_json(filepath);
+    };
+
+    self.load_validators = function() {
+        const file = self.config.files.validators;
+        return self.load_json(file);
     };
 
     self.system_infos = function(extend_infos) {

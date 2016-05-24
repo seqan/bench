@@ -28,7 +28,7 @@
 
     var self = new EventEmitter();
 
-    self.validators = Configure.load_json("./config/validators.json");
+    self.validators = Configure.load_validators();
 
     self.validator_id = (benchmark_id) => {
         const validators = self.validators;

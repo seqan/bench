@@ -13,6 +13,8 @@
         config: {
             files: {
                 app_config: "./resources/config/app_config.json",
+                app_help: "./resources/help/app/helpinfo.json",
+                benchmark_help: "./resources/help/benchmarks/%s.help.json",
                 benchmarks_config: "./config/config.json"
             },
             app: {},
@@ -55,15 +57,14 @@
     };
 
     self.load_app_help_file = function() {
-        const path = "./resources/help/app/";
-        const file = path + "helpinfo.json";
+        const file = self.config.files.app_help;
         return self.load_json(file);
     };
 
     self.load_benchmark_help_file = function(benchmark_id) {
-        const path = "./resources/help/benchmarks/";
-        const file = path + benchmark_id + ".help.json";
-        return self.load_json(file);
+        const sprintf = require("sprintf-js").sprintf;
+        const file = self.config.files.benchmark_help;
+        return self.load_json(sprintf(file, benchmark_id));
     };
 
     self.system_infos = function(extend_infos) {

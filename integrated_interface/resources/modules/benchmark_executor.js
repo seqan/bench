@@ -72,6 +72,8 @@
     };
 
     var BenchmarkQueue = extend([], {
+        started_at: undefined,
+
         add_process: function(benchmark_process) {
             this.push(extend(Object.create(BenchmarkProcess), benchmark_process));
         },
@@ -179,6 +181,7 @@
 
         // reset benchmark queue
         var benchmark_queue = self.new_benchmark_queue();
+        benchmark_queue.started_at = new Date();
         const max_threads = Configure.system_infos().max_threads;
 
         var queue_id = 0;

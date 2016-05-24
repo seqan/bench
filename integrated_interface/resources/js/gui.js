@@ -351,11 +351,13 @@ function slugify(text) {
         .data('benchmark_queue', benchmark_queue)
         .removeAttr('disabled')
         .click(function(){
-            const benchmark_queue = $(this).data('benchmark_queue');
             const strftime = require('strftime');
 
+            const benchmark_queue = $(this).data('benchmark_queue');
+            const filename = 'benchmark-' + strftime("%Y%m%d-%H%M%S", benchmark_queue.started_at);
+
             $('#save-website-filechooser')
-            .attr('nwsaveas', 'benchmark-' + strftime("%Y%m%d-%H%M%S"))
+            .attr('nwsaveas', filename)
             .save_as((website_path) => {
                 WebsiteGenerator.generate(benchmark_queue, website_path);
             });

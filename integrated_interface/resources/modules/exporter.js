@@ -14,10 +14,12 @@
     var self = {};
 
     self.results = function(benchmark_queue) {
-        // TODO benchmark_queue.started_at
+        const strftime = require('strftime');
         var benchmark_results = {
             informations: {
-                system: Configure.system_infos(),
+                system: Configure.system_infos({
+                    started_at: strftime('%F %T', benchmark_queue.started_at)
+                }),
                 project: {
                     title: 'seqan-2.1-gcc'
                 }

@@ -53,11 +53,12 @@
         }
     };
 
-    self.system_infos = function() {
+    self.system_infos = function(extend_infos) {
         const os = require("os");
         const strftime = require('strftime');
+        const extend = require('extend');
 
-        return self.config.system = {
+        const infos = {
             "os": os.platform() + " " + os.arch() + " " + os.release(),
             "cpu_frequency": os.cpus()[0].speed,
             "cpu_name": os.cpus()[0].model,
@@ -66,6 +67,8 @@
             "threads": os.cpus().length,
             "max_threads": os.cpus().length
         };
+
+        return self.config.system = extend(infos, extend_infos);
     };
 
     self.app = function() {

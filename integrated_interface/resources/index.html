@@ -16,8 +16,11 @@
     <body style='background-color:rgba(0,0,0,0)'>
     <script>
         const renderer = require('jsrender');
+        const win = nw.Window.get();
         var tmpl = renderer.templates('./resources/templates/gui/body.html');
-        nw.Window.get().window.document.body.innerHTML = tmpl.render();
+        win.window.document.body.innerHTML = tmpl.render({
+            'window_title': win.title
+        });
     </script>
     </body>
 </html>

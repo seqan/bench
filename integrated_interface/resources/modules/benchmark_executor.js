@@ -25,7 +25,7 @@
  *       ```
  *
  *   'error': (error, benchmark_process, benchmark_queue)
- *       Will be called if an error occured executing the benchmark.
+ *       Will be called if an error occurred executing the benchmark.
  *
  *   'canceled': (benchmark_process, benchmark_queue)
  *       Will be called after the current running benchmark process was stopped.
@@ -284,8 +284,8 @@
 
 
     /**
-     * this handler will be called, if an error occured trying to start a
-     * benchmark process or during the excution of the benchmark process.
+     * this handler will be called, if an error occurred trying to start a
+     * benchmark process or during the execution of the benchmark process.
      *
      * @param Object error error.message contains the error message
      */
@@ -352,7 +352,7 @@
             ValidatorExecutor.once('result', (validator) => {
                 current_process.validator = validator;
 
-                // display successful/failed/aborted execution in the gui
+                // display successful/failed/aborted execution in the GUI
                 self.emit('result', current_process, benchmark_queue);
 
                 // execute next benchmark in the queue

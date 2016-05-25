@@ -217,7 +217,6 @@
                     const thread_name = " -tc " + thread;
 
                     var shell_args = shell_parse(benchmark.command);
-                    shell_args.pop();
                     shell_args = shell_args.concat([result_file, '-tc', thread]);
 
                     benchmark_queue.add_process({

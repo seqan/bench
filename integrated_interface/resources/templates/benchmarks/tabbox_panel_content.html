@@ -7,9 +7,18 @@
         <input id='{{:tab_panel_id}}Checkbox' prg='{{:benchmark}}' type='checkbox'>
     </span>
 
-    <span class='input-group-addon' style='border-right-style:none'>cmd</span>
+    <span class='input-group-addon' style='border-right-style:none'>
+        <span class='glyphicon glyphicon-console' aria-hidden='true'></span>
+    </span>
 
     <input type='text' class='form-control' name='gInput' placeholder='>_' id='{{:tab_panel_id}}Input' prg='{{:benchmark}}' value='{{:benchmark_command}}'>
+
+    <span class='input-group-addon' id='{{:tab_panel_id}}_fixed_cmd' style='border-left-style:none;' title='./results/{{:benchmark}}.single_core.result.txt -tc 1'>
+        <span style="width: 15em; display: block; overflow-x: auto; line-height: 1.1em;">./results/{{:benchmark}}.single_core.result.txt -tc 1</span>
+    </span>
+    <script>
+        $('#{{:tab_panel_id}}_fixed_cmd span').scrollLeft( 100000 );
+    </script>
 
     <span class='input-group-btn'>
         <button type='button' id='{{:tab_panel_id}}Reset' class='btn btn-default' prg='{{:benchmark}}'>Reset</button>

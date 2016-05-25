@@ -120,6 +120,8 @@
         runtime: undefined,
         expected_runtime: 0,
         threads: 1,
+        repeat: 1,
+        repeats: 1,
 
         state: 'QUEUED',
         start_time: undefined,
@@ -223,6 +225,8 @@
                         benchmark_id: benchmark_id,
                         benchmark_name: benchmark_id + repeat_name + thread_name,
                         threads: thread,
+                        repeat: i+1,
+                        repeats: repeats,
                         shell_command: shell_args[0],
                         shell_args: shell_args.slice(1),
                         result_file: result_file,

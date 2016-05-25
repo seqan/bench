@@ -338,7 +338,7 @@
 
         // handles process termination, i.e. this handler will be executed after
         // a benchmark process was closed or aborted.
-        child_process.on('close', function() {
+        child_process.on('close', function(code) {
             var benchmark_queue = self.benchmark_queue();
             var current_process = benchmark_queue.current_process();
             var runtime = process.hrtime(current_process.start_time);
@@ -346,7 +346,7 @@
             current_process.runtime = to_secs(runtime);
 
             if (current_process.state === 'QUEUED') {
-                current_process.state = 'SUCCESS';
+                current_process.state = code == 0 ? 'SUCCESS' : "FAILURE";
             }
 
             ValidatorExecutor.once('result', (validator) => {

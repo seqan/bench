@@ -35,22 +35,22 @@
         "kmers_10mer_counting": {
             "execute": true,
             "name": "kmers_10mer_counting",
-            "command": "./benchmarks/kmers_10mer_counting ./data/indices/index_10gram.inx ./data/chr1_sim_reads_2000.fa ./results/kmers_10mer_counting.result.txt",
-            "expected_runtime": 0.4,
+            "command": "./benchmarks/kmers_10mer_counting ./data/chr1_gl000192.fa ./results/kmers_10mer_counting.result.txt",
+            "expected_runtime": 1.0,
             "repeats": 1
         },
         "kmers_15mer_counting": {
             "execute": true,
             "name": "kmers_15mer_counting",
-            "command": "./benchmarks/kmers_15mer_counting ./data/indices/index_15gram.inx ./data/chr1_sim_reads_2000.fa ./results/kmers_15mer_counting.result.txt",
-            "expected_runtime": 0.2,
+            "command": "./benchmarks/kmers_15mer_counting ./data/chr1_gl000192.fa ./results/kmers_15mer_counting.result.txt",
+            "expected_runtime": 0.7,
             "repeats": 1
         },
         "kmers_50mer_counting": {
             "execute": true,
             "name": "kmers_50mer_counting",
-            "command": "./benchmarks/kmers_50mer_counting ./data/indices/index_50gram.inx ./data/chr1_sim_reads_2000.fa ./results/kmers_50mer_counting.result.txt",
-            "expected_runtime": 0.2,
+            "command": "./benchmarks/kmers_50mer_counting ./data/chr1_gl000192.fa ./results/kmers_50mer_counting.result.txt",
+            "expected_runtime": 1.7,
             "repeats": 1
         },
         "pairwise_alignment_global_affine_dna": {

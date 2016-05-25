@@ -12,8 +12,7 @@ using namespace seqan;
 
 struct Options {
     unsigned threads;
-    CharString readFile;
-    CharString indexFile;
+    CharString input;
     CharString output;
 };
 
@@ -24,17 +23,15 @@ seqan::ArgumentParser::ParseResult parseCommandLine(std::string infoText, Option
     setVersion(parser, "0.1");
     setDate(parser, "April 2016");
 
-    addUsageLine(parser, "[\\fIOPTIONS\\fP] \\fIINDEX\\fP \\fIREADS\\fP \\fIOUT\\fP ");
+    addUsageLine(parser, "[\\fIOPTIONS\\fP] \\fIIN\\fP \\fIOUT\\fP ");
 
     addDescription(parser,
-    "\\fIINDEX\\fP is the index file. \\fIREADS\\fP is a .fa / fasta input file containing the kmers. \\fIOUT\\fP is a txt output file.");
+    "\\fIIN\\fP is a .fa / fasta input file containing a part of a genome. \\fIOUT\\fP is a txt output file.");
 
-    addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE, "INDEX"));
     addArgument(parser, ArgParseArgument(ArgParseArgument::INPUT_FILE, "READS"));
     addArgument(parser, ArgParseArgument(ArgParseArgument::OUTPUT_FILE, "OUT"));
-    setValidValues(parser, 0, "inx");
-    setValidValues(parser, 1, "FASTS, fa");
-    setValidValues(parser, 2, "txt");
+    setValidValues(parser, 0, "FASTS, fa");
+    setValidValues(parser, 1, "txt");
 
     addSection(parser, "Settings");
     addOption(parser, seqan::ArgParseOption("tc", "threads", "Number of threads", seqan::ArgParseArgument::INTEGER, "INT"));
@@ -49,23 +46,25 @@ seqan::ArgumentParser::ParseResult parseCommandLine(std::string infoText, Option
     if(res == seqan::ArgumentParser::PARSE_OK)
     {
         getOptionValue(options.threads, parser, "threads");
-        getArgumentValue(options.indexFile, parser, 0);
-        getArgumentValue(options.readFile, parser, 1);
-        getArgumentValue(options.output, parser, 2);
+        getArgumentValue(options.input, parser, 0);
+        getArgumentValue(options.output, parser, 1);
     }
     return res;
 }
 
-template <unsigned kmerLength, typename TIndex, typename TStringSet, typename TOutputStream>
-inline void kmer_counting (TIndex & index, TStringSet & patterns, TOutputStream & cout)
+template <unsigned kmerLength, typename TIndex, typename TString, typename TOutputStream>
+inline void kmer_counting (TIndex & index, TString & genome, TOutputStream & cout)
 {
     unsigned i = 0;
-    for (auto & pattern: patterns)
+    auto it = begin(genome);
+    auto itEnd = end(genome);
+    for(; it != itEnd; ++it)
     {
-        hash(indexShape(index), begin(pattern));
+        hash(indexShape(index), it);
         auto count = countOccurrences(index, indexShape(index));
+        auto firstPosition = getOccurrence(index, indexShape(index));
 
-        if(count > 0) {
+        if (i <= firstPosition && count >= 5u) {
             cout << i << ": " <<  count << std::endl;
         }
 
@@ -88,21 +87,20 @@ inline int benchmark_kmers_kmer_counting_main(std::string infoText, int argc, ch
     typedef Backtracking<> TBacktracking;
     typedef Index<Dna5String, TIndexSpec > TIndex;
 
-    // read in all k-mers
-    StringSet<CharString> ids;
-    StringSet<Dna5String> seqs;
-    SeqFileIn seqFileIn(toCString(options.readFile));
-    readRecords(ids, seqs, seqFileIn);
+    // read in the genome
+    CharString id;
+    Dna5String genome;
+    SeqFileIn seqFileIn(toCString(options.input));
+    readRecord(id, genome, seqFileIn);
 
     // read in the index of the genome
-    Index<Dna5String, TIndexSpec > index;
-    open(index, toCString(options.indexFile));
+    Index<Dna5String, TIndexSpec > index(genome);
 
     // prepare write steam
     std::ofstream ofs(toCString(options.output), std::ofstream::out);
 
     // search all reads in the index structure
-    kmer_counting<kmerLength>(index, seqs, ofs);
+    kmer_counting<kmerLength>(index, genome, ofs);
 
     return 0;
 }

@@ -39,19 +39,19 @@
         "kmers_10mer_counting": {
             "title": "Counting 10-mers",
             "subtitle": "",
-            "base_time": 0.4,
+            "base_time": 1.0,
             "category": "kmer_counting"
         },
         "kmers_15mer_counting": {
             "title": "Counting 15-mers",
             "subtitle": "",
-            "base_time": 0.2,
+            "base_time": 0.7,
             "category": "kmer_counting"
         },
         "kmers_50mer_counting": {
             "title": "Counting 50-mers",
             "subtitle": "",
-            "base_time": 0.2,
+            "base_time": 1.7,
             "category": "kmer_counting"
         },
         "pairwise_alignment_global_affine_dna": {

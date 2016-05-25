@@ -9,6 +9,8 @@
     }
 
 })(this, function() {
+    "use strict";
+
     const BenchmarkExecutor = require('./modules/benchmark_executor');
     const ValidatorExecutor = require('./modules/validator_executor');
     var self = {};

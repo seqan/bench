@@ -9,6 +9,8 @@
     }
 
 })(this, function() {
+    "use strict";
+
     var self = {
         config: {
             files: {

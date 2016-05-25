@@ -23,6 +23,8 @@
     }
 
 })(this, function() {
+    "use strict";
+
     const EventEmitter = require('events');
     const Configure = require('./configure');
 

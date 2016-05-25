@@ -42,6 +42,11 @@
     }
 
 })(this, function() {
+    // using strict is important, otherwise the `const` within loops won't work
+    // for older nodejs versions
+    // see https://github.com/eslint/eslint/issues/3104#issuecomment-157726737
+    "use strict";
+
     const fs = require('fs');
     const process = require('process');
     const path = require('path');

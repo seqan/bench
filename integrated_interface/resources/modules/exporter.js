@@ -9,6 +9,8 @@
     }
 
 })(this, function() {
+    "use strict";
+
     const Configure = require('./configure');
     const is_object = require('isobject');
     var self = {};

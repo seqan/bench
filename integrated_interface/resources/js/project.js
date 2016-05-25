@@ -9,6 +9,8 @@
     }
 
 })(this, function() {
+    "use strict";
+
     const Configure = require('./modules/configure');
 
     var self = {};

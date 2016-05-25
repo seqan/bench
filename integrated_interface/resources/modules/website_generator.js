@@ -20,6 +20,8 @@
     }
 
 })(this, function() {
+    "use strict";
+
     const EventEmitter = require('events');
     const Configure = require('./configure');
     const Exporter = require('./exporter');

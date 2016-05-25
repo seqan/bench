@@ -18,6 +18,8 @@ function slugify(text) {
     }
 
 })(this, function() {
+    "use strict";
+
     const path = require('path');
     const Configure = require('./modules/configure');
     const Exporter = require('./modules/exporter');

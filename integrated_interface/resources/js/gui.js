@@ -381,6 +381,16 @@ function slugify(text) {
         });
     });
 
+    // at least one listener for the error event, else quote
+    // https://nodejs.org/api/events.html#events_error_events:
+    //
+    // > If an EventEmitter does not have at least one listener registered for
+    // > the 'error' event, and an 'error' event is emitted, the error is
+    // > thrown, a stack trace is printed, and the Node.js process exits.
+    BenchmarkExecutor.on('error', function(error) {
+        console.error("error_handler: " + error.message);
+    });
+
     self.is_running = function() {
         return !!$("#run-btn").prop("disabled");
     };

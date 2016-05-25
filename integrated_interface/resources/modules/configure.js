@@ -130,14 +130,18 @@
         return default_command;
     };
 
-    self.init = function() {
-        const default_app = self.config.files.app_config;
-        const default_benchmarks = self.config.files.benchmarks_config;
-        const default_benchmarks_description = self.config.files.benchmarks_description;
+    self.init = function(config) {
+        const extend = require('extend');
 
-        self.load_app(default_app);
-        self.load_benchmarks(default_benchmarks);
-        self.load_benchmarks_description(default_benchmarks_description);
+        const config_ = extend({
+            app: self.config.files.app_config,
+            benchmarks: self.config.files.benchmarks_config,
+            benchmarks_description: self.config.files.benchmarks_description
+        }, config);
+
+        self.load_app(config_.app);
+        self.load_benchmarks(config_.benchmarks);
+        self.load_benchmarks_description(config_.benchmarks_description);
     };
 
     self.init();

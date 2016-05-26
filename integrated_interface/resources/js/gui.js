@@ -270,6 +270,22 @@ function slugify(text) {
         return (Math.floor(time * 10000) / 10000)  + ' Sec';
     };
 
+    const scrollLock = function(fn) {
+        return $.proxy(function() {
+            const scrollTop = $("#panels").height() + $("#panels").scrollTop();
+            const scrollHeight = $('#panels')[0].scrollHeight;
+            const atBottom =  scrollTop == scrollHeight;
+
+            // execute original function
+            fn.apply(this, arguments)
+
+            // scroll to bottom page, if we were previously at the bottom
+            if (atBottom) {
+                $("#panels").scrollTop($('#panels')[0].scrollHeight);
+            }
+        });
+    };
+
     self.add_result = function(current_process, benchmark_queue){
         const renderer = require('jsrender');
         const result_table_id = benchmark_queue.result_table_id;
@@ -322,7 +338,7 @@ function slugify(text) {
         BenchmarkExecutor.run();
     };
 
-    WebsiteGenerator.on('done', function(website_path) {
+    WebsiteGenerator.on('done', scrollLock(function(website_path) {
         const path = require('path');
         const fs = require('fs');
 
@@ -337,10 +353,10 @@ function slugify(text) {
             const file = 'file://' + website_path + '/benchmark.html';
             nw.Shell.openExternal( file );
         }
-    });
+    }));
 
     // benchmark starts
-    BenchmarkExecutor.on('initialize', function(benchmark_queue){
+    BenchmarkExecutor.on('initialize', scrollLock(function(benchmark_queue){
         const result_table_id = "result-table-" + slugify(benchmark_queue.started_at.toISOString());
         benchmark_queue.result_table_id = result_table_id;
 
@@ -354,10 +370,10 @@ function slugify(text) {
             result_table_id: result_table_id,
             start_date: benchmark_queue.started_at.toISOString()
         }));
-    });
+    }));
 
     // add a summary of all executed benchmarks
-    BenchmarkExecutor.on('done', function(benchmark_queue) {
+    BenchmarkExecutor.on('done', scrollLock(function(benchmark_queue) {
         const renderer = require('jsrender');
         const result_table_id = benchmark_queue.result_table_id;
 
@@ -373,10 +389,10 @@ function slugify(text) {
         $('#' + result_table_id + '-save-btns').click(function (e) {
             e.stopPropagation();
         });
-    });
+    }));
 
     // on a result
-    BenchmarkExecutor.on('result', self.add_result);
+    BenchmarkExecutor.on('result', scrollLock(self.add_result));
 
     // enable save results and save website buttons
     BenchmarkExecutor.on('done', function(benchmark_queue) {

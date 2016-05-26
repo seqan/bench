@@ -313,6 +313,11 @@ function slugify(text) {
         $("#benchmark-panel-body").collapse('hide');
         $('#run-btn').prop({"disabled":"disabled"});
 
+        // set the chosen threads
+        Configure.system_infos({
+            threads: parseInt($('#threads-input').val())
+        });
+
         BenchmarkExecutor.on('canceled', self.reenable_run_btn);
         BenchmarkExecutor.on('done', self.reenable_run_btn);
 

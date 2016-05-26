@@ -1,24 +1,27 @@
-<table class='table table-hover'>
+<table class='table table-hover' style='font-size: 0.9em;'>
   <tbody>
     <tr>
-      <td style='width: 15em'><h6>Operating system:</h6</td>
-      <td><h6>{{:os}}</h6></td>
+      <th style='width: 20%'>Operating system:</th>
+      <td style='width: 30%'>{{:os}}</td>
+      <th style='width: 20%'>Memory:</th>
+      <td>{{:memory}} GB</td>
     </tr>
     <tr>
-      <td><h6>Memory:</h6></td>
-      <td><h6>{{:memory}} GB</h6></td>
+      <th>CPU:</th>
+      <td>{{:cpu_name}}</td>
+      <th>CPU Frequency:</th>
+      <td>{{:cpu_frequency}}</td>
     </tr>
     <tr>
-      <td><h6>CPU:</h6></td>
-      <td><h6>{{:cpu_name}}<h6></td>
-    </tr>
-    <tr>
-      <td><h6>CPU Frequency:</h6></td>
-      <td><h6>{{:cpu_frequency}}<h6></td>
-    </tr>
-    <tr>
-      <td><h6>Threads:</h6></td>
-      <td><h6>{{:max_threads}}</h6></td>
+      <th>Threads:</th>
+      <td colspan="3">
+        <div class='input-group input-group-md' style="width:100%;">
+          <input id='threads-input' type="number" min="1" max="{{:max_threads}}" value='{{:max_threads}}' class='form-control'></input>
+          <span class='input-group-addon'>
+            of {{:max_threads}}
+          </span>
+        </div>
+      </td>
     </tr>
   </tbody>
 </table>

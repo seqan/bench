@@ -86,22 +86,31 @@
         return self.load_json(file);
     };
 
+    self.load_system_infos = function() {
+        const os = require("os");
+        self.config.system = {};
+
+        self.system_infos({
+            "os": os.platform() + " " + os.arch() + " " + os.release(),
+            "cpu_frequency": os.cpus()[0].speed,
+            "cpu_name": os.cpus()[0].model,
+            "memory": Math.floor(os.totalmem()/1024/1024/1024*10)/10,
+            "threads": os.cpus().length,
+            "max_threads": os.cpus().length
+        });
+    };
+
     self.system_infos = function(extend_infos) {
         const os = require("os");
         const strftime = require('strftime');
         const extend = require('extend');
 
         const infos = {
-            "os": os.platform() + " " + os.arch() + " " + os.release(),
             "cpu_frequency": os.cpus()[0].speed,
-            "cpu_name": os.cpus()[0].model,
-            "memory": Math.floor(os.totalmem()/1024/1024/1024*10)/10,
             "date": strftime('%F %T'), // "2016-04-13 14:44:35",
-            "threads": os.cpus().length,
-            "max_threads": os.cpus().length
         };
 
-        return self.config.system = extend(true, infos, extend_infos);
+        return extend(true, self.config.system, infos, extend_infos);
     };
 
     self.app = function() {
@@ -139,6 +148,7 @@
             benchmarks_description: self.config.files.benchmarks_description
         }, config);
 
+        self.load_system_infos();
         self.load_app(config_.app);
         self.load_benchmarks(config_.benchmarks);
         self.load_benchmarks_description(config_.benchmarks_description);

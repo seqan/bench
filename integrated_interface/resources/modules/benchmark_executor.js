@@ -194,10 +194,10 @@
             }),
             started_at: started_at
         });
-        const max_threads = benchmark_queue.system.max_threads;
+        const max_threads = benchmark_queue.system.threads;
 
         var queue_id = 0;
-        const threads = [1, max_threads];
+        const threads = max_threads == 1 ? [1] : [1, max_threads];
 
         // add benchmarks to the benchmark_queue.
         for (var benchmark_id in Configure.benchmarks()) {

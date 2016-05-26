@@ -5,17 +5,41 @@ var started_at = new Date();
 const sprintf = require('sprintf-js').sprintf;
 const strftime = require('strftime');
 const quote = require('shell-quote').quote;
+const yargs = require('yargs');
+const os = require('os');
+
 const Configure = require('./resources/modules/configure');
 const BenchmarkExecutor = require('./resources/modules/benchmark_executor');
 const WebsiteGenerator = require('./resources/modules/website_generator');
 const Exporter = require('./resources/modules/exporter');
-const argv = require('yargs')
-    .usage('Usage: $0 -c [CONFIG] -o [OUTPUT] --html [HTML]')
+const max_threads = os.cpus().length;
+
+const argv = yargs
+    .usage('Usage: $0 -tc [THREADS] -c [CONFIG] -o [OUTPUT] --html [HTML]')
     .example('$0 -c config.json -o results.json', 'Run benchmarks defined in config.json and write results to results.json')
+    .wrap(yargs.terminalWidth())
+    .version()
     .option('v', {
       alias: 'verbose',
       describe: 'be verbose',
       boolean: true
+    })
+    .option('t', {
+      alias: 'threads',
+      describe: 'The number of threads the benchmark should use in the multi-core run.',
+      default: max_threads,
+      number: true
+    })
+    .check(function(argv) {
+      const threads = parseInt(argv['threads']);
+
+      if (1 <= threads && threads <= max_threads) {
+        argv['t'] = threads;
+        argv['threads'] = threads;
+        return true;
+      }
+
+      throw new Error("Threads must be between 1 and " + max_threads + ", " + argv['threads'] + " given.");
     })
     .option('c', {
       alias: 'config',
@@ -42,6 +66,10 @@ console.log();
 
 Configure.init({
   benchmarks: argv['config']
+});
+
+Configure.system_infos({
+  threads: argv['threads']
 });
 
 BenchmarkExecutor.on('setup', (benchmark_process, benchmark_queue) => {

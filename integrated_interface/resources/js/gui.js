@@ -368,6 +368,7 @@ function slugify(text) {
         var result_start_run = renderer.templates('./resources/templates/results/result_start_run.html');
         $('#' + result_table_id + '-head').append(result_start_run.render({
             result_table_id: result_table_id,
+            project_title: benchmark_queue.project.title,
             start_date: benchmark_queue.started_at.toISOString()
         }));
     }));

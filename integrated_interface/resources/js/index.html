@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <script src="jquery-1.11.3.js"></script>	
+    <script src="bootstrap.min.js"></script>
+    <script src="controller.js"></script>
+    <script src="gui.js"></script>
+    <script src="nprogress.js"></script>
+
+    <script>
+        Init()
+    </script>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/nprogress.css">
+    <link rel="stylesheet" href="../css/main.css" type="text/css"/>
+</head>
+
+<body>
+    <div class="mainFrame" >
+        <div class="innerFrame">
+            <div class="headBar">
+                <table style="width:100%;height:40px">
+                    <tr>
+                        <td width="33.3%" align="left" style="border-radius:5px">
+
+                            <button align="left" class="btn btn-sm btn-primary _btn-noborder" aria-label="remove" id="close-btn">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true">
+                                    </span>
+                            </button>
+                            <button align="left" class="btn btn-sm btn-primary _btn-noborder" aria-label="minus" id="minus-btn">
+                                    <span class="glyphicon glyphicon-minus" aria-hidden="true">
+                                    </span>
+                            </button>
+                            
+                            <script>
+                                $("#minus-btn").click(function(){
+                                    var gui = require('nw.gui')
+                                    var win = gui.Window.get()
+                                    win.minimize()   
+                                })
+                                $("#close-btn").click(function(){                                    
+                                    if (_SIGNAL.RUN){
+                                        if(confirm("This is going to terminate all running process"))
+                                        {
+                                            cancel()
+                                            window.close()
+                                        }
+                                    }
+                                    else 
+                                        if (confirm("Quit the program?"))
+                                            window.close()
+                                })
+                            </script>
+                        </td>
+                        <td width="33.3%" align="center" style="border-radius:5px">
+                            <p align="center" style="color:white; margin:0"><b>SeqanBenchTest</b></p>
+                        </td>
+                        <td width="33.3%" align="right" style="border-radius:5px">
+                            <button class="btn btn-sm btn-primary _btn-noborder" aria-label="cog" id="configure" data-toggle="drop">
+                                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                            </button>          
+                        </td>
+                    </tr>
+                    <script>
+                        $("#configure").click(function(){$("#gconfdiv").toggle("medium")})
+                    </script>
+                </table>
+
+                <div id="gconfdiv" class="confFrame">
+                    <!--div id="gconfdiv" style=" left:11px; position:fixed;background:#F5F5F5;z-index:3; height:530px; box-shadow: 0px 5px 30px  gray; width:300px; border-bottom-left-radius:0px; border-bottom-right-radius:4px; display:none"-->
+                    <table style="margin:10px; width:100%">
+                        <tr>
+                            <td>
+                                <b>Configure File</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-top:10px">
+                                <input id="choosefile" type="file" accept=".json">
+
+                                <div class="btn-group" role="group" aria-label="..." style= "position: absolute; right:15px; bottom:30px">
+                                    <button type="button" id = "chooseFileReset" class="btn btn-default btn-xs">
+                                        &nbsp Reset &nbsp
+                                    </button>
+                                    <button type="button" id = "chooseFileSave" class="btn btn-primary btn-xs">
+                                        &nbsp Save &nbsp
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <script>
+                        $("#choosefile").on('change', function(){
+                            var fs = require("fs")
+                            //fs.readFile($("#choosefile").val(),'UTF-8',function(err,data){$("#chooseFileContent").html(data)})
+
+                        })
+
+                        $("#chooseFileSave").click(function(){
+                                _SIGNAL.INIT = false
+                                var tmp = Options.init($("#choosefile").val())
+                                if (_SIGNAL.ERROR)  {
+                                    alert("ConfigFile Format Error")
+                                    return false
+                                }
+                                else{
+                                    cmp = tmp
+                                    waitExec("INIT", function(){g_createCategory()})
+                                    $("#gconfdiv").toggle('fast')
+                                }
+                        })
+
+                        $("#chooseFileReset").click(function(){
+                                _SIGNAL.INIT = false
+                                //var tmp = Options.init($("#choosefile").val())
+                                    if (confirm("This will overwrite all the settings")){
+                                        Init()
+                                        waitExec("INIT", function(){g_createCategory()})
+                                        //g_createCategory()
+                                        //gConfObject.writeConfFilePath($("#choosfile").val())
+                                        $("#gconfdiv").toggle('fast')
+                                    }
+
+                        })
+
+                    </script>
+                </div>        
+            </div>
+            <div id = "c1" class="scroll" style="overflow:auto">
+                <div id="Dlg" style="height:450px">
+                    <div class="panel panel-info" style="border-radius:0">
+                      <div class="panel-heading" id="headingZero">
+                        <span role="button" data-toggle="collapse" data-parent="#sysInfoBody" href="#sysInfoBody" aria-expanded="true" aria-controls="sysInfoBody" >
+                          <b>System</b>
+                        </span>
+                      </div>
+                      <div id="sysInfoBody" class="panel-collapse collapse in" role="tabpanel" arialabelledby="headingZero" style="margin:0;padding:0; height:100%">
+                        <script>
+                            g_showSysInfo();
+                        </script>
+                      </div>
+                    </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading" id="headingOne">
+                            <span id='ConfigTitle' role="button" data-toggle="collapse" data-parent="#Project" href="#Project" aria-controls="Project">
+                                <b>
+                                Project 
+                                </b>
+							</span>
+                        </div>
+                        <div id="Project" class="panel-collapse collapse in" role="tabpanel" arialabelledby="headingOne">
+                            <table style="width:100%; margin-bottom:5px; margin-top: 5px">
+                                <tr>
+                                    <td>
+                                        Title
+                                    </td>
+                                    <td>
+                                        <input id="proTit" type="text" style="width:100%">
+                                        <script>
+                                            waitExec("INIT", function(){$("#proTit").val(cmp.getProjectTitle())})
+                                        </script>
+                                    </td>
+                                </tr>
+                            </table>                      
+                            
+                        </div>
+                    </div>
+                    <div class="panel panel-danger" style="margin:0" >
+                        <div class="panel-heading" role="tab" id="headingOne">
+                            <span id='ConfigTitle' role="button" data-toggle="collapse" data-parent="#ConfigForm" href="#ConfigForm" aria-controls="ConfigForm">
+                                <b>
+                                Configuration
+                                </b>
+                            </span>
+                            <script>
+                                function scroll(){
+                                    $("#ConfigTitle").scrollTop(100)
+                                }
+                                //$("#ConfigTitle").scrollTop(100px)
+                            </script>
+                        </div>
+                        <div id="ConfigForm" class="panel-collapse collapse in" role="tabpanel" arialabelledby="headingOne" style="margin-bottom:3px; box-shadow:1px 5px 10px #888888">
+                            <script>
+                                waitExec("INIT", function(){g_createCategory()})      
+                            </script>
+                        </div>
+                    </div>
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            <b>
+                                Results
+                            </b>
+                        </div>
+                        <div id="Result_panel_body" class="panel-body" style="padding:0; maring:0px;">
+                            <table id="result_table" class="table table-striped tabl-hover" style="box-shadow: 1px 5px 10px #888888; margin: 0px">
+                            </table>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="HelpInfo" tabindex=-1 role="dialog" aria-labelledby="HelpInfoLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="HelpInfoHeader">No Help File Found</h4>
+                        </div>
+                        <div class="modal-body" id="HelpInfoBody" style='height: 450px; overflow: auto'>
+                        </div>
+                        <div class="modal-footer" id="HelpInfoFooter">
+                        </div>
+                    </div>
+                </div>
+            </div>   
+            <div id="Fbt" style="height:100px; background-color:white; border-top: 1px solid #428bca">
+                <div >
+                    <div id="progressbar">
+                        <div id="progressbar_text"> 
+                            <p>
+                                <h6 style='color: #428bca; margin: 0px; padding: 0px'>
+                                    <b> &nbsp</b>
+                                </h6>   
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <table style="width:100%;position:absolute; right:15px;">
+                    <tr>
+                        <td align="right">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button class="btn btn-default  btn-sm" data-toggle="modal" data-target="#HelpInfo">&nbsp Help &nbsp
+                                </button>
+                                <script>
+                                    var helpFile = require(GCmp.getHelpFilePath())
+                                    $("#HelpInfoHeader").html(helpFile.header)
+                                    $("#HelpInfoBody").html(helpFile.body)
+                                    $("#HelpInfoFooter").html(helpFile.footer)
+                                </script>
+                                <button id="cancelbtn" class="btn btn-default btn-sm"  data-dismiss="alert" onclick = g_cancel()>
+                                    Cancel
+                                </button>
+
+                            </div>
+                            <button id="run-btn" class="btn btn-success btn-sm" onclick=g_run()>
+                                &nbsp <b>Run </b> &nbsp
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+    
+</html>

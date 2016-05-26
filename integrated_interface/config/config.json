@@ -1,0 +1,67 @@
+{ 
+    "project": {
+        "title": "seqan-2.1-gcc"
+    },
+    "benchmarks":{
+            "pw_global_dna":{ 
+                "name":"pa_global",
+                "category":["Pairwise_Alignment","Dna_Reads","global_NW_Alignment"],
+                "categoryName":"Dna global_NW",
+                "infoFile":"./Info/configInfo/pw_global_dna_1M_help.json",
+                "programName":"pa_global",
+                "checker":"",
+                "checked":true, 
+                "runCmd":"./std_bench/global_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_global_dna.txt -tc 1 && ./std_bench/global_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_global_dna.txt",
+                "runCmdRemark":["Single_core", "Multi_core"],
+                "time":25.2
+            },
+		    "pw_local_dna":{
+			    "name":"p",
+			    "category":["Pairwise_Alignment", "Dna_Reads", "local_SW_Alignment"],
+                "categoryName":"Dna local_SW",
+			    "infoFile":"./Info/configInfo/pw_local_dna_1M_help.json",
+			    "programName":"",
+			    "checker":"",
+			    "checked":true,
+			    "runCmd":"./std_bench/local_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_local_dna.txt -tc 1 && ./std_bench/local_alignment_dna ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/result_pw_local_dna.txt",
+                "runCmdRemark":["Single_core", "Multi_core"],
+                "time":32.9
+		    },
+		    "pw_global_protein":{
+			    "name":"pa",
+			    "category":["Pairwise_Alignment", "Protein_Reads", "global_NW_Alignment"],	
+                "categoryName":"Protein global_NW",
+			    "infoFile":"./Info/configInfo/pw_global_dna_1M_protein_help.json",
+			    "programName":"",
+			    "checker":"",
+			    "checked":true,
+			    "runCmd":"./std_bench/global_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_global_protein.txt -tc 1 && ./std_bench/global_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_global_protein.txt",
+                "runCmdRemark":["Single_core", "Multi_core"],
+                "time":167.4
+		    },
+            "pw_local_protein":{
+                "name":"pairwise local protein alignment",
+                "category":["Pairwise_Alignment", "Protein_Reads", "local_SW_Alignment"],
+                "categoryName":"Proteine local_NW",
+                "infoFile":"./Info/configInfo/pw_local_dna_1M_protein_help.json",
+                "programName":"",
+                "checker":"",
+                "checked":true,
+                "runCmd":"./std_bench/local_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_local_protein.txt -tc 1 && ./std_bench/local_alignment_protein ./std_bench/data/uniprot_800.fa std_bench/data/result_pw_local_protein.txt",
+                "runCmdRemark":["Single_core", "Multi_core"],
+                "time":225.4
+            },
+		    "genome-index":{
+                "name":"genome_index",
+	            "category":["Index","Rna_Reads"],
+                "categoryName":"Rna",
+	     		"infoFile":"./Info/configInfo/pw_global_dna_1M_protein_help.json",
+			    "programName":"",
+			    "checker":"",
+                "checked":true,
+                "runCmd":"./std_bench/index_search ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/chr1_gl000192.inx std_bench/data/result_index.txt -tc 1 && ./std_bench/index_search ./std_bench/data/chr1_sim_reads_2000.fa ./std_bench/data/chr1_gl000192.inx std_bench/data/result_index.txt",
+                "runCmdRemark":["Single_core", "Multi_core"],
+                "time":145.0
+            }  
+    }
+}

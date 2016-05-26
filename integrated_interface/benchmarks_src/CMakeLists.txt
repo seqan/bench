@@ -2,13 +2,17 @@
 # CMakeLists.txt file for benchmarks.
 # ===========================================================================
 
-cmake_minimum_required (VERSION 2.8.9)
+cmake_minimum_required (VERSION 3.0.0)
 project (seqan_apps_bench CXX)
 
 # require c++11
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CXX11_FOUND TRUE)
+if (CMAKE_VERSION GREATER 3.1.0)
+  set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CXX11_FOUND TRUE)
+else ()
+  set(CMAKE_CXX_FLAGS "-std=c++11")
+endif ()
 
 # ----------------------------------------------------------------------------
 # Dependencies
@@ -26,6 +30,9 @@ endif ()
 # ----------------------------------------------------------------------------
 # Build Setup
 # ----------------------------------------------------------------------------
+
+# Set Release mode
+set(CMAKE_BUILD_TYPE "Release")
 
 # Add include directories.
 include_directories (${SEQAN_INCLUDE_DIRS})

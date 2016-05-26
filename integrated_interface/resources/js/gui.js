@@ -270,8 +270,9 @@ function slugify(text) {
         return (Math.floor(time * 10000) / 10000)  + ' Sec';
     };
 
-    self.add_result = function(current_process){
+    self.add_result = function(current_process, benchmark_queue){
         const renderer = require('jsrender');
+        const result_table_id = benchmark_queue.result_table_id;
 
         const row_id = current_process.queue_id + 1;
         const benchmark_name = current_process.benchmark_name;
@@ -279,7 +280,7 @@ function slugify(text) {
         if(current_process.state === 'SUCCESS'){
             const result_success = renderer.templates('./resources/templates/results/result_success.html');
 
-            $('#result_table').append(result_success.render({
+            $('#' + result_table_id + '-body').append(result_success.render({
                 row_id: row_id,
                 benchmark_name: benchmark_name,
                 message: 'complete',
@@ -288,10 +289,10 @@ function slugify(text) {
             }));
         } else if (current_process.state === 'CANCELED') {
             const result_aborted = renderer.templates('./resources/templates/results/result_aborted.html');
-            $('#result_table').append(result_aborted.render());
+            $('#' + result_table_id + '-body').append(result_aborted.render());
         } else {
             const result_failure = renderer.templates('./resources/templates/results/result_failure.html');
-            $('#result_table').append(result_failure.render({
+            $('#' + result_table_id + '-body').append(result_failure.render({
                 row_id: row_id,
                 benchmark_name: benchmark_name,
                 message: current_process.error.message,
@@ -299,9 +300,6 @@ function slugify(text) {
             }));
         }
     };
-
-    // on a result
-    BenchmarkExecutor.on('result', self.add_result);
 
     self.reenable_run_btn = function(){
         $("#run-btn").prop("disabled", false);
@@ -320,13 +318,6 @@ function slugify(text) {
 
         BenchmarkExecutor.on('canceled', self.reenable_run_btn);
         BenchmarkExecutor.on('done', self.reenable_run_btn);
-
-        var date = new Date();
-
-        var result_start_run = renderer.templates('./resources/templates/results/result_start_run.html');
-        $('#result_table').append(result_start_run.render({
-            start_date: date.toISOString()
-        }));
 
         BenchmarkExecutor.run();
     };
@@ -348,15 +339,44 @@ function slugify(text) {
         }
     });
 
+    // benchmark starts
+    BenchmarkExecutor.on('initialize', function(benchmark_queue){
+        const result_table_id = "result-table-" + slugify(benchmark_queue.started_at.toISOString());
+        benchmark_queue.result_table_id = result_table_id;
+
+        var result_table = renderer.templates('./resources/templates/results/result_table.html');
+        $('#result_tables').append(result_table.render({
+            result_table_id: result_table_id
+        }));
+
+        var result_start_run = renderer.templates('./resources/templates/results/result_start_run.html');
+        $('#' + result_table_id + '-head').append(result_start_run.render({
+            result_table_id: result_table_id,
+            start_date: benchmark_queue.started_at.toISOString()
+        }));
+    });
+
     // add a summary of all executed benchmarks
     BenchmarkExecutor.on('done', function(benchmark_queue) {
         const renderer = require('jsrender');
+        const result_table_id = benchmark_queue.result_table_id;
+
+        $('#' + result_table_id + '-body').collapse('hide');
 
         var result_summary = renderer.templates('./resources/templates/results/result_summary.html');
-        $('#result_table').append(result_summary.render({
+        $('#' + result_table_id + '-foot').append(result_summary.render({
+            benchmarks_count: benchmark_queue.length,
             runtime: format_secs(benchmark_queue.total_runtime())
         }));
+
+        // prevent collapse if save buttons are clicked.
+        $('#' + result_table_id + '-save-btns').click(function (e) {
+            e.stopPropagation();
+        });
     });
+
+    // on a result
+    BenchmarkExecutor.on('result', self.add_result);
 
     // enable save results and save website buttons
     BenchmarkExecutor.on('done', function(benchmark_queue) {

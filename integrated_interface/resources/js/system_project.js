@@ -5,7 +5,7 @@
     } else if (typeof exports === 'object') {
         module.exports = factory();
     } else {
-        root.ProjectGui = factory();
+        root.SystemProjectGui = factory();
     }
 
 })(this, function() {
@@ -15,13 +15,17 @@
 
     var self = {};
 
-    self.show_project_infos = function() {
+    self.show_system_project_infos = function() {
         const renderer = require('jsrender');
         const project = Configure.project_infos();
+        const system = Configure.system_infos();
 
-        var template = renderer.templates("./resources/templates/project/informations.html");
-        var html = template.render(project);
-        $("#project-panel-body").html(html);
+        var template = renderer.templates("./resources/templates/project_system/informations.html");
+        var html = template.render({
+            project: project,
+            system: system
+        });
+        $("#system-project-panel-body").html(html);
     };
 
     self.on_save = function(new_title) {
@@ -73,7 +77,7 @@
 
     $(function() {
         // fill project informations section
-        self.show_project_infos();
+        self.show_system_project_infos();
         self.add_events();
     })
 

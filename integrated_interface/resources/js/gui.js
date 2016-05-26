@@ -37,15 +37,6 @@ function slugify(text) {
         .trigger('click');
     };
 
-    self.show_system_infos = function() {
-        const renderer = require('jsrender');
-        const system = Configure.system_infos();
-
-        var template = renderer.templates("./resources/templates/system/informations.html");
-        var html = template.render(system);
-        $("#system-panel-body").html(html);
-    };
-
     self.show_help = function() {
         try{
             var helpFile = Configure.load_app_help_file();
@@ -480,9 +471,6 @@ function slugify(text) {
     });
 
     $(function() {
-        // fill system informations section
-        self.show_system_infos();
-
         // fill help section
         self.show_help();
 

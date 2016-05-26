@@ -5,106 +5,91 @@
 
     "benchmarks": {
         "index_exact_search": {
-            "execute": false,
-            "name": "index_exact_search",
+            "execute": true,
             "command": "./benchmarks/index_exact_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa",
             "expected_runtime": 0.2,
             "repeats": 3
         },
         "index_one_error_approximate_search": {
             "execute": true,
-            "name": "index_one_error_approximate_search",
             "command": "./benchmarks/index_one_error_approximate_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa",
             "expected_runtime": 0.6,
             "repeats": 1
         },
         "index_two_errors_approximate_search": {
             "execute": true,
-            "name": "index_two_errors_approximate_search",
             "command": "./benchmarks/index_two_errors_approximate_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa",
             "expected_runtime": 2.3,
             "repeats": 1
         },
         "index_three_errors_approximate_search": {
             "execute": true,
-            "name": "index_three_errors_approximate_search",
             "command": "./benchmarks/index_three_errors_approximate_search ./data/indices/index_esa.inx ./data/chr1_sim_reads_2000.fa",
             "expected_runtime": 11.7,
             "repeats": 1
         },
         "kmers_10mer_counting": {
             "execute": true,
-            "name": "kmers_10mer_counting",
             "command": "./benchmarks/kmers_10mer_counting ./data/chr1_gl000192.fa",
             "expected_runtime": 1.0,
             "repeats": 1
         },
         "kmers_15mer_counting": {
             "execute": true,
-            "name": "kmers_15mer_counting",
             "command": "./benchmarks/kmers_15mer_counting ./data/chr1_gl000192.fa",
             "expected_runtime": 0.7,
             "repeats": 1
         },
         "kmers_50mer_counting": {
             "execute": true,
-            "name": "kmers_50mer_counting",
             "command": "./benchmarks/kmers_50mer_counting ./data/chr1_gl000192.fa",
             "expected_runtime": 1.7,
             "repeats": 1
         },
         "pairwise_alignment_global_affine_dna": {
             "execute": true,
-            "name": "pairwise_alignment_global_affine_dna",
             "command": "./benchmarks/pairwise_alignment_global_affine_dna ./data/chr1_sim_reads_100.fa",
             "expected_runtime": 3.1,
             "repeats": 1
         },
         "pairwise_alignment_global_affine_protein": {
             "execute": true,
-            "name": "pairwise_alignment_global_affine_protein",
             "command": "./benchmarks/pairwise_alignment_global_affine_protein ./data/chr1_sim_reads_100.fa",
             "expected_runtime": 3.1,
             "repeats": 1
         },
         "pairwise_alignment_global_linear_dna": {
             "execute": true,
-            "name": "pairwise_alignment_global_linear_dna",
             "command": "./benchmarks/pairwise_alignment_global_linear_dna ./data/chr1_sim_reads_100.fa",
             "expected_runtime": 2.5,
             "repeats": 1
         },
         "pairwise_alignment_global_linear_protein": {
             "execute": true,
-            "name": "pairwise_alignment_global_linear_protein",
             "command": "./benchmarks/pairwise_alignment_global_linear_protein ./data/chr1_sim_reads_100.fa",
             "expected_runtime": 2.7,
             "repeats": 1
         },
         "pairwise_alignment_local_affine_dna": {
             "execute": true,
-            "name": "pairwise_alignment_local_affine_dna",
             "command": "./benchmarks/pairwise_alignment_local_affine_dna ./data/chr1_sim_reads_100.fa",
             "expected_runtime": 3,
             "repeats": 1
         },
         "pairwise_alignment_local_affine_protein": {
             "execute": true,
-            "name": "pairwise_alignment_local_affine_protein",
             "command": "./benchmarks/pairwise_alignment_local_affine_protein ./data/chr1_sim_reads_100.fa",
             "expected_runtime": 3.1,
             "repeats": 1
         },
         "pairwise_alignment_local_linear_dna": {
             "execute": true,
-            "name": "pairwise_alignment_local_linear_dna",
             "command": "./benchmarks/pairwise_alignment_local_linear_dna ./data/chr1_sim_reads_100.fa",
             "expected_runtime": 2.8,
             "repeats": 1
         },
         "pairwise_alignment_local_linear_protein": {
             "execute": true,
-            "name": "pairwise_alignment_local_linear_protein",
             "command": "./benchmarks/pairwise_alignment_local_linear_protein ./data/chr1_sim_reads_100.fa",
             "expected_runtime": 2.7,
             "repeats": 1

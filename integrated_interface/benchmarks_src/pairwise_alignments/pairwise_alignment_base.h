@@ -76,8 +76,8 @@ inline int benchmark_pairwise_alignment_main(std::string infoText, TLambda compu
     resize(score, len*len);
 
     SEQAN_OMP_PRAGMA(parallel for firstprivate(align))
-    for (unsigned m = 0; m < len; m++)
-    for (unsigned n = m + 1; n < len; n++)
+    for (int m = 0; m < len; m++)
+    for (int n = m + 1; n < len; n++)
     {
         assignSource(row(align, 0), sequences[m]);
         assignSource(row(align, 1), sequences[n]);
@@ -87,8 +87,8 @@ inline int benchmark_pairwise_alignment_main(std::string infoText, TLambda compu
 
     //serial output score
     std::ofstream ofs(toCString(options.output), std::ofstream::out);
-    for (unsigned m = 0; m < len; m++)
-    for (unsigned n = m + 1; n < len; n++)
+    for (int m = 0; m < len; m++)
+    for (int n = m + 1; n < len; n++)
         ofs << m << ", " << n << ": " << score[m * len + n] << std::endl;
 
     return 0;

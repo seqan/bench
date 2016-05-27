@@ -25,6 +25,7 @@ function slugify(text) {
     const Exporter = require('./modules/exporter');
     const WebsiteGenerator = require('./modules/website_generator');
     const BenchmarkExecutor = require('./modules/benchmark_executor');
+    const ValidatorExecutor = require('./modules/validator_executor');
     var self = {};
 
     $.fn.save_as = function(on_save) {
@@ -423,6 +424,9 @@ function slugify(text) {
     // > the 'error' event, and an 'error' event is emitted, the error is
     // > thrown, a stack trace is printed, and the Node.js process exits.
     BenchmarkExecutor.on('error', function(error) {
+        console.error("error_handler: " + error.message);
+    });
+    ValidatorExecutor.on('error', function(error) {
         console.error("error_handler: " + error.message);
     });
 

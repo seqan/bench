@@ -11,13 +11,32 @@
 })(this, function() {
     "use strict";
 
+    // the benchmarks, config and validators are not bundled in the app and
+    // reside next to the app executable.
+    const execCwd = function() {
+        const path = require('path');
+        const fs = require('fs');
+        try {
+            const cwd_path = process.cwd();
+            fs.accessSync(cwd_path + '/benchmarks');
+            return cwd_path;
+        } catch (e) {
+        }
+        const macCwd = process.execPath.split('.app/Contents/', 2);
+        // the bundled version on mac has the following execPath:
+        // <execCwd>/seqan-bench-app.app/Contents/Versions/[...]/nwjs Helper.app/Contents/MacOS/nwjs Helper
+        // Thus, we split at the first .app/Contents/ point
+        return path.dirname(macCwd[0]);
+    }();
+
     var self = {
+        execCwd: execCwd,
         config: {
             files: {
                 app_config: "./resources/config/app_config.json",
                 app_help: "./resources/help/app/helpinfo.json",
                 benchmark_help: "./resources/help/benchmarks/%s.help.json",
-                benchmarks_config: "./config/config.json",
+                benchmarks_config: execCwd + "/config/config.json",
                 benchmarks_description: "./resources/config/descriptions.json",
                 validators: "./resources/config/validators.json"
             },

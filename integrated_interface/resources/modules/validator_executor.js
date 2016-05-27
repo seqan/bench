@@ -78,7 +78,10 @@
 
         var child_process;
         try {
-            var child_process = spawn(validator.cmd, validator.args, {detached: true});
+            var child_process = spawn(validator.cmd, validator.args, {
+                cwd: Configure.execCwd,
+                detached: true
+            });
         } catch(err){
             return error_handler({
                 message: err

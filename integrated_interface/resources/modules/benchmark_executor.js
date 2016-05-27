@@ -305,6 +305,7 @@
      * @param  int queue_id
      */
     self._runEach = function(queue_id){
+        const Configure = require('./configure');
         const path = require('path');
         const spawn = require('child_process').spawn;
         const benchmark_queue = self.benchmark_queue();
@@ -326,7 +327,10 @@
         var child_process;
         current_process.start_time = process.hrtime();
         try {
-            child_process = spawn(current_process.shell_command, current_process.shell_args, {detached: true});
+            child_process = spawn(current_process.shell_command, current_process.shell_args, {
+                cwd: Configure.execCwd,
+                detached: true
+            });
         } catch(err){
             return error_handler({
                 message: err

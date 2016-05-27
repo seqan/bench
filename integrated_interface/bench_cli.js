@@ -10,6 +10,7 @@ const os = require('os');
 
 const Configure = require('./resources/modules/configure');
 const BenchmarkExecutor = require('./resources/modules/benchmark_executor');
+const ValidatorExecutor = require('./resources/modules/validator_executor');
 const WebsiteGenerator = require('./resources/modules/website_generator');
 const Exporter = require('./resources/modules/exporter');
 const max_threads = os.cpus().length;
@@ -85,6 +86,10 @@ BenchmarkExecutor.on('setup', (benchmark_process, benchmark_queue) => {
 
 BenchmarkExecutor.on('error', (error, benchmark_process, benchmark_queue) => {
   console.warn("\terror: " + error.message);
+});
+
+ValidatorExecutor.on('error', (error) => {
+  console.warn("\terror (validator): " + error.message);
 });
 
 BenchmarkExecutor.on('result', (benchmark_process, benchmark_queue) => {

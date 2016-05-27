@@ -83,9 +83,11 @@
                 detached: true
             });
         } catch(err){
-            return error_handler({
+            error_handler({
                 message: err
             });
+            self.emit('result', validator);
+            return;
         }
 
         // handles child_process termination

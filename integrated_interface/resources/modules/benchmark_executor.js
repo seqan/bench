@@ -124,6 +124,8 @@
         repeats: 1,
 
         state: 'QUEUED',
+        stdout: "",
+        stderr: "",
         start_time: undefined,
         result_file: undefined,
 
@@ -298,6 +300,35 @@
         self.emit('error', error, current_process, benchmark_queue);
     };
 
+    self.onProcessTerminated = function(code) {
+        const benchmark_queue = self.benchmark_queue();
+        const current_process = benchmark_queue.current_process();
+        const runtime = process.hrtime(current_process.start_time);
+        const queue_id = current_process.queue_id;
+        current_process.runtime = to_secs(runtime);
+
+        if (current_process.state === 'QUEUED') {
+            current_process.state = 'SUCCESS';
+            if (code != 0) {
+                // this will set state = 'FAILURE'
+                error_handler({
+                    message: "non-zero exit status: " + code
+                });
+            }
+        }
+
+        ValidatorExecutor.once('result', (validator) => {
+            current_process.validator = validator;
+
+            // display successful/failed/aborted execution in the GUI
+            self.emit('result', current_process, benchmark_queue);
+
+            // execute next benchmark in the queue
+            self._runEach(queue_id+1);
+        });
+        ValidatorExecutor.validate(current_process);
+    };
+
     /**
      * This function executes every benchmark in the queue and does the error
      * handling.
@@ -332,36 +363,23 @@
                 detached: true
             });
         } catch(err){
-            return error_handler({
-                message: err
+            error_handler({
+               message: err
             });
+            self.onProcessTerminated(-1);
+            return
         }
         current_process.setPid(child_process.pid);
         self.emit('spawned', child_process, current_process, benchmark_queue);
 
         // handles process termination, i.e. this handler will be executed after
         // a benchmark process was closed or aborted.
-        child_process.on('close', function(code) {
-            var benchmark_queue = self.benchmark_queue();
-            var current_process = benchmark_queue.current_process();
-            var runtime = process.hrtime(current_process.start_time);
-            var queue_id = current_process.queue_id;
-            current_process.runtime = to_secs(runtime);
-
-            if (current_process.state === 'QUEUED') {
-                current_process.state = code == 0 ? 'SUCCESS' : "FAILURE";
-            }
-
-            ValidatorExecutor.once('result', (validator) => {
-                current_process.validator = validator;
-
-                // display successful/failed/aborted execution in the GUI
-                self.emit('result', current_process, benchmark_queue);
-
-                // execute next benchmark in the queue
-                self._runEach(queue_id+1);
-            });
-            ValidatorExecutor.validate(current_process);
+        child_process.on('close', self.onProcessTerminated);
+        child_process.stdout.on('data', (chunk) => {
+            current_process.stdout += chunk;
+        });
+        child_process.stderr.on('data', (chunk) => {
+            current_process.stderr += chunk;
         });
         child_process.stdout.on('error', error_handler);
         child_process.stderr.on('error', error_handler);
@@ -384,7 +402,10 @@
             process.kill("-" + current_process.getPid());
         } catch(err){
             console.error(err);
-            return err;
+            // first emit error event, after that emit cancel event
+            error_handler({
+                message: err
+            });
         }
 
         self.emit('canceled', current_process, benchmark_queue);

@@ -304,6 +304,8 @@ function slugify(text) {
                 row_id: row_id,
                 benchmark_name: benchmark_name,
                 message: current_process.error.message,
+                stdout: current_process.stdout,
+                stderr: current_process.stderr,
                 runtime: 'NULL'
             }));
         }

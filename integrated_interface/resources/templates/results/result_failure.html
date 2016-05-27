@@ -10,6 +10,18 @@
             <span class='glyphicon glyphicon-remove' style='color:#d9534f' aria-hidden='true'></span>
             {{:message}}
         </h6>
+{{if stdout}}
+<h5>stdout:</h5>
+<pre>
+{{>stdout}}
+</pre>
+{{/if}}
+{{if stderr}}
+<h5>stderr:</h5>
+<pre>
+{{>stderr}}
+</pre>
+{{/if}}
     </td>
     <td style='width:15%;'>
         <h6>{{:runtime}}</h6>

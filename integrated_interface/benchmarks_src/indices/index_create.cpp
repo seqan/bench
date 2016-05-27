@@ -65,26 +65,34 @@ int main(int argc, char **argv)
     readRecord(idGenome, genome, seqFileIn);
 
     // create sa index
+    std::cout << "Create Sa-Index" << std::endl;
     create_index<IndexSa<> >(genome, options.outputFile + "_sa.inx");
 
     // create esa index
+    std::cout << "Create Esa-Index" << std::endl;
     create_index<IndexEsa<> >(genome, options.outputFile + "_esa.inx");
 
     // create fm index
+    std::cout << "Create FM-Index" << std::endl;
     create_index<FMIndex<> >(genome, options.outputFile + "_fm.inx");
 
     // create wotd index
+    std::cout << "Create Wotd-Index" << std::endl;
     create_index<IndexWotd<> >(genome, options.outputFile + "_wotd.inx");
 
     // create dfi index
+    std::cout << "Create Wotd-dfi-Index" << std::endl;
     create_index<IndexWotd<Dfi<> > >(genome, options.outputFile + "_wotd_dfi.inx");
 
     // create 10gram index
-    create_index<IndexQGram<UngappedShape<10> > >(genome, options.outputFile + "_10gram.inx");
+    // std::cout << "Create 10gram-Index" << std::endl;
+    // create_index<IndexQGram<UngappedShape<10> > >(genome, options.outputFile + "_10gram.inx");
 
     // create 15gram index
-    create_index<IndexQGram<UngappedShape<15>, OpenAddressing> >(genome, options.outputFile + "_15gram.inx");
+    // std::cout << "Create 15gram-Index" << std::endl;
+    // create_index<IndexQGram<UngappedShape<15>, OpenAddressing> >(genome, options.outputFile + "_15gram.inx");
 
     // create 50gram index
+    std::cout << "Create 50gram-Index" << std::endl;
     create_index<IndexQGram<UngappedShape<50>, OpenAddressing > >(genome, options.outputFile + "_50gram.inx");
 }

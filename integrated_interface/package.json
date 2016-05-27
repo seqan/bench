@@ -14,6 +14,7 @@
   "private": true,
   "window": {
     "title": "Seqan Benchmark",
+    "icon": "./resources/icons/nw_256x256x32.png",
     "toolbar": false,
     "frame": false,
     "width": 770,

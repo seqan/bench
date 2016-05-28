@@ -126,6 +126,7 @@
         state: 'QUEUED',
         stdout: "",
         stderr: "",
+        exit_code: 0,
         start_time: undefined,
         result_file: undefined,
 
@@ -139,6 +140,11 @@
         },
         setPid: function(pid){
             this.pid = pid;
+        },
+        full_cmd: function() {
+            const shell_quote = require('shell-quote').quote;
+            const args = [this.shell_command].concat(this.shell_args);
+            return shell_quote(args);
         }
     };
 
@@ -306,6 +312,7 @@
         const runtime = process.hrtime(current_process.start_time);
         const queue_id = current_process.queue_id;
         current_process.runtime = to_secs(runtime);
+        current_process.exit_code = code;
 
         if (current_process.state === 'QUEUED') {
             current_process.state = 'SUCCESS';

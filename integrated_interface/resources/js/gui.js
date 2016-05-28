@@ -284,6 +284,7 @@ function slugify(text) {
 
         const row_id = current_process.queue_id + 1;
         const benchmark_name = current_process.benchmark_name;
+        const result_id = result_table_id + '-' + slugify(benchmark_name);
 
         if(current_process.state === 'SUCCESS'){
             const result_success = renderer.templates('./resources/templates/results/result_success.html');
@@ -292,7 +293,40 @@ function slugify(text) {
                 row_id: row_id,
                 benchmark_name: benchmark_name,
                 message: 'complete',
-                quality: current_process.validator.quality(),
+                validator: (function(validator) {
+                    const quality = validator.quality();
+                    const stdout = validator.stdout;
+                    const stderr = validator.stderr;
+                    const slug_id = slugify(validator.id);
+
+                    return {
+                        quality: quality,
+                        stdout_modal: {
+                            id: result_id+'-validator-'+slug_id+'-stdout',
+                            title: 'Validator: ' + benchmark_name,
+                            stdout: stdout,
+                            cmd: validator.full_cmd()
+                        },
+                        stderr_modal: {
+                            id: result_id+'-validator-'+slug_id+'-stderr',
+                            title: 'Validator: ' + benchmark_name,
+                            stderr: stderr,
+                            cmd: validator.full_cmd()
+                        }
+                    }
+                })(current_process.validator),
+                stdout_modal: {
+                    id: result_id + "-stdout",
+                    title: benchmark_name,
+                    stdout: current_process.stdout,
+                    cmd: current_process.full_cmd()
+                },
+                stderr_modal: {
+                    id: result_id + "-stderr",
+                    title: benchmark_name,
+                    stderr: current_process.stderr,
+                    cmd: current_process.full_cmd()
+                },
                 runtime: format_secs(current_process.runtime)
             }));
         } else if (current_process.state === 'CANCELED') {
@@ -302,10 +336,21 @@ function slugify(text) {
             const result_failure = renderer.templates('./resources/templates/results/result_failure.html');
             $('#' + result_table_id + '-body').append(result_failure.render({
                 row_id: row_id,
+                result_table_id: result_table_id,
                 benchmark_name: benchmark_name,
                 message: current_process.error.message,
-                stdout: current_process.stdout,
-                stderr: current_process.stderr,
+                stdout_modal: {
+                    id: result_id + "-stdout",
+                    title: benchmark_name,
+                    stdout: current_process.stdout,
+                    cmd: current_process.full_cmd()
+                },
+                stderr_modal: {
+                    id: result_id + "-stderr",
+                    title: benchmark_name,
+                    stderr: current_process.stderr,
+                    cmd: current_process.full_cmd()
+                },
                 runtime: 'NULL'
             }));
         }

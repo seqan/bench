@@ -66,6 +66,11 @@
 
             quality: function() {
                 return parseFloat(this.stdout);
+            },
+            full_cmd: function() {
+                const shell_quote = require('shell-quote').quote;
+                const args = [this.cmd].concat(this.args);
+                return shell_quote(args);
             }
         };
 

@@ -9,19 +9,10 @@
         <h6>
             <span class='glyphicon glyphicon-remove' style='color:#d9534f' aria-hidden='true'></span>
             {{:message}}
+
+            {{include tmpl='./resources/templates/widgets/stdout_modal.html'/}}
+            {{include tmpl='./resources/templates/widgets/stderr_modal.html'/}}
         </h6>
-{{if stdout}}
-<h5>stdout:</h5>
-<pre>
-{{>stdout}}
-</pre>
-{{/if}}
-{{if stderr}}
-<h5>stderr:</h5>
-<pre>
-{{>stderr}}
-</pre>
-{{/if}}
     </td>
     <td style='width:15%;'>
         <h6>{{:runtime}}</h6>

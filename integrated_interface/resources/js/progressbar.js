@@ -39,7 +39,10 @@
     self.start = function(benchmark_queue) {
         self.clear();
         self._initialize(benchmark_queue);
-        self.update_process(benchmark_queue.current_process());
+        if (benchmark_queue.length) {
+            // only update if at least one benchmark is available
+            self.update_process(benchmark_queue.current_process());
+        }
         NProgress.start();
 
         NProgress.configure({showSpinner: false, parent:'#progressbar'});

@@ -65,7 +65,8 @@
             stderr: "",
 
             quality: function() {
-                return parseFloat(this.stdout);
+                const quality = parseFloat(this.stdout);
+                return isNaN(quality) ? 0 : quality;
             },
             full_cmd: function() {
                 const shell_quote = require('shell-quote').quote;

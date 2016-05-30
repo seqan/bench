@@ -387,6 +387,24 @@ var updateBarScaling = function(tag)
     scaling_tag = tag;
 };
 
+var loadWebsite = function(data) {
+    $('#result-body2').empty(); // clear result page
+
+    informations = data["informations"]
+    results = data["results"];
+
+    // update global variables
+    if(!updateGlobalVariables(informations)) return;
+
+    updateSummary(results);
+    updateSystemInformation(informations);
+
+    for(category in results)
+    {
+        createCategory(results[category]);
+    }
+};
+
 // ==========================================================================
 // MAIN
 // ==========================================================================
@@ -394,22 +412,8 @@ $(function()
 {
     if(!json_file) return;
 
-    $('#result-body2').empty(); // clear result page
-
     $.getJSON(json_file, function(data)
     {
-        informations = data["informations"]
-        results = data["results"];
-
-        // update global variables
-        if(!updateGlobalVariables(informations)) return;
-
-        updateSummary(results);
-        updateSystemInformation(informations);
-
-        for(category in results)
-        {
-            createCategory(results[category]);
-        }
+        loadWebsite(data);
     });
 });

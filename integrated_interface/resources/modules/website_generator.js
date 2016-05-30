@@ -39,6 +39,11 @@
             }
 
             Exporter.save_results(website_path + "/benchmark_results.json", benchmark_queue);
+            Exporter.save_website_results_jsonp(
+                website_path + '/files/benchmark.jsonp',
+                benchmark_queue,
+                'loadWebsite'
+            );
             Exporter.save_website_results(website_path + '/files/benchmark.json', benchmark_queue);
             self.emit('done', website_path, benchmark_queue);
         });

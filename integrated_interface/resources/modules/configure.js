@@ -60,6 +60,13 @@
         return fs.writeFileSync(json_file, serialize, 'utf8');
     };
 
+    self.save_jsonp = function(json_file, json, callback_name) {
+        const fs = require('fs');
+        const serialize = JSON.stringify(json, null, 2);
+        const jsonp = callback_name + "("+ serialize +");"
+        return fs.writeFileSync(json_file, jsonp, 'utf8');
+    };
+
     self.load_app = function(filepath) {
         try{
             self.config.app = self.load_json(filepath);

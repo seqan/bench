@@ -184,8 +184,11 @@
         return results;
     };
 
-    self.website_results = function(benchmark_queue) {
-        var results = self.results(benchmark_queue);
+    /**
+     * @param  {Object} results returned from Exporter.results(benchmark_queue)
+     * @return {Object}         results in website format
+     */
+    self.website_results = function(results) {
         results = self.reduce_repeat_measures(results);
         results = self.calculate_scores(results);
         results = self.deep_array_map(results);
@@ -194,8 +197,15 @@
     };
 
     self.save_website_results = function(path, benchmark_queue) {
-        const results = self.website_results(benchmark_queue);
-        Configure.save_json(path, results);
+        const results = self.results(benchmark_queue);
+        const website_results = self.website_results(results);
+        Configure.save_json(path, website_results);
+    };
+
+    self.save_website_results_jsonp = function(path, benchmark_queue, callback_name) {
+        const results = self.results(benchmark_queue);
+        const website_results = self.website_results(results);
+        Configure.save_jsonp(path, website_results, callback_name);
     };
 
     self.save_results = function(path, benchmark_queue) {

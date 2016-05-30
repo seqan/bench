@@ -389,7 +389,7 @@ function slugify(text) {
         }
 
         if (confirm("View the website?")) {
-            const file = 'file://' + website_path + '/benchmark.html';
+            const file = 'file://' + website_path + '/index.html';
             nw.Shell.openExternal( file );
         }
     }));

@@ -1,0 +1,62 @@
+<div id="data-download" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Download and setup benchmark data.</h4>
+      </div>
+      <div class="modal-body">
+
+        <div id='data-download-download' class="media">
+          <div class="media-left">
+            <span class="glyphicon glyphicon-minus"></span>
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading alert-info">
+              Download data.tar.gz
+              <span class="pull-right">
+                <span id='data-download-speed'></span>
+              </span>
+            </h4>
+            <div class="progress progress-striped active">
+                <div class="progress-bar"></div>
+            </div>
+            <span id='data-download-rem-time' class="pull-right"></span>
+          </div>
+        </div>
+
+        <div id='data-download-extract' class="media">
+          <div class="media-left">
+            <span class="glyphicon glyphicon-minus"></span>
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">
+              Extract data.tar.gz
+            </h4>
+          </div>
+        </div>
+
+        <div id='data-download-preprocess' class="media">
+          <div class="media-left">
+            <span class="glyphicon glyphicon-minus"></span>
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">
+              Preprocess data
+            </h4>
+            <div id='data-download-stdout' style="display:none;">
+              <h3><small>stdout:</small></h3>
+              <pre class='pre-scrollable'></pre>
+            </div>
+            <div id='data-download-stderr' style="display:none;">
+              <h3><small>stderr:</small></h3>
+              <pre class='pre-scrollable'></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id='data-download-close-btn' type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

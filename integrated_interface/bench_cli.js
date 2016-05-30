@@ -12,6 +12,7 @@ const Configure = require('./resources/modules/configure');
 const BenchmarkExecutor = require('./resources/modules/benchmark_executor');
 const ValidatorExecutor = require('./resources/modules/validator_executor');
 const WebsiteGenerator = require('./resources/modules/website_generator');
+const DataDownloader = require('./resources/modules/data_downloader');
 const Exporter = require('./resources/modules/exporter');
 const max_threads = os.cpus().length;
 
@@ -116,4 +117,20 @@ BenchmarkExecutor.on('done', (benchmark_queue) => {
   }
 });
 
-BenchmarkExecutor.run();
+DataDownloader.on('done', () => {
+  BenchmarkExecutor.run();
+}).on('initialize', () => {
+  console.log('download data.tar.gz');
+}).on('downloaded', () => {
+  console.log('data.tar.gz downloaded');
+}).on('extracted', () => {
+  console.log('data.tar.gz extracted');
+}).on('index_created', () => {
+  console.log('data/indices/ rebuild');
+}).on('stdout', (chunk) => {
+  console.log("stdout", "" + chunk);
+}).on('stderr', (chunk) => {
+  console.log("stderr", "" + chunk);
+}).on('error', (error) => {
+  console.error(error);
+}).rebuild();

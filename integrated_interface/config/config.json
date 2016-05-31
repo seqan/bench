@@ -7,91 +7,91 @@
         "index_exact_search": {
             "execute": true,
             "command": "./benchmarks/index_exact_search ./data/indices/genome.index_esa.inx ./data/genome.index.reads.length.50.fa",
-            "expected_runtime": 0.2,
+            "expected_runtime": 10.64,
             "repeats": 3
         },
         "index_one_error_approximate_search": {
             "execute": true,
             "command": "./benchmarks/index_one_error_approximate_search ./data/indices/genome.index_esa.inx ./data/genome.index.reads.length.50.fa",
-            "expected_runtime": 0.6,
+            "expected_runtime": 191.13,
             "repeats": 1
         },
         "index_two_errors_approximate_search": {
             "execute": true,
             "command": "./benchmarks/index_two_errors_approximate_search ./data/indices/genome.index_esa.inx ./data/genome.index.fewer.reads.length.50.fa",
-            "expected_runtime": 2.3,
+            "expected_runtime": 123.97,
             "repeats": 1
         },
         "index_three_errors_approximate_search": {
             "execute": true,
             "command": "./benchmarks/index_three_errors_approximate_search ./data/indices/genome.index_esa.inx ./data/genome.index.fewer.reads.length.50.fa",
-            "expected_runtime": 11.7,
+            "expected_runtime": 270.66,
             "repeats": 1
         },
         "kmers_10mer_counting": {
             "execute": true,
             "command": "./benchmarks/kmers_10mer_counting ./data/genome.fa",
-            "expected_runtime": 1.0,
+            "expected_runtime": 43.94,
             "repeats": 1
         },
         "kmers_15mer_counting": {
             "execute": true,
             "command": "./benchmarks/kmers_15mer_counting ./data/genome.fa",
-            "expected_runtime": 0.7,
+            "expected_runtime": 205.13,
             "repeats": 1
         },
         "kmers_50mer_counting": {
             "execute": true,
             "command": "./benchmarks/kmers_50mer_counting ./data/genome.fa",
-            "expected_runtime": 1.7,
+            "expected_runtime": 250.06,
             "repeats": 1
         },
         "pairwise_alignment_global_affine_dna": {
             "execute": true,
             "command": "./benchmarks/pairwise_alignment_global_affine_dna ./data/genome.pairwise_alignment.reads.length.100.fa",
-            "expected_runtime": 3.1,
+            "expected_runtime": 245.53,
             "repeats": 1
         },
         "pairwise_alignment_global_affine_protein": {
             "execute": true,
             "command": "./benchmarks/pairwise_alignment_global_affine_protein ./data/genome.pairwise_alignment.reads.length.100.fa",
-            "expected_runtime": 3.1,
+            "expected_runtime": 272.87,
             "repeats": 1
         },
         "pairwise_alignment_global_linear_dna": {
             "execute": true,
             "command": "./benchmarks/pairwise_alignment_global_linear_dna ./data/genome.pairwise_alignment.reads.length.100.fa",
-            "expected_runtime": 2.5,
+            "expected_runtime": 181.35,
             "repeats": 1
         },
         "pairwise_alignment_global_linear_protein": {
             "execute": true,
             "command": "./benchmarks/pairwise_alignment_global_linear_protein ./data/genome.pairwise_alignment.reads.length.100.fa",
-            "expected_runtime": 2.7,
+            "expected_runtime": 186.74,
             "repeats": 1
         },
         "pairwise_alignment_local_affine_dna": {
             "execute": true,
             "command": "./benchmarks/pairwise_alignment_local_affine_dna ./data/genome.pairwise_alignment.reads.length.100.fa",
-            "expected_runtime": 3,
+            "expected_runtime": 311.95,
             "repeats": 1
         },
         "pairwise_alignment_local_affine_protein": {
             "execute": true,
             "command": "./benchmarks/pairwise_alignment_local_affine_protein ./data/genome.pairwise_alignment.reads.length.100.fa",
-            "expected_runtime": 3.1,
+            "expected_runtime": 332.14,
             "repeats": 1
         },
         "pairwise_alignment_local_linear_dna": {
             "execute": true,
             "command": "./benchmarks/pairwise_alignment_local_linear_dna ./data/genome.pairwise_alignment.reads.length.100.fa",
-            "expected_runtime": 2.8,
+            "expected_runtime": 232.04,
             "repeats": 1
         },
         "pairwise_alignment_local_linear_protein": {
             "execute": true,
             "command": "./benchmarks/pairwise_alignment_local_linear_protein ./data/genome.pairwise_alignment.reads.length.100.fa",
-            "expected_runtime": 2.7,
+            "expected_runtime": 212.04,
             "repeats": 1
         }
     }

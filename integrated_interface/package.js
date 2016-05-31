@@ -159,17 +159,20 @@ const modifyPackagedExecutables = function () {
 };
 
 const modifyConfigExecutables = function () {
-  if (!isWin) return;
 
   // add [.exe] suffix on windows in config/config.json
   const config_json = buildDir + "/config/config.json";
   const config = Configure.load_json(config_json);
-  for (const id in config['benchmarks']) {
-    const benchmark = config['benchmarks'][id];
-    const cmd_args = shell_parse(benchmark['command']);
-    cmd_args[0] = toExe(cmd_args[0]);
-    benchmark['command'] = shell_quote(cmd_args);
+
+  if (isWin) {
+    for (const id in config['benchmarks']) {
+      const benchmark = config['benchmarks'][id];
+      const cmd_args = shell_parse(benchmark['command']);
+      cmd_args[0] = toExe(cmd_args[0]);
+      benchmark['command'] = shell_quote(cmd_args);
+    }
   }
+
   // add platform information, e.g. seqan-2.1-win if it's a windows build
   config['project']['title'] += '-' + buildPlatform;
   Configure.save_json(config_json, config);

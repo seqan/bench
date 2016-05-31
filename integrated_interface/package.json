@@ -30,6 +30,7 @@
     "isobject": "^2.1.0",
     "jsrender": "^0.9.75",
     "ncp": "^2.0.0",
+    "pretty-seconds": "^0.1.4",
     "prettysize": "0.0.3",
     "request": "^2.72.0",
     "request-progress": "^2.0.1",

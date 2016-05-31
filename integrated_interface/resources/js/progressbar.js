@@ -13,6 +13,7 @@
 
     const BenchmarkExecutor = require('./modules/benchmark_executor');
     const ValidatorExecutor = require('./modules/validator_executor');
+    const prettySeconds = require('pretty-seconds');
     var self = {};
 
     const _percent_max = 1;
@@ -72,19 +73,30 @@
         self.clear();
     };
 
+    self._remaining_seconds = function() {
+        var elapsedSeconds = _progress_percent * _total_expected_time;
+        return Math.floor(_total_expected_time - elapsedSeconds);
+    }
+
     self._show_progress = function() {
         timeout_id = setTimeout(function(){
+            const _deltaSeconds = (_delta_time / 1000);
             if(_progress_percent < _progress_percent_max){
-                const delta = _progress_percent + _delta_time / _total_expected_time / 1000;
+                const delta = _progress_percent + _deltaSeconds / _total_expected_time;
                 _progress_percent = Math.min(delta, _progress_percent_max)
                 NProgress.set(_progress_percent);
             }
 
             var benchmark_name = _current_benchmark_name;
-            var progress_percent = Math.floor(_progress_percent * 100 * 10) / 10;
-            var progress_percent_max = Math.floor(_progress_percent_max * 100 * 10)/10;
-            var dots = _dots_str[Math.floor((_k++ * _delta_time / 1000)) % _dots_str.length];
-            $('#progressbar_text').html("<p><h6 style='color: #428bca '><b> running " + benchmark_name + " " + progress_percent + "% / " + progress_percent_max + "% " + dots + "</b></h6></p>" );
+            var progress_percent = Math.floor(_progress_percent * 100 * 100) / 100;
+            var progress_percent_max = Math.floor(_progress_percent_max * 100 * 100) / 100;
+            var dots = _dots_str[Math.floor((_k++ * _deltaSeconds)) % _dots_str.length];
+            var remaining_seconds = self._remaining_seconds();
+
+            var html = "<p><h6 style='color: #428bca'><b> running " + benchmark_name + " " + progress_percent + "% / " + progress_percent_max + "% " + dots + "</b>";
+            html += "<div class='pull-right'>" + prettySeconds(remaining_seconds) + "</div>";
+            html += "</h6></p>";
+            $('#progressbar_text').html(html);
             self._show_progress();
         }, _delta_time);
     };

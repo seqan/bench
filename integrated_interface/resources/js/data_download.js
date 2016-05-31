@@ -36,7 +36,10 @@
 
     DataDownloader.on('initialize', () => {
         $('#data-download-close-btn').hide();
-        $('#data-download').modal().show();
+        $('#data-download').modal({
+            backdrop: 'static',
+            keyboard: false
+        }).show();
     }).on('progress', (state) => {
         const pretty = require('prettysize');
         total_size = state.size.total;

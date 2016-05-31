@@ -43,21 +43,24 @@
 
         $('#data-download .progress-bar').css({
             width: (state.percentage*100) + "%"
-        }).html(
+        });
+        $('#data-download .progress-bar span').html(
             pretty(state.size.transferred) + ' / ' + pretty(state.size.total)
         );
         $('#data-download-speed').html(pretty(state.speed) + '/s');
-        $('#data-download-rem-time').html('~' + state.time.remaining + 's');
+        $('#data-download-rem-time').html(state.time.remaining + 's');
     }).on('downloaded', () => {
         const pretty = require('prettysize');
         progressStyle('#data-download-download', '#data-download-extract');
 
         $('#data-download .progress-bar')
-        .css({width: (100) + "%"})
-        .html(
+            .css({width: (100) + "%"})
+            .parent()
+            .removeClass('active');
+
+        $('#data-download .progress-bar span').html(
             pretty(total_size) + ' / ' + pretty(total_size)
-        ).parent()
-        .removeClass('active');
+        );
 
         $('#data-download-speed').html('');
         $('#data-download-rem-time').html('');

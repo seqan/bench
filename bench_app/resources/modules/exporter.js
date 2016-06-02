@@ -13,17 +13,18 @@
 
     const Configure = require('./configure');
     const is_object = require('isobject');
+    const extend = require('extend');
     var self = {};
 
     self.results = function(benchmark_queue) {
-        var benchmark_results = {
+        var benchmark_results = extend(true, {}, {
             informations: {
                 system: benchmark_queue.system,
                 project: benchmark_queue.project
             },
             results: {
             }
-        };
+        });
 
         // prepare benchmark_results.results
         for(const benchmark of benchmark_queue) {

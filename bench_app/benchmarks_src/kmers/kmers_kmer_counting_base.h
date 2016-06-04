@@ -57,7 +57,7 @@ inline void kmer_counting (TIndex & index, TString & genome, TOutputStream & cou
 {
     unsigned i = 0;
     auto it = begin(genome);
-    auto itEnd = end(genome);
+    auto itEnd = end(genome) - kmerLength + 1;
     for(; it != itEnd; ++it)
     {
         hash(indexShape(index), it);

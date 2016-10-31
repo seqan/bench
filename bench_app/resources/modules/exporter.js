@@ -16,7 +16,27 @@
     const extend = require('extend');
     var self = {};
 
-    self.results = function(benchmark_queue) {
+    self.is_benchmark_queue = function(benchmark_queue_or_results) {
+        return !!benchmark_queue_or_results.current_process;
+    };
+
+    self.is_result = function(benchmark_queue_or_results) {
+        return !self.is_benchmark_queue(benchmark_queue_or_results) &&
+                !self.is_website_result(benchmark_queue_or_results);
+    }
+
+    self.is_website_result = function(result_or_website_result) {
+        return !self.is_benchmark_queue(result_or_website_result) &&
+                Array.isArray(result_or_website_result.informations.system.threads)
+    };
+
+    self.results = function(benchmark_queue_or_results) {
+        // return results, if `benchmark_queue` is no BenchmarkQueue
+        if (!self.is_benchmark_queue(benchmark_queue_or_results)) {
+            return benchmark_queue_or_results;
+        }
+
+        const benchmark_queue = benchmark_queue_or_results;
         var benchmark_results = extend(true, {}, {
             informations: {
                 system: benchmark_queue.system,
@@ -190,27 +210,76 @@
      * @return {Object}         results in website format
      */
     self.website_results = function(results) {
+        if (self.is_website_result(results)) {
+            return results;
+        }
+
         results = self.reduce_repeat_measures(results);
         results = self.calculate_scores(results);
         results = self.deep_array_map(results);
         results = self.categorize_results(results);
-        return results;
+
+        // deep copy results
+        const extend = require('extend');
+        return extend(true, {}, results);
+    };
+
+    self._merge_two_website_results = function(result1, result2) {
+        if (Array.isArray(result1)) {
+            return result1.concat(result2);
+        }
+
+        if (!is_object(result1)) {
+            console.assert(result1 == result2, {
+                'message': "This field should be some basic information like title, subtitle, base_time or category which is the same for both results",
+                'arg1': result1,
+                'arg2': result2
+            });
+            return result1;
+        }
+
+        var result = {};
+        Object.keys(result1).map(function(key) {
+           result[key] = self._merge_two_website_results(result1[key], result2[key]);
+        });
+        return result;
+    };
+
+    /**
+     * @param  [{Object}] results An array of results returned by Exporter.results(benchmark_queue).
+     * @return {Object}           results in website format
+     */
+    self.merge_website_results = function(results) {
+        var rest =  results.reduce(function(previous, current) {
+            // merge two arrays
+            return self._merge_two_website_results(previous, current);
+        });
+        return rest;
     };
 
     self.save_website_results = function(path, benchmark_queue) {
         const results = self.results(benchmark_queue);
         const website_results = self.website_results(results);
+        if (!self.is_website_result(website_results)) {
+            console.error("save_website_results: given results are not in the expected output format.");
+        }
         Configure.save_json(path, website_results);
     };
 
     self.save_website_results_jsonp = function(path, benchmark_queue, callback_name) {
         const results = self.results(benchmark_queue);
         const website_results = self.website_results(results);
+        if (!self.is_website_result(website_results)) {
+            console.error("save_website_results_jsonp: given results are not in the expected output format.");
+        }
         Configure.save_jsonp(path, website_results, callback_name);
     };
 
     self.save_results = function(path, benchmark_queue) {
         const results = self.results(benchmark_queue);
+        if (!self.is_result(results)) {
+            console.error("save_results: given results are not in the expected output format.");
+        }
         Configure.save_json(path, results);
     };
 

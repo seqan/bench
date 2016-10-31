@@ -55,6 +55,9 @@ const argv = yargs
       default: 'results-' + strftime("%Y%m%d-%H%M%S", started_at) + '.json',
       normalize: true
     })
+    .array('merge')
+    .describe('merge', 'Merge results given by `./bench_cli --output result(1..5).json`.\n' +
+    'Usage: `./bench_cli --merge result1.json [result2.json..] --output merged_result.json --html merged_website`')
     .option('html', {
       describe: 'Generate static website to HTML, that shows the results.',
       normalize: true
@@ -63,12 +66,39 @@ const argv = yargs
     .alias('h', 'help')
     .argv;
 
-console.log("load benchmarks: " + argv['config']);
-console.log();
-
 Configure.init({
   benchmarks: argv['config']
 });
+
+if (argv["merge"])
+{
+  var merges = argv["merge"];
+  console.log("merge benchmarks: " + merges);
+  console.log();
+
+  merges = merges.map((file) => {
+    const results = Configure.load_json(file);
+    const website_results = Exporter.website_results(results);
+    return website_results;
+  });
+  const merged_results = Exporter.merge_website_results(merges);
+
+  console.log("write merged results to: " + argv['output']);
+  Configure.save_json(argv['output'], merged_results);
+
+  if (argv['html']) {
+    if (argv['html'] === true) {
+      argv['html'] = 'merged-benchmark-' + strftime("%Y%m%d-%H%M%S", started_at);
+    }
+    console.log("write website to: " + argv['html']);
+    WebsiteGenerator.generate(merged_results, argv['html']);
+  }
+
+  return;
+}
+
+console.log("load benchmarks: " + argv['config']);
+console.log();
 
 Configure.system_infos({
   threads: argv['threads']

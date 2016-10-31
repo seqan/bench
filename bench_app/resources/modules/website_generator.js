@@ -28,7 +28,7 @@
 
     var self = new EventEmitter();
 
-    self.generate = function(benchmark_queue, website_path) {
+    self.generate = function(benchmark_queue_or_results, website_path) {
         const ncp = require('ncp');
 
         // copy website template to the given path
@@ -38,14 +38,18 @@
                 self.emit('error', err);
             }
 
-            Exporter.save_results(website_path + "/benchmark_results.json", benchmark_queue);
+            // save raw results, if we have it.
+            if (!Exporter.is_website_result(benchmark_queue_or_results)) {
+                Exporter.save_results(website_path + "/benchmark_results.json", benchmark_queue_or_results);
+            }
+
             Exporter.save_website_results_jsonp(
                 website_path + '/files/benchmark.jsonp',
-                benchmark_queue,
+                benchmark_queue_or_results,
                 'loadWebsite'
             );
-            Exporter.save_website_results(website_path + '/files/benchmark.json', benchmark_queue);
-            self.emit('done', website_path, benchmark_queue);
+            Exporter.save_website_results(website_path + '/files/benchmark.json', benchmark_queue_or_results);
+            self.emit('done', website_path, benchmark_queue_or_results);
         });
     }
 

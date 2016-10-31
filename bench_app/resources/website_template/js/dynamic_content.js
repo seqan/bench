@@ -15,7 +15,7 @@ var comparison_count = 0;
 var summary_class = "";
 
 // the colors to be used for the different input files. The number of colors will restrict the number of possible files to compare.
-var colors = ["#56A5EC", "#E2A76F", "#438D80"];
+var colors = ["#56A5EC", "#E2A76F", "#438D80", "#6f5499"];
 
 // the current scaling option. default is set to subcat.
 var scaling_tag = "subcat"

@@ -7,11 +7,11 @@ project (seqan_apps_bench CXX)
 
 # require c++11
 if (CMAKE_VERSION GREATER 3.1.0)
-  set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD 14)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
   set(CXX11_FOUND TRUE)
 else ()
-  set(CMAKE_CXX_FLAGS "-std=c++11")
+  set(CMAKE_CXX_FLAGS "-std=c++14")
 endif ()
 
 # ----------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 "use strict";
 
 const Promise = require('promise');
@@ -124,6 +125,7 @@ const preparePackagingBenchApp = function () {
   // prepare building nwjs binaries
   fs.mkdirsSync('./build/src');
   fs.emptyDirSync('./build/src/');
+  fs.copySync('./bench_cli.js', './build/src/bench_cli.js')
   fs.copySync('./package.json', './build/src/package.json');
   fs.copySync('./resources', './build/src/resources');
 
@@ -160,10 +162,10 @@ const modifyPackagedExecutables = function () {
 
 const modifyConfigExecutables = function () {
 
-  // add [.exe] suffix on windows in config/config.json
   const config_json = buildDir + "/config/config.json";
   const config = Configure.load_json(config_json);
 
+  // add [.exe] suffix on windows in config/config.json
   if (isWin) {
     for (const id in config['benchmarks']) {
       const benchmark = config['benchmarks'][id];
@@ -183,6 +185,8 @@ const packageBenchApp = function() {
     nwbuild('./build/src', {
         version: nwVersion,
         platforms: platform,
+        sideBySide: true, // don't package all `resources/` files into the
+                          // executable.
         outputDir: './build/',
         macIcns: './resources/icons/nw.icns',
         winIco: './resources/icons/nw.ico'

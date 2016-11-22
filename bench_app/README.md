@@ -106,7 +106,7 @@ Building from source
 ### Requirements
 
 -   [cmake](https://cmake.org) (≥ 3.0),
--   [Node.js](https://nodejs.org/) (≥ 14.5),
+-   [Node.js](https://nodejs.org/) (≥ 4.2),
     -   `npm install` in the source directory will install all required
         `node_modules`.
 -   [python](https://nodejs.org/) (both python ≥ 2.7 and python ≥ 3.4 work),

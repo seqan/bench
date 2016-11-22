@@ -349,6 +349,7 @@ The benchmark must also be added to `resources/config/descriptions.json`.
             "category": "pairwise_alignment"
         }
     }
+}
 ```
 
 If you created a new category (i.e. created a new subfolder in
@@ -483,7 +484,7 @@ For questions or comments, feel free to contact:
 
 -   [Chenxu Pan](
     http://www.mi.fu-berlin.de/en/inf/groups/abi/members/Scientific_Staff/pan.html)
-    &lt;<chenxu.pan@fu-berlin.de>&gt;
+    &lt;<chenxu.pan[ät]fu-berlin.de>&gt;
 -   [Marcel Ehrhardt](
     http://www.mi.fu-berlin.de/en/inf/groups/abi/members/Scientific_Staff/ehrhardt.html)
 -   [Svenja Mehringer](

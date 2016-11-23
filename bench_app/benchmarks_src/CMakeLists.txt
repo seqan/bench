@@ -5,14 +5,24 @@
 cmake_minimum_required (VERSION 3.0.0)
 project (seqan_apps_bench CXX)
 
-# require c++11
+# require c++14
 if (CMAKE_VERSION GREATER 3.1.0)
   set(CMAKE_CXX_STANDARD 14)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
   set(CXX11_FOUND TRUE)
 else ()
-  set(CMAKE_CXX_FLAGS "-std=c++14")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 endif ()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W2")
+endif ()
+
+if (MSVC)
+  add_definitions (-bigobj)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
+
 
 # ----------------------------------------------------------------------------
 # Dependencies

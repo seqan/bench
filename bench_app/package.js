@@ -14,12 +14,18 @@ const shell_quote = require('shell-quote').quote;
 const spawnSync = require('child_process').spawnSync;
 const execSync = require('child_process').execSync;
 const targz = require('tar.gz');
+const packageJson = Configure.load_json("package.json");
+
+const buildConfig = {
+  'app_version': packageJson['version'],
+  'app_data_url': packageJson['seqan-bench-app']['data-url'],
+  'seqan_src_version': packageJson['seqan-bench-app']['seqan-src-version'],
+  'nwjs_version': packageJson['seqan-bench-app']['nwjs-version']
+};
 
 const isWin = /^win/.test(process.platform);
 const isMac = /^darwin/.test(process.platform);
 const isLinux = /^linux/.test(process.platform);
-
-const nwVersion = '0.14.7-sdk';
 
 if (!isWin && !isMac && !isLinux) {
   console.warn("platform: " + process.platform + " unsupported.");
@@ -48,7 +54,7 @@ if (isLinux || isMac) {
 }
 
 const buildPlatform = isWin ? 'win' : (isMac ? 'osx' : 'linux');
-const buildName = 'seqan-bench-app-'+buildPlatform+'-x64';
+const buildName = 'seqan-bench-app-'+buildPlatform+'-'+buildConfig.app_version+'-x64';
 const buildDir = './build/' + buildName + '/';
 const platform = buildPlatform + '64';
 
@@ -60,6 +66,12 @@ const cloneSeqan = function() {
   // clone seqan repository
   try {
     fs.accessSync('./build/seqan', fs.F_OK);
+
+    // if already cloned, do an update
+    execSync('git fetch origin', {
+      cwd: './build/seqan',
+      stdio: 'inherit'
+    });
   } catch (e) {
     execSync('git clone https://github.com/seqan/seqan.git', {
       cwd: './build/',
@@ -67,6 +79,13 @@ const cloneSeqan = function() {
     });
   }
 };
+
+const checkoutSeqanVersion = function() {
+  execSync('git checkout ' + buildConfig.seqan_src_version, {
+    cwd: './build/seqan',
+    stdio: 'inherit'
+  });
+}
 
 const compileBenchmarks = function() {
   // generate makefiles for benchmarks
@@ -130,6 +149,7 @@ const preparePackagingBenchApp = function () {
   fs.copySync('./resources', './build/src/resources');
 
   modifyPackagedExecutables();
+  modifyPackagedAppConfig();
 
   // install only needed node_modules
   execSync('npm install --production', {
@@ -160,8 +180,21 @@ const modifyPackagedExecutables = function () {
   Configure.save_json(validators_json, validators);
 };
 
-const modifyConfigExecutables = function () {
+const modifyPackagedAppConfig = function() {
+  // update values in resources/config/app_config.json
+  const app_config_json = "./build/src/resources/config/app_config.json";
+  const app_config = Configure.load_json(app_config_json);
 
+  // add app version, seqan src version and the data-url
+  app_config['version'] = buildConfig.app_version;
+  app_config['dataUrl'] = buildConfig.app_data_url;
+  app_config['seqan_src_version'] = buildConfig.seqan_src_version;
+
+  Configure.save_json(app_config_json, app_config);
+};
+
+const modifyConfigExecutables = function () {
+  // update values in config/config.json
   const config_json = buildDir + "/config/config.json";
   const config = Configure.load_json(config_json);
 
@@ -176,17 +209,18 @@ const modifyConfigExecutables = function () {
   }
 
   // add platform information, e.g. seqan-2.1-win if it's a windows build
-  config['project']['title'] += '-' + buildPlatform;
+  config['project']['title'] = buildConfig.seqan_src_version + '-' + buildPlatform;
   Configure.save_json(config_json, config);
 };
 
 const packageBenchApp = function() {
   return new Promise(function(fulfill, reject) {
     nwbuild('./build/src', {
-        version: nwVersion,
+        version: buildConfig.nwjs_version,
         platforms: platform,
         sideBySide: true, // don't package all `resources/` files into the
                           // executable.
+        outputName: buildName,
         outputDir: './build/',
         macIcns: './resources/icons/nw.icns',
         winIco: './resources/icons/nw.ico'
@@ -226,6 +260,7 @@ const compressBenchApp = function() {
 
 Promise.resolve()
   .then(cloneSeqan)
+  .then(checkoutSeqanVersion)
   .then(compileBenchmarks)
   .then(compileValidators)
   .then(preparePackagingBenchApp)

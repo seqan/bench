@@ -93,8 +93,17 @@
     };
 
     self.load_app_help_file = function() {
+        const renderer = require('jsrender');
+
         const file = self.config.files.app_help;
-        return self.load_json(file);
+        const json = self.load_json(file);
+
+        var template = renderer.templates(json.footer);
+        json.footer = template.render({
+            seqan_src_version: self.app().seqan_src_version,
+            seqan_bench_app_version: self.app().version
+        });
+        return json;
     };
 
     self.load_benchmark_help_file = function(benchmark_id) {

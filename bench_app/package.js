@@ -208,6 +208,13 @@ const modifyConfigExecutables = function () {
     }
   }
 
+  // copy over expected_runtime from initially measured base_time
+  const descriptions = Configure.load_json("./build/src/resources/config/descriptions.json");
+  for (const id in config['benchmarks']) {
+    const benchmark = config['benchmarks'][id];
+    benchmark['expected_runtime'] = descriptions['benchmarks'][id]['base_time'];
+  }
+
   // add platform information, e.g. seqan-2.1-win if it's a windows build
   config['project']['title'] = buildConfig.seqan_src_version + '-' + buildPlatform;
   Configure.save_json(config_json, config);

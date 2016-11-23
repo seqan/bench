@@ -19,7 +19,7 @@ const isWin = /^win/.test(process.platform);
 const isMac = /^darwin/.test(process.platform);
 const isLinux = /^linux/.test(process.platform);
 
-const nwVersion = '0.14.5-sdk';
+const nwVersion = '0.14.7-sdk';
 
 if (!isWin && !isMac && !isLinux) {
   console.warn("platform: " + process.platform + " unsupported.");

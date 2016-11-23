@@ -28,20 +28,20 @@
     "extend": "^3.0.0",
     "fs-extra": "^0.30.0",
     "isobject": "^2.1.0",
-    "jsrender": "^0.9.75",
+    "jsrender": "^0.9.83",
     "ncp": "^2.0.0",
     "pretty-seconds": "^0.1.4",
     "prettysize": "0.0.3",
-    "request": "^2.72.0",
+    "request": "^2.79.0",
     "request-progress": "^2.0.1",
-    "shell-quote": "^1.6.0",
+    "shell-quote": "^1.6.1",
     "sprintf-js": "^1.0.3",
     "strftime": "^0.9.2",
     "tar.gz": "^1.0.5"
   },
   "devDependencies": {
-    "nwjs-builder": "^1.10.4",
+    "nwjs-builder": "^1.13.1",
     "promise": "^7.1.1",
-    "yargs": "^4.7.1"
+    "yargs": "^4.8.1"
   }
 }

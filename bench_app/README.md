@@ -61,6 +61,45 @@ fixed by [cpufrequtils](http://www.thinkwiki.org/wiki/How_to_use_cpufrequtils)
 at 2.3 GHz. We might change the base frequency to 1.9 GHz in the future, because
 that is the base frequency of AVX2 on this CPU.
 
+### Start benchmark app headless
+
+``` terminal
+# in the folder where seqan-bench-app[.exe] is
+
+# using the app to launch the headless version
+./seqan-bench-app[.exe] bench_cli.js
+
+# or with node directly
+node bench_cli.js
+```
+
+Will start a headless benchmark.
+
+See `./seqan-bench-app[.exe] bench_cli.js --help` (or `node bench_cli.js --help`) for more information:
+
+``` terminal
+Usage: node bench_cli.js -tc [THREADS] -c [CONFIG] -o [OUTPUT] --html [HTML]
+
+Options:
+  --version      Show version number                                             [boolean]
+  -v, --verbose  be verbose                                                      [boolean]
+  -t, --threads  The number of threads the benchmark should use in the multi-core run.
+                                                                     [number] [default: 4]
+  -c, --config   CONFIG file that defines the benchmarks.
+                                                  [string] [default: "config/config.json"]
+  -o, --output   Write results to OUTPUT.
+                                        [string] [default: "results-20160601-140243.json"]
+  --merge        Merge results given by `./bench_cli --output result(1..5).json`.
+                 Usage: `./bench_cli --merge result1.json [result2.json..] --output
+                 merged_result.json --html merged_website`                         [array]
+  --html         Generate static website to HTML, that shows the results.         [string]
+  -h, --help     Show help                                                       [boolean]
+
+Examples:
+  node bench_cli.js -c config.json               Run benchmarks defined in config.json and
+       -o results.json                           write results to results.json
+```
+
 Benchmarks
 ----------
 
@@ -212,37 +251,6 @@ You can debug the gui by right click and `inspect`.
 >             "index_search_hamming_distance_validator.py" by
 >             "index_search_hamming_distance_validator.exe"
 >
-
-### Start benchmark app headless
-
-``` terminal
-# in bench/bench_app
-node bench_cli.js
-```
-
-Will start a headless benchmark.
-
-See `node bench_cli.js --help` for more information:
-
-``` terminal
-Usage: node bench_cli.js -tc [THREADS] -c [CONFIG] -o [OUTPUT] --html [HTML]
-
-Options:
-  --version      Show version number                                             [boolean]
-  -v, --verbose  be verbose                                                      [boolean]
-  -t, --threads  The number of threads the benchmark should use in the multi-core run.
-                                                                     [number] [default: 4]
-  -c, --config   CONFIG file that defines the benchmarks.
-                                                  [string] [default: "config/config.json"]
-  -o, --output   Write results to OUTPUT.
-                                        [string] [default: "results-20160601-140243.json"]
-  --html         Generate static website to HTML, that shows the results.         [string]
-  -h, --help     Show help                                                       [boolean]
-
-Examples:
-  node bench_cli.js -c config.json               Run benchmarks defined in config.json and
-       -o results.json                           write results to results.json
-```
 
 ### Package benchmark app
 

@@ -1,0 +1,41 @@
+<table class='table table-hover' style='font-size: 0.9em;'>
+  <tbody>
+    <tr>
+      <th style='width: 20%'>Operating system:</th>
+      <td style='width: 30%'>{{:system.os}}</td>
+      <th style='width: 20%'>Memory:</th>
+      <td>{{:system.memory}} GB</td>
+    </tr>
+    <tr>
+      <th>CPU:</th>
+      <td>{{:system.cpu_name}}</td>
+      <th>CPU Frequency:</th>
+      <td>{{:system.cpu_frequency}}</td>
+    </tr>
+    <tr>
+      <th>Threads:</th>
+      <td colspan="3">
+        <div class='input-group input-group-md' style="width:100%;">
+          <input id='threads-input' type="number" min="1" max="{{:system.max_threads}}" value='{{:system.max_threads}}' class='form-control'></input>
+          <span class='input-group-addon'>
+            of {{:system.max_threads}}
+          </span>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <th>Project title:</th>
+      <td colspan="3">
+          <div class='input-group input-group-md' style="width:100%;">
+              <input id='project-title' type='text' class='form-control' placeholder='e.g. seqan-2.1-gcc'value='{{:project.title}}'>
+
+              <span class='input-group-btn'>
+                  <button id='project-title-save-btn' class='btn btn-default' data-toggle='tooltip' data-placement:'left' title='save'>
+                      <span name='saved' class='glyphicon glyphicon-floppy-saved' aria-hidden='true' style='color:green'></span>
+                  </button>
+              </span>
+          </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

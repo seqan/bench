@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="js/jquery-1.11.3.js"></script>
+
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/nprogress.css">
+        <link rel="stylesheet" href="css/main.css" type="text/css"/>
+    </head>
+
+    <body style='background-color:rgba(0,0,0,0)'>
+        <script>
+            const renderer = require('jsrender');
+            const tmpl = renderer.templates('./resources/templates/gui/body.html');
+            $('body').prepend(tmpl.render({
+                'window_title': nw.Window.get().title
+            }));
+        </script>
+
+        <script src="js/gui.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/system_project.js"></script>
+        <script src="js/nprogress.js"></script>
+        <script src="js/progressbar.js"></script>
+        <script src="js/data_download.js"></script>
+    </body>
+</html>

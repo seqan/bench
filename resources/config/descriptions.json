@@ -1,0 +1,106 @@
+{
+    "categories": {
+        "index_search": {
+            "title": "Index based exact/approximate search"
+        },
+        "kmer_counting": {
+            "title": "Counting k-mers"
+        },
+        "pairwise_alignment": {
+            "title": "Pairwise Alignment"
+        }
+    },
+
+    "benchmarks": {
+        "index_exact_search": {
+            "title": "Index based exact search",
+            "subtitle": "0 errors",
+            "base_time": 10.64,
+            "category": "index_search"
+        },
+        "index_one_error_approximate_search": {
+            "title": "Index based approximate search",
+            "subtitle": "1 error in hamming distance",
+            "base_time": 191.13,
+            "category": "index_search"
+        },
+        "index_two_errors_approximate_search": {
+            "title": "Index based approximate search",
+            "subtitle": "2 errors in hamming distance",
+            "base_time": 123.97,
+            "category": "index_search"
+        },
+        "index_three_errors_approximate_search": {
+            "title": "Index based approximate search",
+            "subtitle": "3 errors in hamming distance",
+            "base_time": 270.66,
+            "category": "index_search"
+        },
+        "kmers_10mer_counting": {
+            "title": "Counting 10-mers",
+            "subtitle": "",
+            "base_time": 43.94,
+            "category": "kmer_counting"
+        },
+        "kmers_15mer_counting": {
+            "title": "Counting 15-mers",
+            "subtitle": "",
+            "base_time": 205.13,
+            "category": "kmer_counting"
+        },
+        "kmers_50mer_counting": {
+            "title": "Counting 50-mers",
+            "subtitle": "",
+            "base_time": 250.06,
+            "category": "kmer_counting"
+        },
+        "pairwise_alignment_global_affine_dna": {
+            "title": "DNA global Alignment, affine gap costs",
+            "subtitle": "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1",
+            "base_time": 245.53,
+            "category": "pairwise_alignment"
+        },
+        "pairwise_alignment_global_affine_protein": {
+            "title": "Protein global Alignment, affine gap costs",
+            "subtitle": "BLOSUM62, gap_extend: -3, gap_open: -1",
+            "base_time": 272.87,
+            "category": "pairwise_alignment"
+        },
+        "pairwise_alignment_global_linear_dna": {
+            "title": "DNA global Alignment, linear gap costs",
+            "subtitle": "match: 2, mismatch: -3, gap: -2",
+            "base_time": 181.35,
+            "category": "pairwise_alignment"
+        },
+        "pairwise_alignment_global_linear_protein": {
+            "title": "Protein global Alignment, linear gap costs",
+            "subtitle": "BLOSUM62, gap: -1",
+            "base_time": 186.74,
+            "category": "pairwise_alignment"
+        },
+        "pairwise_alignment_local_affine_dna": {
+            "title": "DNA local Alignment, affine gap costs",
+            "subtitle": "match: 2, mismatch: -3, gap_extend: -3, gap_open: -1",
+            "base_time": 311.95,
+            "category": "pairwise_alignment"
+        },
+        "pairwise_alignment_local_affine_protein": {
+            "title": "Protein local Alignment, affine gap costs",
+            "subtitle": "BLOSUM62, gap_extend: -3, gap_open: -1",
+            "base_time": 332.14,
+            "category": "pairwise_alignment"
+        },
+        "pairwise_alignment_local_linear_dna": {
+            "title": "DNA local Alignment, linear gap costs",
+            "subtitle": "match: 2, mismatch: -3, gap: -2",
+            "base_time": 232.04,
+            "category": "pairwise_alignment"
+        },
+        "pairwise_alignment_local_linear_protein": {
+            "title": "Protein local Alignment, linear gap costs",
+            "subtitle": "BLOSUM62, gap: -1",
+            "base_time": 212.04,
+            "category": "pairwise_alignment"
+        }
+    }
+}

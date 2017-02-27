@@ -1,0 +1,17 @@
+<div class="mainFrame" >
+    <div class="innerFrame">
+        <div id='titlebar' class="headBar">
+            {{include tmpl='./resources/templates/gui/titlebar.html'/}}
+            {{include tmpl='./resources/templates/gui/configuration_panel.html'/}}
+        </div>
+        <div id="panels" style="height:450px; overflow: auto; -webkit-app-region: no-drag;">
+            {{include tmpl='./resources/templates/gui/main_panels.html'/}}
+        </div>
+        {{include tmpl='./resources/templates/gui/help_window.html'/}}
+
+        <div id="footer" style="height:100px; background-color:white; border-top: 1px solid #428bca">
+            {{include tmpl='./resources/templates/gui/progressbar.html'/}}
+            {{include tmpl='./resources/templates/gui/footer_controls.html'/}}
+        </div>
+    </div>
+</div>

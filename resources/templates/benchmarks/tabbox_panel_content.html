@@ -1,0 +1,35 @@
+<h6 style='color: {{:text_color}}'>
+    &nbsp;&nbsp;&nbsp;
+    <b>{{:title}}</b>
+</h6>
+<div class='input-group input-group-md' style='margin:10px;'>
+    <span class='input-group-addon'>
+        <input id='{{:tab_panel_id}}Checkbox' prg='{{:benchmark}}' type='checkbox'>
+    </span>
+
+    <span class='input-group-addon' style='border-right-style:none'>
+        <span class='glyphicon glyphicon-console' aria-hidden='true'></span>
+    </span>
+
+    <input type='text' class='form-control' name='gInput' placeholder='>_' id='{{:tab_panel_id}}Input' prg='{{:benchmark}}' value='{{:benchmark_command}}'>
+
+    <span class='input-group-addon' id='{{:tab_panel_id}}_fixed_cmd' style='border-left-style:none;' title='./results/{{:benchmark}}.single_core.result.txt -tc 1'>
+        <span style="width: 15em; display: block; overflow-x: auto; line-height: 1.1em;">./results/{{:benchmark}}.single_core.result.txt -tc 1</span>
+    </span>
+    <script>
+        $('#{{:tab_panel_id}}_fixed_cmd span').scrollLeft( 100000 );
+    </script>
+
+    <span class='input-group-btn'>
+        <button type='button' id='{{:tab_panel_id}}Reset' class='btn btn-default' prg='{{:benchmark}}'>Reset</button>
+
+        <button id='{{:tab_panel_id}}Help' class='btn btn-default' data-toggle='collapse' data-target='#{{:tab_panel_id}}HelpContent' aria-expanded='false' aria-controls='#{{:tab_panel_id}}HelpContent'>
+            <span class='glyphicon glyphicon-book' aria-hidden='true' style='color:gray'></span>
+        </button>
+
+        <button id='{{:tab_panel_id}}Saved' class='btn btn-default' data-toggle='tooltip' data-placement:'left' title='save'>
+            <span name='saved' prg='{{:benchmark}}' class='glyphicon glyphicon-floppy-saved' aria-hidden='true' style='color:green'></span>
+        </button>
+    </span>
+</div>
+<div class='collapse' id='{{:tab_panel_id}}HelpContent' style='padding-left:15px; margin: 0px; overflow: auto'></div>

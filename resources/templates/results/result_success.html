@@ -1,0 +1,35 @@
+<tr>
+    <td>
+        <h6>{{:row_id}}</h6>
+    </td>
+    <td>
+        <h6>{{:benchmark_name}}</h6>
+    </td>
+    <td>
+        <h6>
+            <span class='glyphicon glyphicon-ok' style='color:#5cb85c' aria-hidden='true'></span>
+            {{:message}}
+
+            {{include tmpl='./resources/templates/widgets/stdout_modal.html'/}}
+            {{include tmpl='./resources/templates/widgets/stderr_modal.html'/}}
+        </h6>
+    </td>
+    <td>
+        <h6>
+            {{if validator.quality == 1}}
+                <span class='glyphicon glyphicon-ok' style='color:#5cb85c' aria-hidden='true'></span>
+            {{else validator.quality == 0}}
+                <span class='glyphicon glyphicon-remove' style='color:#d9534f' aria-hidden='true'></span>
+            {{else}}
+                <span class="label label-pill label-info">{{:validator.quality*100}}%</span>
+            {{/if}}
+            output
+
+            {{include validator tmpl='./resources/templates/widgets/stdout_modal.html'/}}
+            {{include validator tmpl='./resources/templates/widgets/stderr_modal.html'/}}
+        </h6>
+    </td>
+    <td style='width:15%;'>
+        <h6>{{:runtime}}</h6>
+    </td>
+</tr>

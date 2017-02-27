@@ -1,0 +1,52 @@
+{
+  "name": "seqan-bench-app",
+  "main": "resources/index.html",
+  "license": "BSD-3-Clause",
+  "description": "An app that benchmarks biological problems.",
+  "version": "1.1.0",
+  "seqan-bench-app": {
+    "data-url": "https://github.com/marehr/bench/releases/download/v1.0.0/data.tar.gz",
+    "seqan-src-version": "seqan-v2.2.0",
+    "nwjs-version": "0.14.7-sdk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seqan/bench"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "private": true,
+  "window": {
+    "title": "Seqan Benchmark",
+    "icon": "./resources/icons/nw_256x256x32.png",
+    "toolbar": false,
+    "frame": false,
+    "width": 770,
+    "height": 615,
+    "min_width": 770,
+    "min_height": 615,
+    "transparent": true
+  },
+  "chromium-args": "--enable-transparent-visuals --disable-gpu",
+  "dependencies": {
+    "extend": "^3.0.0",
+    "fs-extra": "^0.30.0",
+    "isobject": "^2.1.0",
+    "jsrender": "^0.9.83",
+    "ncp": "^2.0.0",
+    "pretty-seconds": "^0.1.4",
+    "prettysize": "0.0.3",
+    "request": "^2.79.0",
+    "request-progress": "^2.0.1",
+    "shell-quote": "^1.6.1",
+    "sprintf-js": "^1.0.3",
+    "strftime": "^0.9.2",
+    "tar.gz": "^1.0.5",
+    "yargs": "^4.8.1",
+    "promise": "^7.1.1"
+  },
+  "devDependencies": {
+    "nwjs-builder": "^1.13.1"
+  }
+}

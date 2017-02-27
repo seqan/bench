@@ -1,0 +1,3 @@
+{
+    "helpContent":"<b>DEFAULT</b><p><p>./std_bench/global_alignment_protein ./std_bench/data/uniprot_1000.fa std_bench/data/result_pw_global_protein.txt -tc 4<p><b>SYNOPSIS</b><p><b>Global Pairwise Alignment benchmark demo (Protein)</b> [OPTIONS] IN OUT <p><b>DESCRIPTION</b><p>IN is a .fa / fasta input file. OUT is a txt output file.<p><b>Settings:</b><p><b>-tc, --threads</b> INT<p>Number of threads Default: 4.<p><b>VERSION</b><p>Last update: Nov 2015<p>Local Pairwise Alignment benchmark demo version: 0.1<p>SeqAn version: 2.1.0<p>"
+}

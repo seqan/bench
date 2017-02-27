@@ -1,0 +1,263 @@
+/*
+==========================================================================
+Bootstrap style changes
+==========================================================================*/
+
+/*
+--------------------------------------------------------------------------
+basic.css
+--------------------------------------------------------------------------*/
+
+body {
+    background: #888;
+}
+
+#wrapper {
+    background: #fff; /*color-navbar-side-bottom-*/
+    margin-left: 5%;
+/*    min-width: 1000px;*/
+    width: 90%;
+}
+
+#page-wrapper {
+    background: #E7E7E7; /*color-mainpage*/
+    min-height: 500px;
+    /*min-width: 1000px;*/
+}
+
+#page-inner {
+    background-color: #fff!important; /*color-innerpage*/
+    border: 2px solid black;
+    padding: 5px;
+    min-height: 1200px;
+    box-shadow: 5px -5px 5px #888;
+}
+
+#page-inner-result {
+    width: 100%;
+    margin: 10px 20px 10px 0px;
+    background-color: #fff!important; /*color-innerpage*/
+/*    border-radius:25px;*/
+    border: 2px solid black;
+    box-shadow: 5px -5px 5px #888;
+    min-height: 1200px;
+}
+
+.navbar-cls-top .navbar-brand {
+    color: #000;
+    background: #E7E7E7;
+}
+
+.navbar-cls-top .navbar-brand:hover {
+    background: #fff;
+    color: #000;
+}
+
+.active-menu {
+    background-color: #fff!important;
+}
+
+.active-menu-top {
+    background-color: #fff!important;
+}
+
+.active > li {
+    background-color: #000;
+}
+
+ .sidebar-collapse .nav > li > a {
+    color: #000;
+    background: #fff;
+    border-bottom: 1px solid #888;
+    border-top: 0px solid #888;
+}
+
+.sidebar-collapse .nav > li > a:hover,
+.sidebar-collapse .nav > li > a:focus {
+    background: #f5f5f5;
+}
+
+.navbar-side {
+    background-color: #fff;
+}
+
+.navbar-cls-top {
+    background: #fff;
+}
+
+.navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+    background-color: #fff;
+}
+
+.navbar-default .navbar-toggle {
+    border-color: #E7E7E7;
+}
+
+ .navbar-default .navbar-toggle .icon-bar {
+    background-color: #E7E7E7;
+}
+
+#footer-sec {
+    background-color:#888;
+    color:#000;
+}
+
+ #footer-sec a {
+        color:#000;
+}
+ #footer-sec a:hover,a:focus {
+        color:#000;
+}
+
+/*
+--------------------------------------------------------------------------
+bootstrap.css
+--------------------------------------------------------------------------*/
+
+.table th {
+    background-color: #000 !important;
+}
+
+.btn > .caret,
+.dropup > .btn > .caret {
+    border-top: 1px solid #888;
+}
+
+output {
+    background-color: #333;
+}
+
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:hover,
+.navbar-default .navbar-nav > .open > a:focus {
+    color: #888;
+}
+
+.progress {
+    height: 25px;
+}
+
+.progress-bar[aria-valuenow="1"],
+.progress-bar[aria-valuenow="2"] {
+    min-width: 0px;
+}
+
+.progress-bar[aria-valuenow="0"] {
+    min-width: 0px;
+}
+
+.panel-title {
+    font-size: 12px;
+}
+
+.panel-title > a {
+    font-size: 12pt;
+}
+
+.panel-default {
+    border: 1px solid #ddd;
+}
+
+.panel-default > .panel-heading {
+    border-color: #888;
+}
+
+
+/*
+--------------------------------------------------------------------------
+Result page Content
+--------------------------------------------------------------------------*/
+
+#template-category {
+    display: none;
+}
+#template-subcategory {
+    display: none;
+}
+#template-result {
+    display: none;
+}
+#template-summary {
+    display: none;
+}
+
+.result-header {
+    /*background-image: url('numbers.jpg');*/
+    background-color: #282828;
+    /*text-shadow: 1px 0px 2px #fff;*/
+    /*-webkit-box-reflect: below -30px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(255, 255, 255, 0.3)));*/
+    color: #ffdb4d;
+    margin-left: 15px;
+    margin-right: 15px;
+    text-align: center;
+    padding-bottom: 3px;
+    padding-top: 1px;
+    border-bottom: 2px solid black;
+    /*border-radius: 22px 22px 0px 0px;*/
+}
+
+.result-header h3 {
+    /*margin-top: -2px;*/
+    /*height: 50px;*/
+    /*-webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), to(rgba(255, 255, 255, 0.3)));*/
+}
+
+.result-comparison {
+    text-align: center;
+}
+.result-comparison-theirs {
+    border-right: 2px solid #888;
+}
+.result-comparison-theirs, .result-comparison-seqan {
+    padding-bottom: 20px;
+}
+
+.result-comparison-score {
+    font-size: 200%;
+}
+
+.result-comparison-text {
+    color: black;
+}
+
+.result-bar{
+    font-size: 10pt;
+    background-color: rgb(86, 165, 236);
+    color: black;
+}
+
+.table-system {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 0px;
+    margin-left: 5px;
+}
+.table-system > thead > tr > th,
+.table-system > tbody > tr > th,
+.table-system > tfoot > tr > th,
+.table-system > thead > tr > td,
+.table-system > tbody > tr > td,
+.table-system > tfoot > tr > td {
+    padding: -5px;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+    padding-right: 2px;
+}
+.table-system > thead > tr > th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #ddd;
+}
+.table-system > caption + thead > tr:first-child > th,
+.table-system > colgroup + thead > tr:first-child > th,
+.table-system > thead:first-child > tr:first-child > th,
+.table-system > caption + thead > tr:first-child > td,
+.table-system > colgroup + thead > tr:first-child > td,
+.table-system > thead:first-child > tr:first-child > td {
+    border-top: 0;
+}
+.table-system > tbody + tbody {
+    border-top: 2px solid #ddd;
+}
+.table-system .table-system {
+    background-color: #fff;
+}

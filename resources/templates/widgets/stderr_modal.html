@@ -1,0 +1,9 @@
+{{if stdout_modal.stdout}}
+    <span class='glyphicon glyphicon-list-alt' style='cursor: pointer;' title="stdout" data-toggle="modal" data-target="#{{:stdout_modal.id}}"></span>
+    {{include stdout_modal tmpl='./resources/templates/widgets/modal_dialog.html'}}
+    <h3>stdout:</h3>
+    <pre class='pre-scrollable'>{{:stdout}}</pre>
+    <h3>cmd:</h3>
+    <input type="text" class="form-control" value='{{>cmd}}'></input>
+    {{/include}}
+{{/if}}

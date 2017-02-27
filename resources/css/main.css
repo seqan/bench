@@ -1,0 +1,190 @@
+body {
+    -webkit-app-region: drag;
+    margin:0px;
+    /*height:600px;*/
+    /*width:760px;*/
+    border-radius:5px;
+    background-color:rgba(0,0,0,0)
+}
+
+button {
+    -webkit-app-region: no-drag;
+}
+
+form {
+    -webkit-app-region: no-drag;
+}
+
+input {
+    -webkit-app-region: no-drag;
+}
+
+span {
+    -webkit-app-region: no-drag;
+}
+
+.mainFrame {
+    /*position:absolute;*/
+    margin: 5px;
+    /*left:10px;*/
+    /*top:10px;*/
+    /*height:600px; */
+    /*width:750px;*/
+    border-radius:5px;
+    background-color:white;
+    box-shadow:1px 1px 10px gray
+}
+
+.confFrame {
+    left:19px;
+    position:fixed;
+    background:#F5F5F5;
+    z-index:3;
+    height:300px;
+    box-shadow: 0px 5px 30px  gray;
+    width: 730px;
+    border-bottom-left-radius:4px;
+    border-bottom-right-radius:4px;
+    display:none
+}
+
+.innerFrame {
+    border-radius:5px;
+    /*height:100%;*/
+    /*width:100%*/
+}
+
+.headBar{
+    margin:0 0 0 0;
+    height: 40px;
+    border-top-left-radius:5px;
+    border-top-right-radius:5px;
+    background-color:#337ab7
+}
+
+._btn-noborder {
+    border-style:None;
+    height:40px;
+    width:40px
+}
+
+.progress{
+    -webkit-app-region: no-drag;
+}
+
+::-webkit-scrollbar{
+    display: none;
+}
+
+/*.input-xs {
+    height: 22px;
+    padding: 2px 5px;
+    font-size: 12px;
+    line-height: 1.5; //If Placeholder of the input is moved up, rem/modify this.
+    border-radius: 3px;
+}*/
+
+/*
+.box-shadow--2dp {
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12)
+}
+.box-shadow--3dp {
+    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, .14), 0 3px 3px -2px rgba(0, 0, 0, .2), 0 1px 8px 0 rgba(0, 0, 0, .12)
+}
+.box-shadow--4dp {
+    box-shadow: 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 rgba(0, 0, 0, .12), 0 2px 4px -1px rgba(0, 0, 0, .2)
+}
+.box-shadow--6dp {
+    box-shadow: 0 6px 10px 0 rgba(0, 0, 0, .14), 0 1px 18px 0 rgba(0, 0, 0, .12), 0 3px 5px -1px rgba(0, 0, 0, .2)
+}
+.box-shadow--8dp {
+    box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12), 0 5px 5px -3px rgba(0, 0, 0, .2)
+}
+.box-shadow--16dp {
+    box-shadow: 0 16px 24px 2px rgba(0, 0, 0, .14), 0 6px 30px 5px rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2)
+}*/
+
+#panels .panel{
+    box-shadow:1px 5px 10px #888888;
+    margin-bottom: 5px;
+}
+
+.bs-callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 0px solid #eee;
+    border-left-width: 4px;
+    /*border-radius: 3px;*/
+}
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.bs-callout p:last-child {
+    margin-bottom: 0;
+}
+.bs-callout code {
+    /*border-radius: 3px;*/
+}
+.bs-callout+.bs-callout {
+    margin-top: -5px;
+}
+.bs-callout-default {
+    border-left-color: #777;
+}
+
+.bs-callout-default h5 {
+    color: #777;
+}
+
+.bs-callout-primary {
+    border-left-color: #428bca;
+}
+.bs-callout-primary h5 {
+    color: #428bca;
+}
+
+.bs-callout-success {
+    border-left-color: #5cb85c;
+}
+.bs-callout-success h5 {
+    color: #5cb85c;
+}
+
+.bs-callout-danger {
+    border-left-color: #d9534f;
+}
+.bs-callout-danger h5 {
+    color: #d9534f;
+}
+
+.bs-callout-warning {
+    border-left-color: #f0ad4e;
+}
+.bs-callout-warning h5 {
+    color: #f0ad4e;
+}
+
+.bs-callout-info {
+    border-left-color: #5bc0de;
+}
+.bs-callout-info h5 {
+    color: #5bc0de;
+}
+
+.input-group{
+    border-radius: 0px
+}
+
+h6{
+    margin: 0px;
+}
+
+.modal-backdrop{
+    position: absolute;
+    /*left: 10px;*/
+    /*top: 10px;*/
+    /*height: 600px;*/
+    /*width: 750px*/
+
+}

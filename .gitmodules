@@ -1,0 +1,3 @@
+[submodule "benchmarks_src"]
+	path = benchmarks_src
+	url = https://github.com/seqan/seqan_bench_code.git

@@ -162,9 +162,12 @@ Building from source
 
 Download source code
 
+Note: We use git submodule to seperate our benchmarks from the actual tool
+so you need to clone the repository recursively (Git version > 1.6.5)
+
 ``` terminal
-git clone -b bench_app https://github.com/marehr/bench.git
-cd bench/bench_app
+git clone --recursive https://github.com/seqan/bench.git bench_app
+cd bench_app
 ```
 
 Download seqan source code
